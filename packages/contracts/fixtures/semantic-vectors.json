@@ -1,0 +1,19 @@
+{
+  "format": "context-foundry-semantic-vectors-1",
+  "schema_version": "0.2.0",
+  "cases": [
+    {"name":"file-normal-path","schema":"captured_file","valid":true,"value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src/A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bytes":12,"media_kind":"text/plain","classification":"internal"}},
+    {"name":"file-parent-traversal","schema":"captured_file","valid":false,"value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src/../A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bytes":12,"media_kind":"text/plain","classification":"internal"}},
+    {"name":"file-backslash","schema":"captured_file","valid":false,"value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src\\A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bytes":12,"media_kind":"text/plain","classification":"internal"}},
+    {"name":"locator-line-order","schema":"evidence_locator","valid":false,"value":{"kind":"file_range","evidence_id":"ev:1","source_id":"source:1","snapshot_id":"snap:1","revision_kind":"git","path":"src/A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","start_line":9,"end_line":3}},
+    {"name":"locator-byte-order","schema":"evidence_locator","valid":false,"value":{"kind":"file","evidence_id":"ev:1","source_id":"source:1","snapshot_id":"snap:1","revision_kind":"git","path":"src/A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","byte_span":{"start":5,"end":5}}},
+    {"name":"locator-valid-range","schema":"evidence_locator","valid":true,"value":{"kind":"file_range","evidence_id":"ev:1","source_id":"source:1","snapshot_id":"snap:1","revision_kind":"git","path":"src/A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","start_line":3,"end_line":9}},
+    {"name":"coverage-exceeds-eligible","schema":"coverage","valid":false,"value":{"schema_version":"0.2.0","source_id":"source:1","capture_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","adapter_id":"adapter:1","artifact_family":"java","supported_patterns":[],"eligible_count":2,"processed_count":2,"failed_count":1,"excluded_count":0,"known_unsupported":[],"diagnostic_refs":[],"status":"partial","reason":"failed item"}},
+    {"name":"coverage-within-eligible","schema":"coverage","valid":true,"value":{"schema_version":"0.2.0","source_id":"source:1","capture_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","adapter_id":"adapter:1","artifact_family":"java","supported_patterns":[],"eligible_count":3,"processed_count":2,"failed_count":1,"excluded_count":0,"known_unsupported":[],"diagnostic_refs":[],"status":"partial","reason":"failed item"}},
+    {"name":"callable-missing-signature","schema":"engineering_symbol_payload","valid":false,"value":{"name":"run","artifact_kind":"method","language":"java"}},
+    {"name":"callable-with-signature","schema":"engineering_symbol_payload","valid":true,"value":{"name":"run","artifact_kind":"method","language":"java","signature":"run()"}},
+    {"name":"bounded-without-scope","schema":"business_rule_payload","valid":false,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"bounded"}}},
+    {"name":"unknown-with-scope","schema":"business_rule_payload","valid":false,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"unknown","product_ids":["product:1"]}}},
+    {"name":"unknown-without-scope","schema":"business_rule_payload","valid":true,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"unknown"}}}
+  ]
+}
