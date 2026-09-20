@@ -2,10 +2,10 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains nine
+**Implementation note (2026-09-20):** `packages/contracts` now contains twelve
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
-coverage, release manifest, task artifact, human decision receipt, task error and
-evaluation run manifest), static TypeScript types, strict Ajv runtime validators
+captured file, coverage, release manifest/set, relationship payload, task artifact,
+human decision receipt, task error and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
 tests exist. This is only a WP1 subset: registered payload-kind validation, body
 subschemas, support closure, semantic cross-record checks and cross-language
@@ -15,8 +15,11 @@ an envelope passing schema validation as a reviewed or fully supported assertion
 
 The capture/locator/coverage envelopes were reconciled with the more precise
 [extraction and binding contract](extraction-and-source-binding.md) before freeze.
-Their individual normalized-path, line/byte-order and coverage-count checks do not
-yet prove a locator belongs to a capture or that a digest matches local source.
+Their individual normalized-path, line/byte-order and coverage-count checks are
+supplemented by `checkCaptureBindings`, which compares source/snapshot/revision/path
+and captured-file digests without reading source. It does not prove the captured
+file's digest matches current local bytes, verify manifest digest closure or grant
+access.
 
 ## Identity and versioning
 

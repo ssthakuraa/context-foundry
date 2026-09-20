@@ -1,0 +1,71 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:captured-file",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "bytes": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "classification": {
+      "anyOf": [
+        {
+          "const": "public",
+          "type": "string"
+        },
+        {
+          "const": "internal",
+          "type": "string"
+        },
+        {
+          "const": "restricted",
+          "type": "string"
+        }
+      ]
+    },
+    "file_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "language_kind": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "media_kind": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "path": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_id",
+    "snapshot_id",
+    "path",
+    "file_digest",
+    "bytes",
+    "media_kind",
+    "classification"
+  ],
+  "type": "object"
+}

@@ -1,0 +1,56 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:release-set",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "cross_pack_bridge_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "packs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "manifest_digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "pack_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "release_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "pack_id",
+          "release_id",
+          "manifest_digest"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "release_set_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "release_set_id",
+    "packs",
+    "cross_pack_bridge_digest"
+  ],
+  "type": "object"
+}

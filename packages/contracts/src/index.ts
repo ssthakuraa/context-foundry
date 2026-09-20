@@ -26,6 +26,19 @@ export const SourceCaptureSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:source-capture', additionalProperties: false });
 export type SourceCapture = Static<typeof SourceCaptureSchema>;
 
+export const CapturedFileSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  source_id: id(),
+  snapshot_id: id(),
+  path: Type.String({ minLength: 1, maxLength: 4096 }),
+  file_digest: digest(),
+  bytes: Type.Integer({ minimum: 0 }),
+  media_kind: id(),
+  language_kind: Type.Optional(id()),
+  classification: Type.Union([Type.Literal('public'), Type.Literal('internal'), Type.Literal('restricted')]),
+}, { $id: 'urn:context-foundry:schema:0.2.0:captured-file', additionalProperties: false });
+export type CapturedFile = Static<typeof CapturedFileSchema>;
+
 const LocatorBase = {
   source_id: id(),
   snapshot_id: id(),
@@ -125,6 +138,31 @@ export const ReleaseManifestSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:release-manifest', additionalProperties: false });
 export type ReleaseManifest = Static<typeof ReleaseManifestSchema>;
 
+const ReleaseSetEntry = Type.Object({
+  pack_id: id(), release_id: id(), manifest_digest: digest(),
+}, { additionalProperties: false });
+export const ReleaseSetSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  release_set_id: id(),
+  packs: Type.Array(ReleaseSetEntry, { minItems: 1 }),
+  cross_pack_bridge_digest: digest(),
+}, { $id: 'urn:context-foundry:schema:0.2.0:release-set', additionalProperties: false });
+export type ReleaseSet = Static<typeof ReleaseSetSchema>;
+
+export const RelationshipPayloadSchema = Type.Object({
+  subject_id: id(),
+  object_id: id(),
+  relation_type: Type.String({ pattern: '^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$' }),
+  direction: Type.Union([Type.Literal('subject_to_object'), Type.Literal('object_to_subject')]),
+  resolution_method: Type.Union([
+    Type.Literal('syntax'), Type.Literal('semantic_index'), Type.Literal('framework_rule'),
+    Type.Literal('reviewed_mapping'), Type.Literal('observed_run'),
+  ]),
+  evidence_refs: Type.Array(id(), { minItems: 1, uniqueItems: true }),
+  supporting_record_refs: refs(),
+}, { $id: 'urn:context-foundry:schema:0.2.0:relationship-payload', additionalProperties: false });
+export type RelationshipPayload = Static<typeof RelationshipPayloadSchema>;
+
 export const TaskArtifactSchema = Type.Object({
   schema_version: Type.Literal(CONTRACT_VERSION),
   artifact_id: id(),
@@ -206,10 +244,13 @@ export type EvaluationRunManifest = Static<typeof EvaluationRunManifestSchema>;
 
 export const Schemas = {
   source_capture: SourceCaptureSchema,
+  captured_file: CapturedFileSchema,
   evidence_locator: EvidenceLocatorSchema,
   record_envelope: RecordEnvelopeSchema,
   coverage: CoverageSchema,
   release_manifest: ReleaseManifestSchema,
+  release_set: ReleaseSetSchema,
+  relationship_payload: RelationshipPayloadSchema,
   task_artifact: TaskArtifactSchema,
   human_decision_receipt: HumanDecisionReceiptSchema,
   task_error: TaskErrorSchema,
@@ -222,13 +263,18 @@ const validators = Object.fromEntries(
   Object.entries(Schemas).map(([name, schema]) => [name, ajv.compile(schema)]),
 ) as Record<SchemaName, ValidateFunction>;
 
+function normalizedRelativePath(path: string): boolean {
+  const parts = path.split('/');
+  return !path.startsWith('/') && !path.includes('\\') &&
+    !/[\u0000-\u001f\u007f]/.test(path) && !/^[a-zA-Z]:/.test(path) &&
+    parts.every(part => !!part && part !== '.' && part !== '..');
+}
+
 function semanticErrors(name: SchemaName, value: unknown): string[] {
   if (name === 'evidence_locator') {
     const locator = value as EvidenceLocator;
     const errors: string[] = [];
-    const parts = locator.path.split('/');
-    if (locator.path.startsWith('/') || locator.path.includes('\\') || /[\u0000-\u001f\u007f]/.test(locator.path) ||
-        /^[a-zA-Z]:/.test(locator.path) || parts.some(part => !part || part === '.' || part === '..')) {
+    if (!normalizedRelativePath(locator.path)) {
       errors.push('/path must be a normalized relative POSIX path');
     }
     if (locator.kind === 'file_range' && locator.start_line > locator.end_line) {
@@ -239,10 +285,28 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
     }
     return errors;
   }
+  if (name === 'captured_file') {
+    return normalizedRelativePath((value as CapturedFile).path)
+      ? [] : ['/path must be a normalized relative POSIX path'];
+  }
   if (name === 'coverage') {
     const coverage = value as Coverage;
     return coverage.processed_count + coverage.failed_count + coverage.excluded_count > coverage.eligible_count
       ? ['/eligible_count must cover processed, failed and excluded items'] : [];
+  }
+  if (name === 'release_set') {
+    const packs = (value as ReleaseSet).packs;
+    return new Set(packs.map(pack => pack.pack_id)).size === packs.length
+      ? [] : ['/packs must contain each pack_id at most once'];
+  }
+  if (name === 'record_envelope') {
+    const record = value as RecordEnvelope;
+    if (record.kind === 'engineering.relationship') {
+      if (!validators.relationship_payload(record.payload)) return ['/payload must conform to relationship_payload'];
+      const relationship = record.payload as RelationshipPayload;
+      return relationship.evidence_refs.every(ref => record.evidence_refs.includes(ref))
+        ? [] : ['/evidence_refs must include relationship payload support'];
+    }
   }
   return [];
 }
@@ -261,4 +325,73 @@ export function validateDetailed(name: SchemaName, value: unknown): { valid: boo
 
 export function validate(name: SchemaName, value: unknown): boolean {
   return validateDetailed(name, value).valid;
+}
+
+export type BindingIssueCode =
+  | 'INVALID_CAPTURE' | 'DUPLICATE_CAPTURE' | 'INVALID_FILE' | 'UNBOUND_FILE'
+  | 'DUPLICATE_PATH' | 'INVALID_LOCATOR' | 'UNBOUND_LOCATOR_SOURCE'
+  | 'REVISION_MISMATCH' | 'MISSING_FILE' | 'FILE_DIGEST_MISMATCH';
+
+export type BindingIssue = {
+  code: BindingIssueCode;
+  item: 'capture' | 'file' | 'locator';
+  index: number;
+};
+
+/** Metadata-only consistency check. It does not read files or confer authorization. */
+export function checkCaptureBindings(
+  captures: readonly SourceCapture[],
+  files: readonly CapturedFile[],
+  locators: readonly EvidenceLocator[],
+): readonly BindingIssue[] {
+  const issues: BindingIssue[] = [];
+  const captureKey = (source: string, snapshot: string) => JSON.stringify([source, snapshot]);
+  const fileKey = (source: string, snapshot: string, path: string) => JSON.stringify([source, snapshot, path]);
+  const capturesByKey = new Map<string, SourceCapture>();
+  const filesByKey = new Map<string, CapturedFile>();
+
+  captures.forEach((capture, index) => {
+    if (!validate('source_capture', capture)) {
+      issues.push({ code: 'INVALID_CAPTURE', item: 'capture', index });
+      return;
+    }
+    const key = captureKey(capture.source_id, capture.snapshot_id);
+    if (capturesByKey.has(key)) issues.push({ code: 'DUPLICATE_CAPTURE', item: 'capture', index });
+    else capturesByKey.set(key, capture);
+  });
+
+  files.forEach((file, index) => {
+    if (!validate('captured_file', file)) {
+      issues.push({ code: 'INVALID_FILE', item: 'file', index });
+      return;
+    }
+    if (!capturesByKey.has(captureKey(file.source_id, file.snapshot_id))) {
+      issues.push({ code: 'UNBOUND_FILE', item: 'file', index });
+      return;
+    }
+    const key = fileKey(file.source_id, file.snapshot_id, file.path);
+    if (filesByKey.has(key)) issues.push({ code: 'DUPLICATE_PATH', item: 'file', index });
+    else filesByKey.set(key, file);
+  });
+
+  locators.forEach((locator, index) => {
+    if (!validate('evidence_locator', locator)) {
+      issues.push({ code: 'INVALID_LOCATOR', item: 'locator', index });
+      return;
+    }
+    const capture = capturesByKey.get(captureKey(locator.source_id, locator.snapshot_id));
+    if (!capture) {
+      issues.push({ code: 'UNBOUND_LOCATOR_SOURCE', item: 'locator', index });
+      return;
+    }
+    if (capture.revision_kind !== locator.revision_kind || capture.revision_value !== locator.revision_value) {
+      issues.push({ code: 'REVISION_MISMATCH', item: 'locator', index });
+    }
+    const file = filesByKey.get(fileKey(locator.source_id, locator.snapshot_id, locator.path));
+    if (!file) issues.push({ code: 'MISSING_FILE', item: 'locator', index });
+    else if (file.file_digest !== locator.file_digest) {
+      issues.push({ code: 'FILE_DIGEST_MISMATCH', item: 'locator', index });
+    }
+  });
+  return issues;
 }

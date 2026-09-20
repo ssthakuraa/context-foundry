@@ -7,10 +7,11 @@ includes source/authority/snapshot identities, revision kind/value, file-manifes
 digest, publication-policy reference and capture producer. The locator schema
 carries source/snapshot identity, relative path and file digest, with separate
 file, file-range and document-section shapes. Strict semantic validation rejects
-non-normalized relative paths and reversed line/byte bounds. These are envelope
-checks only: per-file manifests, symlink/case-collision checks, capture-to-locator
-binding and actual digest comparison remain for WP1/WP2. The contract version is
-not frozen.
+non-normalized relative paths and reversed line/byte bounds. A captured-file
+envelope and metadata-only binding check now distinguish missing files, revision
+drift and locator/file digest disagreement across separate source identities.
+Manifest-digest closure, symlink/case-collision checks, live local-byte comparison
+and authorization remain for WP1/WP2. The contract version is not frozen.
 
 Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
 supported patterns; it does not promise a complete program-analysis engine.

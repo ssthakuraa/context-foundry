@@ -40,10 +40,10 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
-<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains nine
+<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twelve
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
-coverage, release manifest, task artifact, human decision receipt, task error and
-evaluation run manifest), static TypeScript types, strict Ajv runtime validators
+captured file, coverage, release manifest/set, relationship payload, task artifact,
+human decision receipt, task error and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
 tests exist. This is only a WP1 subset: registered payload-kind validation, body
 subschemas, support closure, semantic cross-record checks and cross-language
@@ -52,8 +52,11 @@ human identity or authorization; the server must issue and verify it. Do not tre
 an envelope passing schema validation as a reviewed or fully supported assertion.</p>
 <p>The capture/locator/coverage envelopes were reconciled with the more precise
 <a href="extraction-and-source-binding.html">extraction and binding contract</a> before freeze.
-Their individual normalized-path, line/byte-order and coverage-count checks do not
-yet prove a locator belongs to a capture or that a digest matches local source.</p>
+Their individual normalized-path, line/byte-order and coverage-count checks are
+supplemented by <code>checkCaptureBindings</code>, which compares source/snapshot/revision/path
+and captured-file digests without reading source. It does not prove the captured
+file's digest matches current local bytes, verify manifest digest closure or grant
+access.</p>
 <h2 id="identity-and-versioning">Identity and versioning</h2>
 <p>An entity ID combines logical repository or document namespace with adapter-owned
 artifact identity. A record ID identifies an assertion about an entity; a content

@@ -5,7 +5,7 @@ import { CONTRACT_VERSION, Schemas, validate, validateDetailed } from '../src/in
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 9);
+  assert.equal(Object.keys(Schemas).length, 12);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -127,4 +127,46 @@ test('evaluation manifest records comparable arm and unknown cache state', () =>
   assert.equal(validate('evaluation_run_manifest', manifest), true);
   assert.equal(validate('evaluation_run_manifest', { ...manifest, arm: 'uncontrolled' }), false);
   assert.equal(validate('evaluation_run_manifest', { ...manifest, attempt: 0 }), false);
+});
+
+test('captured files keep source identity separate from path', () => {
+  const file = {
+    schema_version: CONTRACT_VERSION, source_id: 'repo:A', snapshot_id: 'snap:1',
+    path: 'src/Service.java', file_digest: hash, bytes: 123, media_kind: 'text/plain',
+    language_kind: 'java', classification: 'internal',
+  };
+  assert.equal(validate('captured_file', file), true);
+  assert.equal(validate('captured_file', { ...file, source_id: 'repo:B' }), true);
+  assert.equal(validate('captured_file', { ...file, path: '/etc/passwd' }), false);
+  assert.equal(validate('captured_file', { ...file, path: 'src/../secret' }), false);
+});
+
+test('release sets pin one version per pack', () => {
+  const entry = { pack_id: 'pack:A', release_id: 'release:1', manifest_digest: hash };
+  const releaseSet = {
+    schema_version: CONTRACT_VERSION, release_set_id: 'set:1', packs: [entry],
+    cross_pack_bridge_digest: hash,
+  };
+  assert.equal(validate('release_set', releaseSet), true);
+  assert.equal(validate('release_set', { ...releaseSet, packs: [entry, { ...entry, release_id: 'release:2' }] }), false);
+  assert.equal(validate('release_set', { ...releaseSet, packs: [] }), false);
+});
+
+test('declared relationship records require a supported payload shape', () => {
+  const payload = {
+    subject_id: 'repo:A:java:Foo.m(int)', object_id: 'repo:B:java:Bar.n()',
+    relation_type: 'engineering.calls', direction: 'subject_to_object',
+    resolution_method: 'syntax', evidence_refs: ['ev:1'], supporting_record_refs: [],
+  };
+  assert.equal(validate('relationship_payload', payload), true);
+  const record = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:rel:1', entity_id: payload.subject_id,
+    kind: 'engineering.relationship', owner_id: 'team:demo', origin: 'static_resolution',
+    review: { state: 'not_required' }, payload, evidence_refs: ['ev:1'],
+    dependency_refs: [], classification: 'internal',
+  };
+  assert.equal(validate('record_envelope', record), true);
+  assert.equal(validate('record_envelope', { ...record, payload: { ...payload, evidence_refs: [] } }), false);
+  assert.equal(validate('record_envelope', { ...record, payload: { ...payload, resolution_method: 'name_match' } }), false);
+  assert.equal(validate('record_envelope', { ...record, evidence_refs: ['ev:other'] }), false);
 });

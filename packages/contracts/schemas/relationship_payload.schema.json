@@ -1,0 +1,86 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:relationship-payload",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "direction": {
+      "anyOf": [
+        {
+          "const": "subject_to_object",
+          "type": "string"
+        },
+        {
+          "const": "object_to_subject",
+          "type": "string"
+        }
+      ]
+    },
+    "evidence_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "object_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "relation_type": {
+      "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+      "type": "string"
+    },
+    "resolution_method": {
+      "anyOf": [
+        {
+          "const": "syntax",
+          "type": "string"
+        },
+        {
+          "const": "semantic_index",
+          "type": "string"
+        },
+        {
+          "const": "framework_rule",
+          "type": "string"
+        },
+        {
+          "const": "reviewed_mapping",
+          "type": "string"
+        },
+        {
+          "const": "observed_run",
+          "type": "string"
+        }
+      ]
+    },
+    "subject_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "supporting_record_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "subject_id",
+    "object_id",
+    "relation_type",
+    "direction",
+    "resolution_method",
+    "evidence_refs",
+    "supporting_record_refs"
+  ],
+  "type": "object"
+}
