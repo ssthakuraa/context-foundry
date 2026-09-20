@@ -344,6 +344,11 @@ retain evidence references so hidden text cannot contribute match reasons or ran
 <p>Manifest: schema version, pack ID, release ID, source-manifest digests, adapter/config
 digests, ordered shard digests, coverage/validation references, and creation identity.
 A release set pins one version per included pack plus a cross-pack bridge digest.
+<code>checkReleaseSetBindings</code> validates the release-set and supplied manifest shapes, then
+requires one exact pack/release identity and canonical manifest digest per entry with
+no ambiguous or unlisted manifest. This is metadata closure only: a claimed shard or
+bridge digest is not evidence that bytes were loaded or reviewed. Byte verification,
+cross-pack entity conflict detection and activation authorization remain separate.
 Activation transaction verifies reviewed manifest identity, compiled generation,
 policy compatibility, and expected prior activation version. Idempotency key prevents
 duplicate promotion. Concurrent mismatches return CONFLICT rather than last-writer wins.</p>

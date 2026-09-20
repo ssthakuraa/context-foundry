@@ -177,6 +177,54 @@ export const ReleaseSetSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:release-set', additionalProperties: false });
 export type ReleaseSet = Static<typeof ReleaseSetSchema>;
 
+export type ReleaseSetIssueCode =
+  | 'INVALID_RELEASE_SET' | 'INVALID_RELEASE_MANIFEST' | 'DUPLICATE_RELEASE_MANIFEST'
+  | 'MISSING_RELEASE_MANIFEST' | 'MANIFEST_DIGEST_MISMATCH' | 'UNLISTED_RELEASE_MANIFEST';
+export type ReleaseSetIssue = { code: ReleaseSetIssueCode; index: number; item: 'release_set' | 'release_manifest' | 'pack' };
+
+/** Close a release set against exact manifest identities and canonical metadata digests.
+ * Does not verify shard bytes, bridge bytes, capture provenance or activation authority. */
+export function checkReleaseSetBindings(
+  releaseSet: ReleaseSet,
+  manifests: readonly ReleaseManifest[],
+): readonly ReleaseSetIssue[] {
+  if (!validate('release_set', releaseSet)) {
+    return [{ code: 'INVALID_RELEASE_SET', item: 'release_set', index: 0 }];
+  }
+  const issues: ReleaseSetIssue[] = [];
+  const byPack = new Map<string, { manifest: ReleaseManifest; index: number }>();
+  const duplicatePacks = new Set<string>();
+  manifests.forEach((manifest, index) => {
+    if (!validate('release_manifest', manifest)) {
+      issues.push({ code: 'INVALID_RELEASE_MANIFEST', item: 'release_manifest', index });
+      return;
+    }
+    if (byPack.has(manifest.pack_id)) {
+      issues.push({ code: 'DUPLICATE_RELEASE_MANIFEST', item: 'release_manifest', index });
+      duplicatePacks.add(manifest.pack_id);
+      return;
+    }
+    byPack.set(manifest.pack_id, { manifest, index });
+  });
+  releaseSet.packs.forEach((pack, index) => {
+    if (duplicatePacks.has(pack.pack_id)) return;
+    const found = byPack.get(pack.pack_id);
+    if (!found) {
+      issues.push({ code: 'MISSING_RELEASE_MANIFEST', item: 'pack', index });
+    } else if (found.manifest.release_id !== pack.release_id ||
+      canonicalSha256(found.manifest) !== pack.manifest_digest) {
+      issues.push({ code: 'MANIFEST_DIGEST_MISMATCH', item: 'pack', index });
+    }
+  });
+  const included = new Set(releaseSet.packs.map(pack => pack.pack_id));
+  for (const [packId, found] of byPack) {
+    if (!included.has(packId)) {
+      issues.push({ code: 'UNLISTED_RELEASE_MANIFEST', item: 'release_manifest', index: found.index });
+    }
+  }
+  return issues;
+}
+
 export const EngineeringSymbolPayloadSchema = Type.Object({
   name: id(),
   artifact_kind: Type.Union([

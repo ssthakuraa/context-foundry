@@ -6,7 +6,7 @@
 
 - Twenty-one Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. The first registered record kinds are engineering symbols/relationships and business rules/mappings; all five task artifact body kinds have strict shapes.
 - Metadata checks cover capture/file/locator binding, canonical declared-file manifest digests, acyclic source-evidence support with no empty-support record, and exact same-task artifact references. These checks return issues instead of partial authorization decisions.
-- The current thirty-eight package tests, typecheck, build, schema export check, forty-eight generated HTML pages, thirteen bounded semantic vectors in TypeScript/Python and four valid/three rejected canonical vectors in TypeScript/Python pass. These are bounded fixtures, not a completeness claim.
+- The current forty package tests, typecheck, build, schema export check, forty-eight generated HTML pages, thirteen bounded semantic vectors in TypeScript/Python and four valid/three rejected canonical vectors in TypeScript/Python pass. These are bounded fixtures, not a completeness claim.
 
 ## Blocking gaps before a shared contract freeze
 
@@ -16,7 +16,7 @@
 | Portable semantic parity | JSON Schema exports do not encode all TypeScript semantic checks, including path normalization, cross-record support, exact body digest and version-chain rules | [Partial ledger](semantic-conformance.md) and thirteen shared cases now cover five bounded rule families in TypeScript/Python; full schema prevalidation and remaining single/cross-object parity are still required |
 | Evidence trust | Execution-evidence JSON is shape-only; source capture metadata does not prove bytes, producer authenticity or publication authority | Authenticated importer and digest/revision/policy receipts; forged or stale report denial tests |
 | Task authority | Receipt shape and artifact references cannot establish a human session, current grant, nonrevocation or valid state transition | WP3 transactional authorization/state tests before any implementation approval claim |
-| Release-set closure | Cross-pack identity conflicts, source-manifest provenance, shard digest closure and activation compatibility are not yet checked end to end | Portable synthetic two-pack fixture with valid/invalid release-set and dependency cases |
+| Release-set closure | Exact two-pack manifest identity/digest closure now has synthetic positive/negative tests, but cross-pack entity conflicts, source-manifest provenance, shard/bridge byte closure and activation compatibility are not checked end to end | Verified bytes and provenance, cross-pack conflict cases and transactional activation tests |
 | Cross-language boundaries | Four canonical vectors are a start, but not a broad Unicode/number/size/JSONL corpus or independent importer round-trip | Expanded fixed vectors and parity report with supported limits and rejection behavior |
 
 ## Decision
