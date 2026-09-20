@@ -22,6 +22,14 @@ does not establish that a proposal was approved; authenticated task-state author
 read-receipt authenticity, validation-run authenticity and human review decisions
 remain unimplemented.
 
+`planTaskTransition` is now a pure, intent-sensitive phase table. It rejects
+implementation entry for diagnosis/inquiry, labels scope/implementation/completion
+human events separately, and models revision, reassessment and cancellation. Its
+`required_authority` output is a **requirement**, not proof that the event came from
+that authority. It does not inspect receipts, authenticate a human, verify current
+grants, compare artifact digests, lock a task version or write an event. WP3 must
+perform those checks transactionally before applying any planned transition.
+
 ## Task aggregate
 
 Task fields: task_id, owner_subject, intent, request_origin, original_request_ref,

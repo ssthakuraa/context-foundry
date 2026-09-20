@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 import { Type, type Static } from '@sinclair/typebox';
 import { canonicalSha256 } from './canonical.js';
 export { canonicalJson, canonicalRecordLines, canonicalSha256, parseJsonStrict } from './canonical.js';
+export { planTaskTransition, type TaskIntent, type TaskPhase, type TaskPhaseEvent,
+  type TransitionAuthority, type PhaseTransition } from './task-phases.js';
 
 export const CONTRACT_VERSION = '0.2.0' as const;
 const id = () => Type.String({ minLength: 1, maxLength: 512 });
