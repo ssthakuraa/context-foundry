@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Second-pass architecture challenge · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../second-pass-assessment.md">Markdown source</a></nav>
+    <article>
+      <h1 id="second-pass-architecture-challenge">Second-pass architecture challenge</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#verdict">Verdict</a></li><li><a href="#keep-change-defer">Keep, change, defer</a></li><li><a href="#evidence-method-and-limits">Evidence method and limits</a></li><li><a href="#what-would-change-the-recommendation">What would change the recommendation</a></li></ul></details>
+<p><strong>Status:</strong> Research-informed revisions proposed · 2026-09-20 · CF-0.1</p>
+<p>Historical research pass retained as evidence. The reconciled CF-0.2 scope and
+current verdict are in <a href="design-closeout.html">design closeout</a>; later Java/fixture and
+review-workflow decisions supersede earlier sequencing suggestions here.</p>
+<h2 id="verdict">Verdict</h2>
+<p>Keep the product direction and small deployment footprint. Change the first proof
+of value, extraction precision model, and access lifecycle before implementation.
+ContextFoundry should earn its place by supplying useful enterprise meaning and
+constraints with inspectable evidence—not by producing another repository overview.
+This pass strengthens the proposal; it does not validate a working product.</p>
+<h2 id="keep-change-defer">Keep, change, defer</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Disposition</th>
+<th>Reason / next evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Existing agents own reasoning/code generation</td>
+<td>Keep</td>
+<td>No need to build another agent runtime</td>
+</tr>
+<tr>
+<td>Independent implementation informed by other systems</td>
+<td>Keep</td>
+<td>Reuse mechanisms and formats, not whole runtime providers</td>
+</tr>
+<tr>
+<td>React/TypeScript, Node/Fastify</td>
+<td>Keep provisionally</td>
+<td>No evidence found requiring a UI/runtime change; compatibility still untested</td>
+</tr>
+<tr>
+<td>PostgreSQL operational state and initial projections</td>
+<td>Keep conditionally</td>
+<td>Scoped quality/query-plan spike must precede a broad build</td>
+</tr>
+<tr>
+<td>Minimal business knowledge</td>
+<td>Move earlier</td>
+<td>M2/M3 must test the enterprise gap; full curation UI can wait</td>
+</tr>
+<tr>
+<td>Syntax-only extraction</td>
+<td>Change</td>
+<td>Add precision tiers and a CI-produced semantic-index import path</td>
+</tr>
+<tr>
+<td>Retrieval/guidance evaluation</td>
+<td>Strengthen</td>
+<td>Same-information baseline, minimal-guidance control, staged fault localization</td>
+</tr>
+<tr>
+<td>Search roadmap</td>
+<td>Change priority</td>
+<td>Test semantic recall early if lexical/mapping lanes miss business terminology; no mandatory vector service</td>
+</tr>
+<tr>
+<td>Access lifecycle</td>
+<td>Strengthen</td>
+<td>Acquisition, publication, source ACL freshness, withdrawal, and local revocation are different</td>
+</tr>
+<tr>
+<td>Test impact / architecture proposals</td>
+<td>Keep staged</td>
+<td>Advisory, evidence-bound; compatibility is not behavioral parity</td>
+</tr>
+<tr>
+<td>Broad connectors, full graph engine, HA, automatic migration</td>
+<td>Defer</td>
+<td>They do not resolve the first usefulness uncertainty</td>
+</tr>
+</tbody>
+</table>
+<h2 id="evidence-method-and-limits">Evidence method and limits</h2>
+<p>Read primary documentation, a research-paper abstract/version record, selected
+pinned public source paths, and v2 reports/source. Vendor descriptions establish
+documented capabilities, not independent comparative quality. No external benchmark,
+enterprise corpus run, paid model experiment, or full security audit was reproduced.
+The AGENTS.md finding below uses the revised paper abstract, not a full replication.
+Sources were accessed on 2026-09-20; live documentation can change.</p>
+<h3 id="1-more-context-and-more-guidance-are-not-inherently-better">1. More context and more guidance are not inherently better</h3>
+<p>The revised AGENTS.md study reports no general task-success improvement and higher
+average inference cost in its evaluated repository-context settings. It also finds
+instructions are followed. This challenges the assumption that failure to benefit
+always means the model ignored guidance. It is not a study of ContextFoundry or of
+permission-scoped enterprise retrieval. <a href="https://arxiv.org/abs/2602.11988v2">Paper, v2</a>.</p>
+<p>Our inference: compare minimal guidance against the proposed guidance, and score
+outcomes rather than obedience. Keep native source inspection available. A compact
+response can still omit decisive evidence; a longer one can sometimes be justified.</p>
+<h3 id="2-retrieval-must-preserve-document-meaning-as-well-as-code-names">2. Retrieval must preserve document meaning as well as code names</h3>
+<p>Anthropic describes adding chunk-specific context before lexical and embedding
+indexing, then combining retrieval and reranking. Its reported gains are from its
+own evaluation, not an enterprise-engineering guarantee.
+<a href="https://www.anthropic.com/engineering/contextual-retrieval">Contextual retrieval</a>.</p>
+<p>Our design: retain title, section hierarchy, product/version, and exact passage
+together. Deterministic context comes first. Generated contextual descriptions,
+embeddings, and reranking remain independently measured candidates. A descriptor
+derived from restricted material inherits its visibility requirements. Do not let
+curated aliases encode benchmark answers or postpone vocabulary failures indefinitely.</p>
+<h3 id="3-structural-precision-needs-an-explicit-ladder">3. Structural precision needs an explicit ladder</h3>
+<p>Sourcegraph distinguishes precise SCIP-backed navigation from search fallback and
+recommends CI indexing for complex/authenticated builds. SCIP is a language-neutral
+code-intelligence format. Neither statement proves complete runtime dependency
+coverage. <a href="https://sourcegraph.com/docs/code-navigation/precise-code-navigation">Precise navigation</a>,
+<a href="https://github.com/scip-code/scip">SCIP protocol</a>.</p>
+<p>Our design: distinguish syntax declarations, semantic symbol resolution, framework
+bindings, and observed runtime behavior. Import bounded semantic indexes bound to
+source digests from approved CI. ContextFoundry still does not execute arbitrary
+repository builds during extraction, and Sourcegraph is not a required server.
+Unsupported dynamic dispatch/reflection remains an explicit gap.</p>
+<h3 id="4-recheck-the-mechanisms-not-only-the-project-summaries">4. Recheck the mechanisms, not only the project summaries</h3>
+<p>The following pinned files were reopened. Historical v2 line ranges do not all
+align with the functions in the fetched files; use commit, path, and function name
+together. No copied implementation or benchmark claim follows from these inspections.</p>
+<table>
+<thead>
+<tr>
+<th>Source inspected</th>
+<th>Observation</th>
+<th>Transfer / limitation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitNexus <code>query</code>, <code>local-backend.ts</code>, commit <code>ac9a4e9abd8fd3058c070b72c23402a4f887929a</code></td>
+<td>Parallel lexical/semantic retrieval, rank fusion keyed by node ID with path fallback, batched process enrichment</td>
+<td>Separate candidate retrieval from grouping; batching matters; process membership needs preparation and is not proven business flow</td>
+</tr>
+<tr>
+<td>Codebase Memory MCP trace response, <code>mcp.c</code>, commit <code>8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798</code></td>
+<td>Distinguishes output, page, engine, and edge-data limits; continuation tied to query arguments</td>
+<td>Preserve distinct incompleteness causes instead of one generic truncation flag</td>
+</tr>
+<tr>
+<td>Graphify <code>_query_graph_text</code>, <code>_traversal_view</code>, <code>_cut_lines_to_budget</code>, <code>serve.py</code>, commit <code>c7ec1082083e3e876443f643ecf86ebcfae177c2</code></td>
+<td>Seed-oriented bounded output; neighborhood traversal uses an undirected view while retaining direction metadata</td>
+<td>Useful neighborhood browsing is not equivalent to a directed causal path; preserve parallel directed edges in our impact engine</td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://github.com/abhigyanpatwari/GitNexus/blob/ac9a4e9abd8fd3058c070b72c23402a4f887929a/gitnexus/src/mcp/local/local-backend.ts">GitNexus source</a>,
+<a href="https://github.com/DeusData/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/src/mcp/mcp.c">Codebase Memory source</a>,
+<a href="https://github.com/Graphify-Labs/graphify/blob/c7ec1082083e3e876443f643ecf86ebcfae177c2/graphify/serve.py">Graphify source</a>.</p>
+<p>GraphRAG local search combines graph-derived information with associated text for
+answer context. Borrow the evidence association and selection idea, not a hidden
+answer-generation service. <a href="https://microsoft.github.io/graphrag/query/local_search/">Local search</a>.</p>
+<h3 id="5-v2-implicates-query-composition-not-just-payload-size">5. V2 implicates query composition, not just payload size</h3>
+<p>Re-read the retrospective, latency RCA, <code>discovery-response-v2.js</code>, and selected
+<code>serving-projection-v2.js</code> / <code>typed-paths.js</code> paths. The response validator enforces
+an exact one-call instruction string; this verifies wire policy, not agent behavior.
+The RCA reports the same first lexical query at 0.740 seconds unrestricted versus
+20.475 seconds with actual host scope. It identifies repeated witness/proof work;
+the source includes scope-sensitive search and support authorization. These are
+reported historical timings, not reruns. See <a href="v2-disposition.html">v2 disposition</a>.</p>
+<p>The conclusion is narrower than the retrospective's preferred redesign: progressive
+tools are a candidate, not a demonstrated cure. Keep a compact one-call arm. Do not
+remove authorization to obtain speed or assume replacing SQLite solves the problem.
+Measure capture availability, candidate recall, path construction, serialization,
+tool latency, and final answer separately to locate the failure.</p>
+<h3 id="6-postgresql-is-a-reasonable-consolidation-choice-not-retrieval-proof">6. PostgreSQL is a reasonable consolidation choice, not retrieval proof</h3>
+<p>PostgreSQL's text-search configuration normalizes terms and supports weighted
+ranking; code identifiers need their own exact/token handling. Native text rank
+must not be presented as BM25. <a href="https://www.postgresql.org/docs/current/textsearch-controls.html">Text search controls</a>.</p>
+<p>pgvector documents recall issues when filtering approximate-index scans, with
+iterative scans and partitioning among the mitigations. SQL row filtering alone
+does not demonstrate permission-independent retrieval quality.
+<a href="https://github.com/pgvector/pgvector#filtering">pgvector filtering</a>.</p>
+<p>Our gate: compare authorized-only exact retrieval with each candidate index plan;
+vary permissions, hidden distractors, dependency density, and concurrent preparation.
+Do this before selecting an approximate index or promising enterprise scale.</p>
+<h3 id="7-authorization-consistency-is-a-product-contract">7. Authorization consistency is a product contract</h3>
+<p>OpenFGA explicitly distinguishes cached low-latency queries from higher-consistency
+queries. That illustrates a tradeoff, not a recommendation to add OpenFGA or proof
+that a local policy-version field solves distributed source permissions.
+<a href="https://openfga.dev/docs/interacting/consistency">Consistency modes</a>.</p>
+<p>Our design must name the authority for each source, the validity of its ACL snapshot,
+and what happens when that authority is unavailable. Locally committed revocation
+can be enforced immediately for subsequent authorization decisions; a remote
+permission change is unknown until observed. Long-lived group claims and cached
+exports need explicit treatment. Previously delivered content cannot be recalled.</p>
+<p>MCP guidance prohibits token passthrough and covers confused-deputy, SSRF, and
+session risks. Enterprise login alone does not address these integration boundaries.
+<a href="https://modelcontextprotocol.io/docs/2025-11-25/tutorials/security/security_best_practices">MCP security guidance</a>.</p>
+<h3 id="8-the-competitive-gap-is-narrower-than-code-plus-enterprise-documents">8. The competitive gap is narrower than &quot;code plus enterprise documents&quot;</h3>
+<p>Unblocked documents PR discussion using connected code, documents, and team
+discussions, as well as source-specific Teams permission controls.
+<a href="https://docs.getunblocked.com/code-review/pr-chat">PR Chat</a>,
+<a href="https://docs.getunblocked.com/data-sources/microsoft-teams">Teams access behavior</a>.</p>
+<p>Therefore that combination alone is not a novel differentiator. Our proposed
+position is a self-hosted, inspectable evidence layer with explicit business-to-code
+relations, constraint applicability, revision-aware change/test reasoning, and
+agent-independent access. This is a positioning hypothesis, not a claim competitors
+lack those capabilities. Measure onboarding and maintenance effort as well as answer
+quality. A connector inventory or public-source benchmark cannot establish leadership.</p>
+<h3 id="9-compatibility-and-behavior-are-different-obligations">9. Compatibility and behavior are different obligations</h3>
+<p>Pact distinguishes consumer/provider message agreements from provider functional
+side effects. This supports keeping contract compatibility, test coverage, and
+behavioral parity separate in the review model.
+<a href="https://docs.pact.io/consumer/contract_tests_not_functional_tests">Contract versus functional tests</a>.</p>
+<p>Our extension needs behavior obligations with input partitions, observable outputs
+and side effects, tolerances, exclusions, and actual run evidence. Test selection
+alone is not a migration-validation feature. CI remains responsible for execution.</p>
+<h2 id="what-would-change-the-recommendation">What would change the recommendation</h2>
+<ul>
+<li>If hand-selected evidence does not improve answers, revisit information utility
+and agent integration before optimizing retrieval.</li>
+<li>If useful evidence exists but cannot be selected reliably, fix retrieval before
+adding more preparation or a broad workbench.</li>
+<li>If decisive evidence is missing, add the narrowly identified source/semantic facet.</li>
+<li>If same-information baselines match our result at lower total effort, narrow or
+reconsider the product proposition.</li>
+<li>If authorized query plans fail after bounded optimization, reopen projection
+storage without discarding the operational database or portable records.</li>
+</ul>
+<p>The <a href="../../evaluation/html/validation-sequence.html">validation sequence</a> defines the next
+experiments. They require a separately authorized implementation/evaluation phase.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/research/second-pass-assessment.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

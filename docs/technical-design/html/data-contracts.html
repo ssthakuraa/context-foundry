@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data contracts and storage · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../data-contracts.md">Markdown source</a></nav>
+    <article>
+      <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
+<p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
+<h2 id="identity-and-versioning">Identity and versioning</h2>
+<p>An entity ID combines logical repository or document namespace with adapter-owned
+artifact identity. A record ID identifies an assertion about an entity; a content
+digest identifies its immutable representation. Source revision, pack release,
+query generation, schema version, adapter version, and policy generation are distinct.
+Do not use a content hash as the only long-lived entity identity.</p>
+<p>Use opaque UUIDs for operational identities, qualified strings for entity keys, and
+SHA-256 digests for canonical content. Canonical serialization uses UTF-8, LF, sorted
+object keys, stable record ordering, and rejects non-finite numbers/duplicate keys.
+Specify Unicode and number normalization in serializer fixtures before implementation.
+Build timestamps live in provenance/run metadata and are not invented to force
+semantic equality between independently captured evidence.</p>
+<h2 id="record-envelope">Record envelope</h2>
+<p>All fields below are conceptual schema requirements. JSON Schema Draft 7 is the
+initial first-party validation dialect; generated TypeScript types must stay in sync.</p>
+<pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;0.2.0&quot;,
+  &quot;record_id&quot;: &quot;rec:billing:cycle-start&quot;,
+  &quot;entity_id&quot;: &quot;repo:billing-service:symbol:BillingCycle.start&quot;,
+  &quot;kind&quot;: &quot;engineering.symbol&quot;,
+  &quot;owner_id&quot;: &quot;team:billing&quot;,
+  &quot;origin&quot;: &quot;source_declared&quot;,
+  &quot;review&quot;: {&quot;state&quot;: &quot;not_required&quot;},
+  &quot;payload&quot;: {&quot;name&quot;: &quot;start&quot;, &quot;artifact_kind&quot;: &quot;method&quot;},
+  &quot;evidence_refs&quot;: [&quot;ev:cycle-start&quot;],
+  &quot;dependency_refs&quot;: [],
+  &quot;classification&quot;: &quot;internal&quot;
+}
+</code></pre>
+<p>The owning release supplies pack/revision bindings. A relationship includes qualified
+subject/object, relation type, direction, evidence, and supporting record references.
+Registered extension kinds use namespaced payload schemas and immutable schema digests.
+Unknown required kinds fail validation; optional unknown kinds are preserved but
+excluded from unsupported operations with explicit coverage status.</p>
+<h2 id="evidence-dimensions">Evidence dimensions</h2>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Values/examples</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Origin</td>
+<td>source_declared, static_resolution, human_asserted, model_proposed</td>
+<td>Immutable attribution</td>
+</tr>
+<tr>
+<td>Review</td>
+<td>pending, approved, rejected, not_required, stale</td>
+<td>Approval binds to evidence fingerprint</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>absent, passed, failed, inconclusive</td>
+<td>Attached to a named check/run, not universal truth</td>
+</tr>
+<tr>
+<td>Freshness</td>
+<td>current_for_snapshot, source_changed, unknown</td>
+<td>Relative to supplied identities, not wall-clock age alone</td>
+</tr>
+<tr>
+<td>Coverage</td>
+<td>complete_for_declared_scope, partial, unsupported, unavailable</td>
+<td>Applies to a named extractor/corpus/facet</td>
+</tr>
+</tbody>
+</table>
+<p>Unknown is an epistemic outcome, not an extraction origin. A reviewed association
+does not become source_declared. Validation retains revision, environment, test input,
+assertion scope, and method. A model confidence score is neither calibrated certainty
+nor approval. Relevance scores live on query results, not canonical evidence trust.</p>
+<h2 id="record-families">Record families</h2>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Required fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source/document capture</td>
+<td>Logical authority, URI/path, revision/edition, digest, capture policy</td>
+</tr>
+<tr>
+<td>Evidence locator</td>
+<td>Capture ID, line/range or document section/span, content digest</td>
+</tr>
+<tr>
+<td>Engineering artifact</td>
+<td>Qualified ID, kind, owner, declarations and contract references</td>
+</tr>
+<tr>
+<td>Engineering relationship</td>
+<td>Endpoints, typed direction, support records, resolution method</td>
+</tr>
+<tr>
+<td>Interface contract</td>
+<td>Protocol/service/version/operation, fields/types, completeness by facet</td>
+</tr>
+<tr>
+<td>Business concept/assertion</td>
+<td>Pack-owned meaning, aliases, source passages</td>
+</tr>
+<tr>
+<td>Domain/product/flow/rule/variant</td>
+<td>Qualified kind/identity, applicability, owner, evidence and named effective conditions; see enterprise knowledge model</td>
+</tr>
+<tr>
+<td>Worked business procedure</td>
+<td>Prerequisites, illustrative steps/outcomes, applicability, supporting evidence and review; never implicit execution authority</td>
+</tr>
+<tr>
+<td>Business mapping</td>
+<td>Business and engineering endpoints, mapping relation, support and review</td>
+</tr>
+<tr>
+<td>Test association</td>
+<td>Test identity, relation type, evidence, revision and optional run</td>
+</tr>
+<tr>
+<td>Execution evidence</td>
+<td>Tool/run ID, environment, revision, outcomes, coverage inputs, attachments</td>
+</tr>
+<tr>
+<td>Semantic index receipt</td>
+<td>Producer identity, format/indexer version, repository/revision, input digests, dependency context, validation outcome</td>
+</tr>
+<tr>
+<td>Behavior obligation</td>
+<td>Requirement, input partition, observable output/side effects, tolerance, exclusions, linked validation evidence</td>
+</tr>
+<tr>
+<td>Architecture proposal</td>
+<td>Baseline release set, constraints, changes, assumptions, review version</td>
+</tr>
+<tr>
+<td>Task/artifact/decision</td>
+<td>Immutable original input, versioned map/findings/proposal, evidence scope, authenticated decision and revocation; operational, not released knowledge</td>
+</tr>
+</tbody>
+</table>
+<h2 id="storage-separation">Storage separation</h2>
+<table>
+<thead>
+<tr>
+<th>Store</th>
+<th>Contents</th>
+<th>Source of truth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Canonical release files</td>
+<td>Manifests, JSONL assertions, support dependencies, coverage</td>
+<td>Released knowledge</td>
+</tr>
+<tr>
+<td>PostgreSQL operational tables</td>
+<td>Grants, configuration, jobs, reviews, proposal versions, activation, audit</td>
+<td>Operational state</td>
+</tr>
+<tr>
+<td>PostgreSQL projections</td>
+<td>Search fields, adjacency, interface indexes, support dependencies</td>
+<td>Rebuildable from releases</td>
+</tr>
+<tr>
+<td>Blob directory</td>
+<td>Approved captures, documents, CI artifacts, candidate shards</td>
+<td>Captured evidence, under retention rules</td>
+</tr>
+</tbody>
+</table>
+<p>Git versions configuration, schemas, documentation, and reasonably sized canonical
+metadata. Large generated corpora and sensitive captures use blob storage with a
+manifest reference; do not force gigabytes of snapshots into application Git history.
+No automatic commit or push is implied by generating a pack.</p>
+<h2 id="proposed-relational-layout">Proposed relational layout</h2>
+<p>Operational tables: principal, group_binding, grant, policy_version, pack,
+source_binding, adapter_registration, job, job_attempt, review, proposal_version,
+validation_run, release_activation, audit_event, outbox.</p>
+<p>CF-0.2 task tables: task, task_input, task_artifact, task_event, task_decision,
+decision_revocation and optional local_read_receipt. Their fields, transition and
+concurrency rules are in <a href="task-and-review-contracts.html">task contracts</a>. Do not index
+private task text as reusable enterprise facts. Capture, precise locator, source-control
+identity and coverage fields are in <a href="extraction-and-source-binding.html">extraction/source binding</a>.
+Canonical business types follow the <a href="../../design/html/enterprise-knowledge-model.html">enterprise model</a>.</p>
+<p>Source bindings additionally retain access mode, entitlement authority, ACL observation
+revision/expiry or explicit publication receipt, and withdrawal state. Access epochs
+cover local policy, group/session revocation and withdrawals independently of releases.
+Publication approval binds source digests and audience; extraction approval cannot
+substitute for it. Semantic receipts are validated inputs, not permissions.</p>
+<p>Projection tables: generation, artifact, assertion, locator, relationship,
+record_dependency, descriptor, business_mapping, interface_provider,
+interface_consumer, test_association, visibility_requirement.</p>
+<p>Primary keys include generation_id for projected rows. Artifact identity is unique
+within a generation; overlapping releases with conflicting facts block activation.
+Index relationships by (generation, subject, relation) and reverse object ordering;
+index exact artifact keys separately from weighted text fields. Search descriptors
+retain evidence references so hidden text cannot contribute match reasons or rank.</p>
+<h2 id="release-manifest-and-activation">Release manifest and activation</h2>
+<p>Manifest: schema version, pack ID, release ID, source-manifest digests, adapter/config
+digests, ordered shard digests, coverage/validation references, and creation identity.
+A release set pins one version per included pack plus a cross-pack bridge digest.
+Activation transaction verifies reviewed manifest identity, compiled generation,
+policy compatibility, and expected prior activation version. Idempotency key prevents
+duplicate promotion. Concurrent mismatches return CONFLICT rather than last-writer wins.</p>
+<p>Rows never silently join across generations. A query keeps a consistent snapshot
+until completion; subsequent continuation must use the same retained generation and
+current policy or fail explicitly. Retention must keep referenced generations until
+their query leases/cursors expire, subject to overriding access revocation.</p>
+<h2 id="schema-changes-and-portability">Schema changes and portability</h2>
+<p>Minor versions add optional fields; semantic changes require a new major contract.
+Importers reject unsupported required versions. Migrations stage new canonical
+outputs and projections, retain original digests, validate equivalence or declared
+changes, and activate explicitly. Export bundles include schemas and manifests but
+only evidence the exporter is allowed to redistribute. File presence alone does not
+confer permission. The importer reassigns local access policy before serving.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/technical-design/data-contracts.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

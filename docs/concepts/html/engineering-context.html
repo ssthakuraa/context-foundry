@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Engineering context · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../engineering-context.md">Markdown source</a></nav>
+    <article>
+      <h1 id="engineering-context">Engineering context</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#context-layers">Context layers</a></li><li><a href="#context-delivery">Context delivery</a></li></ul></details>
+<p><strong>Status:</strong> Draft</p>
+<p>Engineering context is structured information that helps an engineer or AI
+agent understand an enterprise system for inquiry, API use, diagnosis or change.</p>
+<p>It may include:</p>
+<ul>
+<li>Business capabilities, domains, and terminology</li>
+<li>Applications, services, libraries, jobs, and data stores</li>
+<li>APIs, events, schemas, tables, and external integrations</li>
+<li>Source files, symbols, declarations, and configuration</li>
+<li>Dependencies and other evidence-backed relationships</li>
+<li>Ownership, lifecycle, repository, and release information</li>
+<li>Requirements, architecture decisions, and test associations</li>
+<li>Known gaps, ambiguity, staleness, and coverage limitations</li>
+</ul>
+<p>Engineering context is not a copy of the entire source estate. It is a
+compact, navigable map that points an agent toward the evidence it needs.</p>
+<h2 id="context-layers">Context layers</h2>
+<pre><code class="language-text">Business intent
+      ↓
+Product and domain concepts
+      ↓
+Architecture and system components
+      ↓
+Source symbols, data objects, APIs, and tests
+      ↓
+Validation and operational evidence
+</code></pre>
+<p>The layers are related, but they must not be collapsed into one type of fact.
+A business label is not proof of an implementation relationship, and a static
+dependency is not proof of runtime behavior.</p>
+<h2 id="context-delivery">Context delivery</h2>
+<p>ContextFoundry should normally return:</p>
+<ul>
+<li>Relevant components and why they matched</li>
+<li>Source locations and revision identity</li>
+<li>Connected components and relationship types</li>
+<li>Ownership and access scope</li>
+<li>Evidence status and known gaps</li>
+<li>Handles for focused follow-up retrieval</li>
+</ul>
+<p>It should avoid returning a preassembled source dump as the default. The
+connected agent should inspect current source and choose the next operation.</p>
+<p>An API-use contract can be sufficient without a full source read. A behavior change
+normally needs the actual service/workflow/tests after human scope review. The
+agent usually already has local file access; logical locators guide it there directly.
+The map reduces discovery, not necessary verification. See the
+<a href="../../design/html/enterprise-knowledge-model.html">knowledge model</a> and
+<a href="../../design/html/human-reviewed-engineering-workflow.html">two-gate workflow</a>.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/concepts/engineering-context.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

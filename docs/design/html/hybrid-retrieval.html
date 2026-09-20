@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hybrid retrieval: exact, fuzzy, semantic and structural · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../hybrid-retrieval.md">Markdown source</a></nav>
+    <article>
+      <h1 id="hybrid-retrieval-exact-fuzzy-semantic-and-structural">Hybrid retrieval: exact, fuzzy, semantic and structural</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#technique-selection">Technique selection</a></li><li><a href="#proposed-query-path">Proposed query path</a></li><li><a href="#enterprise-semantic-model">Enterprise semantic model</a></li><li><a href="#implementation-and-data-protection">Implementation and data protection</a></li><li><a href="#experiments-and-boundaries">Experiments and boundaries</a></li></ul></details>
+<p><strong>Status:</strong> Proposed strategy; model/index choices experimental · 2026-09-20</p>
+<p>Supports CF-R01, CF-R02, CF-R04, CF-R06 and CF-R14. Search finds candidates;
+evidence-backed relations explain connections. Neither similarity nor model fluency
+establishes company-specific truth.</p>
+<h2 id="technique-selection">Technique selection</h2>
+<table>
+<thead>
+<tr>
+<th>Lane</th>
+<th>Useful for</th>
+<th>Must not do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exact identity / lexical fields</td>
+<td>Qualified symbols, paths, APIs, error codes, known terms</td>
+<td>Lose exact matches through stemming or approximate spelling</td>
+</tr>
+<tr>
+<td>Reviewed terminology</td>
+<td>Enterprise abbreviations, product-family aliases, business variants</td>
+<td>Treat one acronym as globally unambiguous</td>
+</tr>
+<tr>
+<td>Bounded fuzzy matching</td>
+<td>Typographical errors and nearby names</td>
+<td>Silently correct an exact API/field identifier or infer semantic equivalence</td>
+</tr>
+<tr>
+<td>Transformer embeddings</td>
+<td>Paraphrases and conceptual similarity across descriptions/passages</td>
+<td>Invent missing business rules or treat a nearby vector as a dependency</td>
+</tr>
+<tr>
+<td>Cross-encoder reranking</td>
+<td>Reorder a small candidate set for the actual question</td>
+<td>Recover facts absent from the candidate set or certify truth</td>
+</tr>
+<tr>
+<td>Typed relationship traversal</td>
+<td>Connect flows to product steps, services, entities, APIs and tests</td>
+<td>Treat shared vocabulary or an undirected neighborhood as causal impact</td>
+</tr>
+</tbody>
+</table>
+<p>Fuzzy search can use edit distance; PostgreSQL's pg_trgm instead offers trigram
+similarity and indexed search. They are different approximate-string mechanisms.
+<a href="https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-fuzzy-query">Elastic fuzzy query</a>,
+<a href="https://www.postgresql.org/docs/current/pgtrgm.html">PostgreSQL pg_trgm</a>.</p>
+<p>Sentence Transformers documents efficient embedding-based retrieval followed by a
+cross-encoder that scores query/candidate pairs. The latter is applied to a limited
+candidate set because scoring the whole corpus is more expensive.
+<a href="https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html">Retrieve and rerank</a>.</p>
+<h2 id="proposed-query-path">Proposed query path</h2>
+<ol>
+<li>Authorize sources, descriptors and supporting evidence; bind product/version scope.</li>
+<li>Recognize explicit identifiers; maintain an exact-match lane separately.</li>
+<li>Retrieve lexical and reviewed-alias candidates per concern. Suggest bounded fuzzy
+alternatives for weak/empty name matches, with the original query preserved.</li>
+<li>For conceptual questions, evaluate a semantic lane over context-preserving
+passages/descriptors. Filter authorized candidates before exposed ranking/aggregation.</li>
+<li>Deduplicate by qualified entity or passage identity, not file basename. Combine
+approximate lane rankings with measured reciprocal rank fusion parameters; keep
+exact identifiers distinguishable. Do not compare raw cosine and text scores directly.</li>
+<li>Optionally rerank a bounded shortlist. Record model/profile versions, latency and
+availability. A failure falls back explicitly to nonmodel retrieval, not empty truth.</li>
+<li>Expand only supported typed relationships needed by the concern. Preserve alternate
+interpretations, variant conditions, provenance and gaps.</li>
+<li>Return a reviewable map and locators. After scope review, the agent judges sufficiency
+and reads current local source; retrieval does not silently assemble every file.</li>
+</ol>
+<p>RRF combines ranked lists rather than requiring comparable relevance scores.
+<a href="https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion">Elastic RRF</a>.
+Using the technique does not require Elasticsearch or prove it is optimal here.</p>
+<h2 id="enterprise-semantic-model">Enterprise semantic model</h2>
+<p>Capture product/domain/flow identities and explicit many-to-many implementation
+links. A flow step has business preconditions/outcomes, participating products,
+applicable variants and implementation references. A standard has version,
+applicability and approved exceptions. Similarity nominates such records, while their
+stored relationships provide the evidenced path to code. Do not expect general
+embeddings to know an undocumented enterprise acronym or implicit business exception.</p>
+<p>Represent API-use facets separately from implementation-change pointers. A user may
+need a contract only, or need a service/workflow/test investigation. Sufficiency is
+an agent judgment supported by coverage metadata, not a universal confidence score.</p>
+<h2 id="implementation-and-data-protection">Implementation and data protection</h2>
+<p>Keep PostgreSQL exact/full-text/adjacency as the initial baseline. Evaluate pg_trgm
+for typo candidates and pgvector for embeddings when the controlled experiment
+justifies them. No new mandatory search service is selected. Start with a pretrained
+retrieval model; do not train a foundation model or fine-tune on private source by default.
+Model/license/runtime selection, CPU/GPU sizing and latency require a separate spike.</p>
+<p>Offline corpus embedding is versioned by model, input digest, chunking and dimensions;
+query embedding and cross-encoder scoring run at query time under explicit routing
+policy. These are retrieval models, not a hidden generative answer agent. Default
+enterprise operation must support local inference or no-model retrieval; remote
+processing is opt-in with approved data policy. Authorization precedes model input.
+Treat vectors/descriptors as sensitive derivatives with withdrawal dependencies.</p>
+<h2 id="experiments-and-boundaries">Experiments and boundaries</h2>
+<p>Keep exact/lexical/mapping retrieval as the control. Separately add fuzzy matching,
+embeddings, rank fusion and reranking; include typos, paraphrases, ambiguous acronyms,
+negation, product-version variants, hidden distractors and unknown facts. Measure
+critical evidence recall, false positives, scoped latency and human review effort.
+Do not trade a decisive missing impact for a better average search score.</p>
+<p>The analogy to web search is useful at the level of combining matching and ranking
+signals. This design makes no claim to reproduce Google's proprietary system.
+Retrieval cannot replace missing enterprise knowledge or either human review gate.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/hybrid-retrieval.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

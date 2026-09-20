@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Identity and policy · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../identity-and-policy.md">Markdown source</a></nav>
+    <article>
+      <h1 id="identity-and-policy">Identity and policy</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#principals">Principals</a></li><li><a href="#initial-roles">Initial roles</a></li><li><a href="#protected-operations">Protected operations</a></li><li><a href="#policy-decision-model">Policy decision model</a></li><li><a href="#machine-access">Machine access</a></li><li><a href="#initial-implementation-policy">Initial implementation policy</a></li></ul></details>
+<p><strong>Status:</strong> Proposed</p>
+<p>ContextFoundry is intended for one enterprise per deployment, with strong
+authorization inside that enterprise. The system therefore needs identity and
+policy controls even though it is not a multi-enterprise SaaS service.</p>
+<h2 id="principals">Principals</h2>
+<ul>
+<li>Human users</li>
+<li>Service accounts</li>
+<li>Extractor workers</li>
+<li>Scheduled jobs</li>
+<li>Agent or MCP clients</li>
+<li>Administrative operators</li>
+</ul>
+<p>Every request should carry an authenticated principal and an auditable policy
+context.</p>
+<h2 id="initial-roles">Initial roles</h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Typical authority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform administrator</td>
+<td>Manage deployment-wide configuration and identity integration.</td>
+</tr>
+<tr>
+<td>Pack owner</td>
+<td>Manage a pack's scope, maintainers, and release policy.</td>
+</tr>
+<tr>
+<td>Data publication approver</td>
+<td>Approve captured source versions for a named audience; separate from extraction and pack administration.</td>
+</tr>
+<tr>
+<td>Extractor operator</td>
+<td>Run approved extraction jobs within assigned source scope.</td>
+</tr>
+<tr>
+<td>Pack maintainer</td>
+<td>Edit pack configuration and review candidate diagnostics.</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Approve or reject candidate releases and design artifacts.</td>
+</tr>
+<tr>
+<td>Task reviewer</td>
+<td>Confirm task scope and, with a separate action grant, authorize an exact implementation proposal.</td>
+</tr>
+<tr>
+<td>Engineering reader</td>
+<td>Query authorized context and validation evidence.</td>
+</tr>
+<tr>
+<td>Auditor</td>
+<td>Read policy, release, and access history without changing data.</td>
+</tr>
+</tbody>
+</table>
+<p>Roles should be supplemented by attributes such as business unit, pack,
+repository, source classification, environment, and action type.</p>
+<h2 id="protected-operations">Protected operations</h2>
+<p>Authorization must cover:</p>
+<ul>
+<li>Pack discovery and listing</li>
+<li>Pack authoring and extraction</li>
+<li>Candidate validation and release promotion</li>
+<li>Knowledge search and relationship traversal</li>
+<li>Source pointer and source-body access</li>
+<li>Architecture proposal creation and approval</li>
+<li>Task creation, artifact access, human scope review and implementation authorization</li>
+<li>Test-impact analysis and validation evidence</li>
+<li>Export, reporting, and audit access</li>
+<li>MCP tools, API methods, and CLI commands</li>
+</ul>
+<h2 id="policy-decision-model">Policy decision model</h2>
+<pre><code class="language-text">Principal + action + resource + environment
+                    ↓
+              Policy decision
+                    ↓
+       allow/deny + obligations + audit receipt
+</code></pre>
+<p>The same policy decision service should be used by the UI, API, MCP, CLI,
+extractors, and source providers. Clients may improve usability by hiding
+unavailable actions, but they must never be trusted to enforce authorization.</p>
+<h2 id="machine-access">Machine access</h2>
+<p>Agent and extractor access should use separately identifiable machine
+credentials with explicit capability grants. A connected agent should not
+inherit unrestricted administrator access merely because it is operating on
+behalf of an authorized user.</p>
+<p>Delegation is not human presence. An agent credential cannot call the verified human
+decision route even when its owner can approve in Studio. Design acceptance and
+permission to code are different decisions. Receipt revocation/version conflicts and
+task-evidence visibility follow <a href="../../technical-design/html/task-and-review-contracts.html">task contracts</a>.</p>
+<h2 id="initial-implementation-policy">Initial implementation policy</h2>
+<p>Use explicit allow grants scoped to pack, source domain, and action, with default
+deny and explicit-deny precedence. Resource restrictions combine by intersection;
+multiple grants within the same action may union allowed resources unless denied.
+Do not infer grants from ownership labels. Review permissions and activation are
+separate; a configurable separation-of-duties rule rejects self-approval where required.</p>
+<p>Store immutable policy versions and audit changes. A request derives current effective
+access on the server; principals cannot submit trusted group claims in ordinary JSON.
+Browser sessions, CLI tokens, MCP delegates, and worker credentials all map to this
+policy. Validate the intersection of delegating user and client grants. Initial SAML
+support is via enterprise federation into OIDC.</p>
+<p>Pack metadata, candidate diagnostics, audit details, and job logs have resource scope
+as well as action permission. Being allowed to run a job does not automatically
+authorize reading every emitted record. V0.1 rejects access to an inaccessible
+derived record; field-level redaction is deferred until its inference risks and
+semantics are specified. Do not imply a redacted record is complete.</p>
+<p>Source-inherited access and explicitly approved publication are distinct modes.
+Local snapshots initially require explicit publication receipts; no automatic live
+filesystem ACL mirroring is claimed. Group/session revocation, source withdrawal
+and policy updates advance the access epoch used for final response authorization
+and continuations. See <a href="../../architecture/html/security-and-authorization.html#source-authority-and-publication">source authority and revocation</a>.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/identity-and-policy.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

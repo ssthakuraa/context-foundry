@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deployment and operations · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../deployment-and-operations.md">Markdown source</a></nav>
+    <article>
+      <h1 id="deployment-and-operations">Deployment and operations</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#initial-installation">Initial installation</a></li><li><a href="#activation-and-recovery">Activation and recovery</a></li><li><a href="#retention-and-revocation">Retention and revocation</a></li><li><a href="#observability">Observability</a></li><li><a href="#required-runbooks">Required runbooks</a></li></ul></details>
+<p><strong>Status:</strong> Proposed for review · CF-0.2</p>
+<h2 id="initial-installation">Initial installation</h2>
+<p>One enterprise runs API/Studio, workers, PostgreSQL, and managed evidence volumes.
+TLS terminates at its gateway; the application independently validates identity and
+permissions. Provide a Compose example with synthetic data. Enterprise mode requires
+identity configuration. Demo mode binds loopback and refuses enterprise credentials.
+The initial profile is single-node, with no claim of high availability.</p>
+<p>API readiness checks database/schema compatibility, policy availability, and active
+projection integrity. Liveness establishes only process health. Workers lease jobs,
+heartbeat, checkpoint immutable outputs, and cancel at stage boundaries. Query
+deadlines cancel database work; extraction never runs in the API request process.</p>
+<p>Sources mount read-only; staging is writable only by the assigned worker. Workers
+have no broad network access, privileged capabilities, or ambient user credentials.
+Network connectors use destination allowlists and scoped secret references. Secrets
+never enter packs, generated HTML, or logs.</p>
+<h2 id="activation-and-recovery">Activation and recovery</h2>
+<p>Write immutable blobs, verify hashes, construct a projection, then activate the
+manifest reference atomically. Readers pin generations. Failed candidates remain
+unserved. Upload-before-commit crashes leave collectible orphans; committed activation
+recovers from its pointer. Generation rollback uses current policy.</p>
+<p>Back up PostgreSQL and referenced blobs as a recoverable set. The backup manifest
+records database restore position and required digests. Rebuilding indexes cannot
+recover lost reviews, grants, task/artifact versions, decisions or audit events.
+Restore drills check these separately, including revoked implementation receipts.
+Proposed pilot targets are RPO &lt;=24 hours and RTO &lt;=4 hours on the declared pilot
+dataset; these are planning targets, not achieved enterprise guarantees.</p>
+<h2 id="retention-and-revocation">Retention and revocation</h2>
+<p>Revocation invalidates subsequent reads, exports, caches, and continuations. In-flight
+queries recheck the current access epoch outside pinned content snapshots before
+delivery. Previously downloaded data cannot
+be recalled. Retention expiry tombstones evidence, blocks serving, and invalidates
+dependent mappings; physical deletion follows legal holds and configured retention.
+Audit receipts retain only content permitted by policy.</p>
+<h2 id="observability">Observability</h2>
+<p>Measure queue delay; capture/parse/resolve/validate/index times; worker memory; bytes
+read; cache reuse; projection lag; denied operations; and audit health. Query spans
+separate authorization, candidate lookup, graph, evidence, and encoding. Distinguish
+cold startup, warm unseen requests, and exact cache hits. Raw stories, source, tokens,
+and document passages remain excluded from default logs.</p>
+<h2 id="required-runbooks">Required runbooks</h2>
+<table>
+<thead>
+<tr>
+<th>Incident</th>
+<th>Recovery</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bad release</td>
+<td>Activate verified prior generation with current permissions</td>
+</tr>
+<tr>
+<td>Stuck worker</td>
+<td>Fence expired lease and resume verified checkpoints</td>
+</tr>
+<tr>
+<td>IdP/policy outage</td>
+<td>Deny protected requests; display sanitized service status</td>
+</tr>
+<tr>
+<td>Disk pressure</td>
+<td>Pause builds; collect only expired unreferenced blobs after grace period</td>
+</tr>
+<tr>
+<td>Corrupt projection</td>
+<td>Mark unready, verify canonical manifest, rebuild new generation</td>
+</tr>
+<tr>
+<td>Required audit sink unavailable</td>
+<td>Fail protected mutations and data delivery closed</td>
+</tr>
+</tbody>
+</table>
+<p>Before release: test upgrades, rollback, backup restoration, capacity bounds, and
+restrictive default configuration. HA and object-store deployment profiles follow
+the first usefulness gate rather than enlarging the initial build.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/architecture/deployment-and-operations.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

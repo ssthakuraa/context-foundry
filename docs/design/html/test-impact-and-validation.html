@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test impact and validation · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../test-impact-and-validation.md">Markdown source</a></nav>
+    <article>
+      <h1 id="test-impact-and-validation">Test impact and validation</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#primary-question">Primary question</a></li><li><a href="#impact-inputs">Impact inputs</a></li><li><a href="#impact-outputs">Impact outputs</a></li><li><a href="#future-extensions">Future extensions</a></li><li><a href="#responsibility-boundaries">Responsibility boundaries</a></li><li><a href="#association-semantics">Association semantics</a></li><li><a href="#initial-output-and-safety">Initial output and safety</a></li><li><a href="#migration-and-parity-extensions">Migration and parity extensions</a></li></ul></details>
+<p><strong>Status:</strong> Proposed</p>
+<p>ContextFoundry should begin with Test Impact Analysis and grow into a broader
+change-verification capability. It should complement CI and test platforms,
+not replace them.</p>
+<h2 id="primary-question">Primary question</h2>
+<blockquote>
+<p>Given a requirement, code change, schema change, API change, or proposed
+architecture change, which tests and validation activities may be affected?</p>
+</blockquote>
+<h2 id="impact-inputs">Impact inputs</h2>
+<ul>
+<li>Changed files, symbols, APIs, schemas, and configuration</li>
+<li>Requirement and business-capability associations</li>
+<li>Static dependency relationships</li>
+<li>Test-to-code and test-to-requirement mappings</li>
+<li>Runtime coverage when available</li>
+<li>Historical change and failure data</li>
+<li>Ownership, criticality, and security metadata</li>
+</ul>
+<h2 id="impact-outputs">Impact outputs</h2>
+<ul>
+<li>Likely affected tests</li>
+<li>Affected requirements and business capabilities</li>
+<li>Impacted interfaces, data objects, jobs, and consumers</li>
+<li>Missing or weak test coverage</li>
+<li>Recommended regression and contract checks</li>
+<li>Potentially unaffected test areas</li>
+<li>Evidence, confidence, and unresolved gaps</li>
+</ul>
+<p>“Unaffected” must be treated as a qualified result. It means no impact was
+found within the available and authorized evidence, not that impact is
+impossible.</p>
+<h2 id="future-extensions">Future extensions</h2>
+<ul>
+<li>Characterization-test recommendations for legacy behavior</li>
+<li>Mapping legacy tests to replacement components</li>
+<li>Test-framework migration plans</li>
+<li>Contract and schema compatibility comparisons</li>
+<li>Golden-data and differential-execution evidence</li>
+<li>CI result ingestion and release validation reports</li>
+<li>Behavior-parity assessment across old and new implementations</li>
+</ul>
+<h2 id="responsibility-boundaries">Responsibility boundaries</h2>
+<pre><code class="language-text">ContextFoundry: map impact and preserve evidence
+LLM: explain impact and propose validation work
+CI/test systems: execute tests and collect results
+Human reviewers: accept risk and validation conclusions
+</code></pre>
+<p>Passing related tests is not by itself proof of behavioral equivalence. The
+platform must report exactly which behaviors were exercised and which remain
+unvalidated.</p>
+<h2 id="association-semantics">Association semantics</h2>
+<p>Keep static imports/references, declared requirement mappings, observed runtime
+coverage, and actual test assertions as different relation types. A static import
+nominates a test; it does not prove the test validates a behavior. Runtime coverage
+applies to a particular revision, environment, input set, and run.</p>
+<p>Change sets identify before/after revisions and actual changed symbols, APIs, fields,
+or configuration. Requirement-only impact is labelled hypothetical. Traverse reverse
+dependencies under relation-specific rules, then retrieve associated tests. Each
+recommendation carries the path and evidence reason; confidence labels must explain
+their basis rather than present invented probabilities.</p>
+<h2 id="initial-output-and-safety">Initial output and safety</h2>
+<p>WP5/M3 includes a minimal validation-obligation list linked to the reviewed task and
+proposal. M5 expands analytical UI and report ingestion. Test declarations, statically
+recognized skips, contract skeletons and authenticated execution outcomes are separate.
+Absence of a skip marker is not proof a test ran. A wrong-revision or skipped run cannot
+discharge a behavior obligation. See <a href="../../technical-design/html/task-and-review-contracts.html">task contracts</a>.</p>
+<p>Return recommended tests, affected behavior/contracts, evidence basis, missing
+coverage, and unresolved dynamic/reflection/external-consumer dependencies. Keep
+tests with no discovered connection in a separate low-evidence category rather than
+automatically excluding them from CI. Initial releases are advisory and never skip
+tests automatically. Selection safety requires separate mutation/fault experiments.</p>
+<p>CI imports authenticate the reporting system and bind results to source snapshot/revision, environment,
+test identities, report digest, coverage format/version, and attachments. Duplicate
+imports are idempotent; wrong-revision evidence cannot validate a new change. XML/JSON
+reports are parsed under the same hostile-input limits as other sources.</p>
+<h2 id="migration-and-parity-extensions">Migration and parity extensions</h2>
+<p>Later mapping records connect old tests/behaviors to new components without replacing
+their historical identities. Differential comparisons record both revisions,
+controlled inputs, environment differences, nondeterminism handling, compared outputs,
+and tolerances. Passing only establishes equivalence for the tested observations.
+Failed comparisons and uncovered behavior remain visible in an approval report.</p>
+<p>Represent a behavior obligation separately from a test: requirement/source, input
+partition, expected observations, side effects, ordering/time constraints, tolerances,
+exclusions and owner. Link old/new tests and actual run receipts to this obligation.
+An API compatibility result cannot validate persistence, notifications, authorization,
+or other business side effects. Contract, functional and differential evidence stay
+separate; see <a href="../../research/html/second-pass-assessment.html">research rationale</a>.</p>
+<p>Before describing impact as precise, demonstrate semantic-resolution coverage for
+the supported language slice. An unresolved dependency is not an unaffected one.
+Require critical test/behavior truth from an independent rubric, not just agreement
+with a baseline that may itself miss faults.</p>
+<p>Acceptance uses seeded faults with known affected tests, negative/irrelevant tests,
+changed test names, stale coverage, inaccessible dependencies, and incomplete reports.
+Measure missed relevant tests and excess recommended tests separately; minimal test
+counts alone are not a success metric.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/test-impact-and-validation.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Private evaluation metadata and local runtime files
+.local/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+coverage/
+**/coverage/
+*.tsbuildinfo

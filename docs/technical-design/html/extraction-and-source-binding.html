@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extraction and local source-binding contracts · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../extraction-and-source-binding.md">Markdown source</a></nav>
+    <article>
+      <h1 id="extraction-and-local-source-binding-contracts">Extraction and local source-binding contracts</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#source-capture-manifest">Source capture manifest</a></li><li><a href="#adapter-protocol">Adapter protocol</a></li><li><a href="#first-supported-matrix">First supported matrix</a></li><li><a href="#resolution-and-identities">Resolution and identities</a></li><li><a href="#coverage-and-incrementality">Coverage and incrementality</a></li><li><a href="#locator-and-local-resolution">Locator and local resolution</a></li><li><a href="#acceptance-fixtures">Acceptance fixtures</a></li></ul></details>
+<p><strong>Status:</strong> Implementation specification for the validation slice · CF-0.2</p>
+<p>Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
+supported patterns; it does not promise a complete program-analysis engine.</p>
+<h2 id="source-capture-manifest">Source capture manifest</h2>
+<p>Each capture contains source_id, authority_id, snapshot_id, revision_kind
+(git, enterprise_view, supplied_snapshot), optional revision_value, captured_at,
+file-manifest digest, publication-policy reference and capture-producer identity.
+Each included file has a normalized relative POSIX path, SHA-256 content digest,
+byte length, media/language kind and exclusion/classification outcome. Excluded
+files are not served; sensitive exclusion details are restricted diagnostics.</p>
+<p>Reject duplicate normalized paths, absolute paths, parent traversal, symlink escapes,
+case collisions on the target filesystem, inconsistent bytes/digests, excessive file
+counts and oversized inputs. Apply limits before parsing. Default-deny inclusion
+rules exclude credential files, dependency caches, build outputs, dumps and private
+runtime data. A clean Git status is not a secret scan or redistribution permission.
+Use prepared immutable captures; never switch branches or mutate developer checkouts.</p>
+<h2 id="adapter-protocol">Adapter protocol</h2>
+<p>Trusted job input identifies capture digest, adapter/version digest, configuration,
+supported grammar version, approved resource budget and output namespace. The runner
+provides read-only input handles, not ambient developer roots or credentials. Output
+streams contain declarations, assertions, locators, diagnostics and coverage units.
+Every record binds to input digest(s); the runner verifies those bindings and IDs.</p>
+<p>No source code, package script, annotation processor, Maven/Gradle build, macro or
+document instruction executes in the extractor. Framework interpretation is static
+and bounded. Worker process isolation is not a complete hostile-code sandbox by
+itself; enterprise untrusted adapters require the documented container/OS controls.</p>
+<h2 id="first-supported-matrix">First supported matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Extract initially</th>
+<th>Do not infer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java</td>
+<td>Packages, types, methods/constructors with parameter signatures, fields, imports, annotations and source ranges using a pinned Java grammar</td>
+<td>A call graph from matching names; overload resolution without adequate type context</td>
+</tr>
+<tr>
+<td>Spring MVC</td>
+<td>Literal class/method request mappings, HTTP method, declared DTO/parameter references, literal permission annotations and transaction annotations</td>
+<td>Composed/custom annotations, inherited routes, placeholders or runtime bean selection without a supported resolver</td>
+</tr>
+<tr>
+<td>JPA / SQL</td>
+<td>Explicit entity/table/column mappings, literal named-table references, DDL tables/columns/keys; literal query references labelled with parser coverage</td>
+<td>Complete data lineage, dynamic query targets, triggers' runtime effects, tenant isolation from a table name alone</td>
+</tr>
+<tr>
+<td>TypeScript/React</td>
+<td>Declarations, import/export bindings, literal file/workspace package dependencies; explicit JSX symbol references</td>
+<td>Runtime behavior from imports, dynamic imports, generated modules or React effect execution</td>
+</tr>
+<tr>
+<td>Hono / API metadata</td>
+<td>Literal route/method registrations within supported router mount patterns; declared OpenAPI operations and schemas</td>
+<td>Full endpoint identity when base mounts or paths are computed; OpenAPI parity with code without comparison</td>
+</tr>
+<tr>
+<td>Cross-product events</td>
+<td>Declared producer strings and consumer taxonomy members as separately evidenced artifacts</td>
+<td>A working transport link merely because names match; record candidate contract association until supported</td>
+</tr>
+<tr>
+<td>Markdown</td>
+<td>Document identity, title, heading ancestry, exact passages, explicit references and document-stated status</td>
+<td>Treating every worklist, historical report or prompt as current behavior or an instruction</td>
+</tr>
+<tr>
+<td>Test source / reports</td>
+<td>Test declarations and known skip markers; bounded JUnit/Vitest-style report outcomes if supplied</td>
+<td>A passing run from source presence, behavior coverage from filename, or success from skipped cases</td>
+</tr>
+</tbody>
+</table>
+<p>Unsupported constructs emit operation-specific coverage gaps with permitted locators.
+They do not silently disappear from the coverage denominator. Unit tests use tiny
+synthetic examples of each supported/unsupported construct and representative private
+source only in authorized evaluation. No private code becomes a checked-in golden file.</p>
+<h2 id="resolution-and-identities">Resolution and identities</h2>
+<p>Qualify symbols by source_id, language namespace, containing type/module and signature.
+Keep record/content identity separate from symbol identity. A signature rename may
+create a new symbol; do not silently equate identities through fuzzy matching.</p>
+<p>Resolution states are exact, candidate, ambiguous, unresolved or unsupported.
+Relationships retain method: syntax, semantic_index, framework_rule,
+reviewed_mapping or observed_run. Configuration, parser/resolver versions and source
+digests are part of resolution provenance. Semantic indexes are accepted only with
+matching source and dependency context; producing them belongs to approved CI.</p>
+<p>Cross-repository joins require explicit package/service namespace and version/context.
+A <code>file:</code> dependency is a declared package relationship, not a runtime call. Route
+matching uses service identity, normalized path template, HTTP method and version;
+identical routes in different products remain different. Reviewed business mappings
+retain evidence and applicability rather than pretending to be static calls.</p>
+<h2 id="coverage-and-incrementality">Coverage and incrementality</h2>
+<p>Coverage unit: source_id, capture digest, adapter, artifact family, supported patterns,
+eligible/processed/failed/excluded counts, known unsupported constructs and diagnostics.
+Completeness applies only to that declared unit. No global completeness percentage
+combines unlike facts into an engineering safety guarantee.</p>
+<p>Cache per-file contributions by content/configuration/adapter digest; maintain reverse
+resolution dependencies. A provider change, deleted symbol or changed business passage
+invalidates dependent bindings/reviews. New providers trigger unresolved-reference
+reconsideration. Compare canonical full/delta outputs including deletions, ambiguity
+and coverage; exclude only run-specific timing metadata. Initially permit full rebuild
+of the bounded slice when incremental correctness cannot be established.</p>
+<h2 id="locator-and-local-resolution">Locator and local resolution</h2>
+<p>Server locator fields: source_id, snapshot_id, revision_kind/value when known, path,
+file_digest, optional symbol_id, optional start_line/end_line and section_id. Lines
+are one-based inclusive for text display; an optional byte span uses zero-based
+half-open UTF-8 offsets. The schema requires paired bounds and validates ordering.
+At least a file/document locator is required; symbol/line precision is never invented.</p>
+<p>The helper keeps an OS-protected local map from source_id to approved absolute root.
+It resolves paths under that root, checks containment after symlink resolution and
+returns a structured result:</p>
+<table>
+<thead>
+<tr>
+<th>Result</th>
+<th>Required behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exact</td>
+<td>File digest matches; supplied range/symbol may be used</td>
+</tr>
+<tr>
+<td>changed</td>
+<td>Digest differs; return permitted candidate locator and require inspection/reassessment, not silent equivalence</td>
+</tr>
+<tr>
+<td>ambiguous</td>
+<td>More than one permitted binding/candidate; ask for selection</td>
+</tr>
+<tr>
+<td>unbound / missing</td>
+<td>Ask for root or report absent file; no auto-clone or source-view switch</td>
+</tr>
+<tr>
+<td>denied / unsafe_path</td>
+<td>Stop resolution; do not fall back to a broader root</td>
+</tr>
+</tbody>
+</table>
+<p>The helper does not send absolute roots or dirty file contents to the server. Default
+receipts contain logical locator, digest comparison, time and outcome; uploading
+source excerpts requires explicit publication authority. Host native tools do actual
+reading and editing. These checks protect helper operations, not arbitrary host shell
+commands or races in a host's separate file reader. Enforced tool access requires
+host mediation and separate conformance evidence.</p>
+<h2 id="acceptance-fixtures">Acceptance fixtures</h2>
+<p>Cover Java overloads, duplicate service names, inherited/custom Spring mappings,
+literal/dynamic Hono mounts, JPA explicit/implicit names, parameterized/dynamic SQL,
+matching event strings without transport proof, test skips, UTF-8/CRLF ranges,
+renamed/deleted files, dirty workspaces, missing semantic indexes, path escapes and
+incremental/full parity. Record false bindings and unsupported coverage separately.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/technical-design/extraction-and-source-binding.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

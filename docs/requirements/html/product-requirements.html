@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextFoundry product requirements · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../product-requirements.md">Markdown source</a></nav>
+    <article>
+      <h1 id="contextfoundry-product-requirements">ContextFoundry product requirements</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#authority-and-purpose">Authority and purpose</a></li><li><a href="#users-and-knowledge-scope">Users and knowledge scope</a></li><li><a href="#supported-task-intents">Supported task intents</a></li><li><a href="#primary-journey-and-review-checkpoints">Primary journey and review checkpoints</a></li><li><a href="#functional-requirements-and-acceptance">Functional requirements and acceptance</a></li><li><a href="#default-source-access-model">Default source-access model</a></li><li><a href="#responsibilities-and-assurance">Responsibilities and assurance</a></li><li><a href="#non-goals-and-sequencing">Non-goals and sequencing</a></li></ul></details>
+<p><strong>Status:</strong> User-confirmed product direction; detailed requirements proposed for review
+<strong>Baseline:</strong> CF-0.2 requirements alignment · 2026-09-20</p>
+<h2 id="authority-and-purpose">Authority and purpose</h2>
+<p>This document is the authoritative statement of intended product behavior. It
+captures the owner's clarified requirements; it does not claim implementation or
+approval of every design choice. Design documents describe how these requirements
+are fulfilled. Historical research is evidence, not a competing product specification.
+CF-0.2 is the reconciled validation-slice design baseline. Historical CF-0.1 research
+remains evidence, not a competing execution plan; unchanged technical choices retain
+their proposed status.</p>
+<p>ContextFoundry fills the company-specific knowledge gap between a general-purpose
+LLM and the enterprise's functional, technical, product-family and domain experts.
+It supports existing agents rather than replacing their reasoning or coding tools.</p>
+<h2 id="users-and-knowledge-scope">Users and knowledge scope</h2>
+<p>Users include product specialists, functional/domain experts, architects, developers,
+support engineers, testers, and knowledge/security administrators. Product experts
+know implementation depth; domain experts connect products across procurement,
+supply chain, Order to Cash, Procure to Pay, and other enterprise flows.</p>
+<p>Knowledge must connect these levels, not merely collect documents:</p>
+<ul>
+<li>Domain, product family, product, capability, business flow and flow step.</li>
+<li>Company-specific rules, variants, exceptions, configuration and applicability.</li>
+<li>Custom libraries, frameworks, utilities, standards and architectural decisions.</li>
+<li>Entities/tables, backend programs, jobs, workflows, APIs, events and integrations.</li>
+<li>Actual source locations, tests, ownership, evidence and known limitations.</li>
+</ul>
+<p>Intended behavior, observed implementation, expert assertions, and proposals remain
+distinct. Product/domain boundaries need not coincide with repositories or packs.</p>
+<h2 id="supported-task-intents">Supported task intents</h2>
+<table>
+<thead>
+<tr>
+<th>Intent</th>
+<th>Appropriate outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Functional/user inquiry</td>
+<td>Explain current behavior and conditions with evidence</td>
+</tr>
+<tr>
+<td>Consume a capability/API</td>
+<td>Contract, prerequisites, authorization, errors, side effects and usage constraints</td>
+</tr>
+<tr>
+<td>Defect investigation</td>
+<td>Expected versus observed behavior, hypotheses, targeted investigation and findings</td>
+</tr>
+<tr>
+<td>Impact analysis</td>
+<td>Affected flows/products/layers/tests, reasons, uncertainty and validation needs</td>
+</tr>
+<tr>
+<td>Enhancement request/new feature</td>
+<td>Investigated design, impact findings, execution/validation plan, then authorized implementation</td>
+</tr>
+</tbody>
+</table>
+<p>Diagnosis does not authorize a fix. A consumption question does not automatically
+require reading a full service implementation. Every outcome is limited by available
+and authorized evidence.</p>
+<h2 id="primary-journey-and-review-checkpoints">Primary journey and review checkpoints</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Required output</th>
+<th>Progress condition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Understand and map</td>
+<td>Interpreted request, relevant business/product areas, constraints, source pointers and gaps</td>
+<td>Present a reviewable scope; no broad implementation investigation yet</td>
+</tr>
+<tr>
+<td>Gate 1: scope review</td>
+<td>Human confirmation, corrections, additions or narrowing</td>
+<td>Confirm the exact revised scope before deeper investigation</td>
+</tr>
+<tr>
+<td>Assess and investigate</td>
+<td>Per-question sufficiency assessment; selective source/test inspection; updated findings</td>
+<td>Resolve or explicitly surface material uncertainty</td>
+</tr>
+<tr>
+<td>Propose</td>
+<td>Findings, impact analysis, appropriately sized design, execution and validation plan</td>
+<td>Inquiry/diagnosis can conclude here; implementation requests go to Gate 2</td>
+</tr>
+<tr>
+<td>Gate 2: implementation review</td>
+<td>Human decision on the exact proposal and permitted implementation scope</td>
+<td>Explicit authorization to code; rejection or revision returns to proposal</td>
+</tr>
+<tr>
+<td>Implement and validate</td>
+<td>Changes, check results, deviations, residual risks and final handoff</td>
+<td>Material scope/design changes return for review; no implicit merge/deploy authorization</td>
+</tr>
+</tbody>
+</table>
+<p>Gate 1 asks whether the agent is investigating the right areas. Gate 2 asks whether
+the resulting change is understood and authorized. Approval of one never implies the
+other. A review may be short, but cannot be inferred from silence. Straightforward
+inquiries may combine scope confirmation with clarification and need no coding gate.</p>
+<h2 id="functional-requirements-and-acceptance">Functional requirements and acceptance</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Observable acceptance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CF-R01</td>
+<td>Represent connected product/domain/implementation knowledge</td>
+<td>A cross-product flow query reaches distinct product steps and evidenced technical artifacts without assuming repo = product</td>
+</tr>
+<tr>
+<td>CF-R02</td>
+<td>Preserve company variants and technical conventions</td>
+<td>Two similarly named capabilities with different applicability remain distinguishable; unsupported applicability prompts clarification</td>
+</tr>
+<tr>
+<td>CF-R03</td>
+<td>Identify task intent and preserve original request</td>
+<td>Agent questions and reviewer additions are separate versioned inputs; diagnosis stays read-only</td>
+</tr>
+<tr>
+<td>CF-R04</td>
+<td>Produce a useful investigation map</td>
+<td>Each selected area/file has relevance, evidence, source identity and gaps; no default source dump</td>
+</tr>
+<tr>
+<td>CF-R05</td>
+<td>Support Gate 1 and human supplementation</td>
+<td>A missing subsystem can be added; revised scope is confirmed before deep reading; correction is not silently published as shared fact</td>
+</tr>
+<tr>
+<td>CF-R06</td>
+<td>Assess sufficiency by question and intended action</td>
+<td>API-use and service-change tasks over the same capability produce different reading needs and explain why</td>
+</tr>
+<tr>
+<td>CF-R07</td>
+<td>Navigate directly into accessible local source</td>
+<td>Logical source references resolve to approved local folders, symbols/sections and revisions; stale/missing mappings are explicit</td>
+</tr>
+<tr>
+<td>CF-R08</td>
+<td>Investigate selectively with a safe fallback</td>
+<td>Agent reads necessary sections/files, expands when justified, and reports material scope changes rather than hiding them</td>
+</tr>
+<tr>
+<td>CF-R09</td>
+<td>Deliver an evidence-backed proposal</td>
+<td>Current facts, proposed changes, impacts, risks, unknowns, execution steps and validation obligations are separated</td>
+</tr>
+<tr>
+<td>CF-R10</td>
+<td>Support Gate 2, plan versioning and final review</td>
+<td>No coding before explicit authorization in conforming integrations; material plan changes invalidate approval; results retain plan linkage</td>
+</tr>
+<tr>
+<td>CF-R11</td>
+<td>Remain agent- and source-control-independent</td>
+<td>Existing agent handles local reads/edits; logical snapshot identity supports Git and enterprise source mechanisms without requiring a Git SHA</td>
+</tr>
+<tr>
+<td>CF-R12</td>
+<td>Govern knowledge provenance and lifecycle</td>
+<td>Revisions, origin, review, conflicts, coverage, withdrawal and stale mappings are visible and independently represented</td>
+</tr>
+<tr>
+<td>CF-R13</td>
+<td>Enforce enterprise access at all controlled surfaces</td>
+<td>Direct UI/API/MCP/CLI/extractor paths deny unauthorized actions and evidence; review confirmation cannot grant source access</td>
+</tr>
+<tr>
+<td>CF-R14</td>
+<td>Retrieve terminology robustly without inventing facts</td>
+<td>Exact names, typos and paraphrases are evaluated separately; similarity nominates candidates, never proves business equivalence or dependency</td>
+</tr>
+<tr>
+<td>CF-R15</td>
+<td>Expose review and investigation artifacts accessibly</td>
+<td>Host conversation and Studio can display the same versioned map/proposal; tables/text do not require graph visualization</td>
+</tr>
+<tr>
+<td>CF-R16</td>
+<td>Demonstrate benefit and maintainability</td>
+<td>Same-information baselines, unseen tasks, missed impacts, human effort, preparation/refresh cost and scoped latency are reported</td>
+</tr>
+</tbody>
+</table>
+<h2 id="default-source-access-model">Default source-access model</h2>
+<p>The coding agent normally has authorized project-folder access already. ContextFoundry
+returns logical source identity, relative file path, symbol/section, revision/digest,
+and why the location matters. Local integration resolves this to the actual workspace.
+No upload of the whole working tree is required for investigation. Nonlocal document
+evidence can still be retrieved under service authorization.</p>
+<p>Known file locations should reduce unnecessary discovery, not prohibit grep/search
+when knowledge is stale, missing, ambiguous, or contradicted by current source.</p>
+<h2 id="responsibilities-and-assurance">Responsibilities and assurance</h2>
+<p>ContextFoundry owns knowledge preparation, retrieval, evidence, access and review
+artifacts. The integration guides stages, source binding and checkpoints. The agent
+owns sufficiency reasoning, source inspection, design, coding and tests; CI may
+execute validation. Humans supply domain context and approve scope and implementation.</p>
+<p>A prompt-driven skill provides guided compliance, not an enforceable filesystem
+barrier. The initial release must label this assurance honestly. Enforced mode is
+claimed only when a host can gate its own read/write tools and the integration has
+passed conformance tests. The knowledge server cannot block independent agent tools.
+Neither mode turns an agent's claimed approval into authenticated human approval.</p>
+<h2 id="non-goals-and-sequencing">Non-goals and sequencing</h2>
+<p>No replacement coding model, mandatory agent runtime, automatic code conversion,
+production deployment orchestrator, or automatic test-suite pruning. No claim that
+all functional knowledge can be inferred from source. Experts and approved documents
+are necessary inputs where implementation does not explain business intent.</p>
+<p>The first usable slice includes connected business knowledge, local navigation,
+both review checkpoints and a minimal proposal. Rich architecture diagrams and
+test-migration workbenches follow; the core workflow must not wait for them.</p>
+<p>See <a href="../../design/html/human-reviewed-engineering-workflow.html">workflow design</a>,
+<a href="../../design/html/hybrid-retrieval.html">retrieval strategy</a>, and
+<a href="traceability.html">requirements traceability</a>.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/requirements/product-requirements.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

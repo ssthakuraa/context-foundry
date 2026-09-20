@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextFoundry documentation · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="index.html">Documentation</a><a href="review-guide.html">Review guide</a><a href="../index.md">Markdown source</a></nav>
+    <article>
+      <h1 id="contextfoundry-documentation">ContextFoundry documentation</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#start-here">Start here</a></li><li><a href="#design-areas">Design areas</a></li><li><a href="#architecture-and-security">Architecture and security</a></li><li><a href="#technical-design-and-execution">Technical design and execution</a></li><li><a href="#research">Research</a></li><li><a href="#documentation-conventions">Documentation conventions</a></li></ul></details>
+<p>ContextFoundry gives AI agents governed access to enterprise engineering
+context while keeping source systems, authorization, and engineering judgment
+inside the enterprise boundary.</p>
+<h2 id="start-here">Start here</h2>
+<p><strong>CF-0.2 design closeout:</strong> begin with the <a href="review-guide.html">review guide</a>,
+<a href="../research/html/design-closeout.html">research verdict</a> and
+<a href="../execution/html/readiness-and-risks.html">implementation readiness</a>.
+All architecture/technical choices remain proposed unless an ADR states otherwise.
+No product implementation or benchmark validation is claimed.</p>
+<ol>
+<li><a href="vision.html">Vision</a></li>
+<li><a href="../concepts/html/engineering-context.html">Engineering context</a></li>
+<li><a href="../concepts/html/knowledge-packs.html">Knowledge packs</a></li>
+<li><a href="../concepts/html/evidence-and-provenance.html">Evidence and provenance</a></li>
+<li><a href="../architecture/html/overview.html">Architecture overview</a></li>
+</ol>
+<h2 id="design-areas">Design areas</h2>
+<ul>
+<li>
+<p><a href="../requirements/html/product-requirements.html">Product requirements</a></p>
+</li>
+<li>
+<p><a href="../requirements/html/traceability.html">Requirements traceability</a></p>
+</li>
+<li>
+<p><a href="../design/html/enterprise-knowledge-model.html">Enterprise knowledge model</a></p>
+</li>
+<li>
+<p><a href="../design/html/human-reviewed-engineering-workflow.html">Human-reviewed engineering workflow</a></p>
+</li>
+<li>
+<p><a href="../design/html/hybrid-retrieval.html">Hybrid retrieval</a></p>
+</li>
+<li>
+<p><a href="../design/html/preparation-and-business-knowledge.html">Preparation and business knowledge</a></p>
+</li>
+<li>
+<p><a href="../design/html/retrieval-and-agent-guidance.html">Retrieval content and agent guidance</a></p>
+</li>
+<li>
+<p><a href="../design/html/studio-experience.html">Studio experience</a></p>
+</li>
+<li>
+<p><a href="../design/html/target-architecture-workbench.html">Target architecture workbench</a></p>
+</li>
+<li>
+<p><a href="../design/html/test-impact-and-validation.html">Test impact and validation</a></p>
+</li>
+<li>
+<p><a href="../design/html/identity-and-policy.html">Identity and policy</a></p>
+</li>
+</ul>
+<h2 id="architecture-and-security">Architecture and security</h2>
+<ul>
+<li>
+<p><a href="../architecture/html/system.html">System architecture</a></p>
+</li>
+<li>
+<p><a href="../architecture/html/technology-stack.html">Technology stack and alternatives</a></p>
+</li>
+<li>
+<p><a href="../architecture/html/deployment-and-operations.html">Deployment and operations</a></p>
+</li>
+<li>
+<p><a href="../architecture/html/overview.html">Architecture overview</a></p>
+</li>
+<li>
+<p><a href="../architecture/html/security-and-authorization.html">Security and authorization</a></p>
+</li>
+<li>
+<p><a href="../decisions/html/0001-single-enterprise-deployment.html">Single-enterprise deployment decision</a></p>
+</li>
+<li>
+<p><a href="../decisions/html/0002-independent-implementation.html">Independent implementation decision</a></p>
+</li>
+<li>
+<p><a href="../decisions/html/0003-postgresql-and-portable-releases.html">Storage decision</a></p>
+</li>
+<li>
+<p><a href="../decisions/html/0004-retrieval-and-guidance-experiment.html">Retrieval experiment decision</a></p>
+</li>
+<li>
+<p><a href="../decisions/html/0005-validation-slice-baseline.html">Validation-slice baseline decision</a></p>
+</li>
+</ul>
+<h2 id="technical-design-and-execution">Technical design and execution</h2>
+<ul>
+<li><a href="../technical-design/html/system.html">Technical design</a></li>
+<li><a href="../technical-design/html/data-contracts.html">Data contracts and storage</a></li>
+<li><a href="../technical-design/html/interfaces.html">API, MCP, and CLI contracts</a></li>
+<li><a href="../technical-design/html/extraction-and-source-binding.html">Extraction and local source binding</a></li>
+<li><a href="../technical-design/html/task-and-review-contracts.html">Task and review contracts</a></li>
+<li><a href="../evaluation/html/methodology.html">Evaluation and acceptance</a></li>
+<li><a href="../evaluation/html/three-repository-benchmark.html">Three-repository benchmark</a></li>
+<li><a href="../execution/html/validation-work-packages.html">Validation work packages</a></li>
+<li><a href="../execution/html/implementation-plan.html">Detailed implementation plan</a></li>
+</ul>
+<h2 id="research">Research</h2>
+<ul>
+<li>
+<p><a href="../research/html/design-closeout.html">Research verdict and design closeout</a></p>
+</li>
+<li>
+<p><a href="../research/html/enterprise-modeling-patterns.html">Enterprise modeling patterns</a></p>
+</li>
+<li>
+<p><a href="../research/html/second-pass-assessment.html">Second-pass architecture challenge</a></p>
+</li>
+<li>
+<p><a href="../evaluation/html/validation-sequence.html">Validation sequence before broad implementation</a></p>
+</li>
+<li>
+<p><a href="../research/html/v2-disposition.html">V2 research and implementation disposition</a></p>
+</li>
+<li>
+<p><a href="../research/html/reference-analysis.html">Reference analysis</a></p>
+</li>
+<li>
+<p><a href="../research/html/market-and-technical-landscape.html">Market and technical landscape</a></p>
+</li>
+</ul>
+<h2 id="documentation-conventions">Documentation conventions</h2>
+<p>Documents use these statuses:</p>
+<ul>
+<li><strong>Draft</strong> — under discussion and expected to change.</li>
+<li><strong>Proposed</strong> — shaped enough for review and implementation planning.</li>
+<li><strong>Accepted</strong> — approved direction that implementation should follow.</li>
+<li><strong>Implemented</strong> — supported by working code and validation evidence.</li>
+<li><strong>Superseded</strong> — replaced by a later decision or design.</li>
+</ul>
+<p>Architecture and design documents describe intended behavior. Decision records
+capture why a significant choice was made. Reference documentation should be
+generated or kept close to the interfaces it describes once implementation
+exists.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/index.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

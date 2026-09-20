@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security and authorization · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../security-and-authorization.md">Markdown source</a></nav>
+    <article>
+      <h1 id="security-and-authorization">Security and authorization</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#security-boundaries">Security boundaries</a></li><li><a href="#deny-by-default-requirements">Deny-by-default requirements</a></li><li><a href="#authorization-timing">Authorization timing</a></li><li><a href="#extractor-security">Extractor security</a></li><li><a href="#effective-access-and-derived-evidence">Effective access and derived evidence</a></li><li><a href="#source-authority-and-publication">Source authority and publication</a></li><li><a href="#revocation-semantics">Revocation semantics</a></li><li><a href="#host-and-content-boundaries">Host and content boundaries</a></li><li><a href="#security-acceptance">Security acceptance</a></li></ul></details>
+<p><strong>Status:</strong> Proposed</p>
+<p>Authorization is a platform invariant. A user or process that is not allowed
+to access a pack, source root, function, or result must be denied regardless of
+whether the request came from the UI, CLI, API, MCP, or an extractor.</p>
+<h2 id="security-boundaries">Security boundaries</h2>
+<ol>
+<li><strong>Identity boundary</strong> — authenticate users, services, and scheduled jobs.</li>
+<li><strong>Enterprise boundary</strong> — bind the deployment to one enterprise security
+domain.</li>
+<li><strong>Pack boundary</strong> — isolate product and business-unit knowledge.</li>
+<li><strong>Source boundary</strong> — restrict repositories, snapshots, paths, and symbols.</li>
+<li><strong>Function boundary</strong> — authorize individual operations and capabilities.</li>
+<li><strong>Evidence boundary</strong> — prevent unauthorized facts from appearing in
+results, counts, diagnostics, logs, cursors, or exports.</li>
+</ol>
+<h2 id="deny-by-default-requirements">Deny-by-default requirements</h2>
+<ul>
+<li>No anonymous access to enterprise data</li>
+<li>No authorization based only on UI visibility</li>
+<li>No broad filesystem access for extractors by convention</li>
+<li>No cross-pack search without explicit policy</li>
+<li>No source pointer or relationship leakage through error messages</li>
+<li>No logging of restricted source content</li>
+<li>No cached response reuse across incompatible authorization scopes</li>
+</ul>
+<h2 id="authorization-timing">Authorization timing</h2>
+<p>Authorization should occur before:</p>
+<ul>
+<li>Search ranking and result aggregation</li>
+<li>Relationship traversal</li>
+<li>Pagination and count calculation</li>
+<li>Source content loading</li>
+<li>Export or report generation</li>
+<li>Response serialization and caching</li>
+</ul>
+<p>These checks reduce disclosure through result metadata; they do not by themselves
+prove freedom from timing or statistical side channels. Test ranking, suggestions,
+counts, cache behavior, and diagnostics under restricted principals.</p>
+<h2 id="extractor-security">Extractor security</h2>
+<p>Extractors require scoped, preferably read-only credentials and an explicit
+source manifest. Each run records the initiating principal, source scope,
+pack, extractor version, policy decision, and resulting candidate release.</p>
+<p>Secret scanning, data classification, redaction, retention, and release review
+are part of the extraction workflow. Extractors do not receive permission to
+publish or serve knowledge merely because they can read source.</p>
+<h2 id="effective-access-and-derived-evidence">Effective access and derived evidence</h2>
+<p>For a delegated agent operation, effective access is the intersection of user grants,
+client/tool grants, requested scope, and current policy. For an extractor worker it
+is the intersection of the initiating authority, worker grant, approved source scope,
+and current policy. An administrative role need not grant source-reading permission.</p>
+<p>Authorize a derived relationship's endpoints and all supporting records/passages.
+Precomputed dependency requirements may accelerate this check but cannot freeze
+user grants into a release. Recheck the current access epoch before delivering results;
+invalidate caches and cursors on change. Cached content still requires authorization.</p>
+<p>Use resource actions such as pack.configure, extraction.run, candidate.review,
+release.activate, context.search, evidence.read, proposal.approve, export.create,
+task.create, task.read, task.write, task.review_scope, task.approve_implementation,
+task.review_completion, task.revoke_decision, task.cancel, and audit.read. Data classification is a policy input, not an authorization mechanism
+by itself. Unauthenticated, no-grant, unavailable-policy, and ambiguous-delegation
+requests fail closed.</p>
+<p>Task decisions bind exact map/proposal digests to authenticated human authority.
+Agent/delegated tokens may submit drafts, not human approvals. Task membership does
+not grant evidence access. Initial artifacts require visibility of all supports;
+do not leak restricted facts through copied findings or approval screens. See
+<a href="../../technical-design/html/task-and-review-contracts.html">task contracts</a>.</p>
+<p>Human review gates govern conforming workflow progression; they never expand source
+access. A skill cannot prevent independent host shell reads/writes. Initial assurance
+is guided behavior with verified receipts; enforced mode requires host mediation.</p>
+<h2 id="source-authority-and-publication">Source authority and publication</h2>
+<p>Each source binding declares an access mode; extraction credentials never define
+the audience of derived knowledge:</p>
+<ul>
+<li><strong>Source-inherited:</strong> require current-enough source entitlements as well as local
+ContextFoundry grants. Record authority, identity mapping, ACL revision, observed
+time and expiry. Unknown identity, stale ACL, or unavailable required authority
+denies serving the affected content. Connector-specific freshness limits must be
+approved before use; no unbounded last-known-allow fallback.</li>
+<li><strong>Explicit publication:</strong> an authorized data owner approves a captured version
+for a named audience under retention and withdrawal rules. Reader access follows
+that publication grant; it does not pretend to mirror live source permissions.
+This is the initial local-snapshot mode. Source acquisition and redistribution
+authority are reviewed separately; a generic pack administrator cannot grant both.</li>
+</ul>
+<p>Derived descriptors, summaries, aliases and embeddings inherit all information
+dependencies, including context used to generate them. Combining sources must not
+broaden visibility. A sanitized/publication derivative is a separate reviewed
+artifact, not an automatic privilege reduction for its original evidence.</p>
+<p>Withdrawal blocks affected evidence and dependent results across retained generations
+and exports before asynchronous cleanup. Immutable release history does not require
+indefinite serving or retention of withdrawn bytes. Record a non-content tombstone
+and follow approved deletion/backup-expiry policy. Test withdrawal after rollback.</p>
+<h2 id="revocation-semantics">Revocation semantics</h2>
+<p>Local grants, group bindings, session revocation and source-withdrawal state share a
+monotonic access epoch. Check the primary authority at final response authorization,
+outside any old repeatable-read snapshot. Changed epochs require recomputation or
+denial. A response authorized before a concurrent revocation can already be in
+flight; do not promise recall of bytes already sent. Subsequent requests and export
+downloads must see a committed local revocation. Long streams reauthorize chunks.</p>
+<p>Remote IdP/source changes become enforceable when observed; short token lifetime
+alone is not immediate revocation. Document sync/expiry limits and fail-closed
+behavior. Bind groups to stable issuer/subject identifiers rather than email names.
+No policy cache or read replica may silently weaken this documented consistency.</p>
+<h2 id="host-and-content-boundaries">Host and content boundaries</h2>
+<p>The service cannot govern a user's independent access to local source, nor recall
+previous downloads. Access claims apply to ContextFoundry-controlled operations.
+Treat retrieved documents, source comments, adapter output, and imported metadata
+as untrusted content. No embedded text grants access or controls tool execution.
+Escape HTML, restrict source-link schemes, and sanitize Markdown in Studio/export.</p>
+<p>Network captures require SSRF controls and bounded redirects. Extractors require
+process/container isolation, read-only inputs, resource limits, and approved egress.
+Captured source and derived indexes are sensitive assets even without full bodies
+in the canonical pack. Encrypt enterprise storage/backups according to deployment
+policy and retain secrets only in approved secret storage.</p>
+<h2 id="security-acceptance">Security acceptance</h2>
+<p>Attempt direct API access to hidden UI actions, hidden-support graph traversal,
+cross-user cursor replay, revoked cache hits, stale approval activation, malicious
+document instructions, archive traversal, escaped HTML, worker escape through paths,
+and unauthorized export downloads. Compare positive and denied paths so controls
+do not silently destroy legitimate result quality. Permission-scoped performance
+tests are required alongside correctness tests.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/architecture/security-and-authorization.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

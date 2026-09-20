@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human-reviewed engineering workflow · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../human-reviewed-engineering-workflow.md">Markdown source</a></nav>
+    <article>
+      <h1 id="human-reviewed-engineering-workflow">Human-reviewed engineering workflow</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#integration-design">Integration design</a></li><li><a href="#task-state-and-artifacts">Task state and artifacts</a></li><li><a href="#gate-semantics">Gate semantics</a></li><li><a href="#human-identity-and-host-assurance">Human identity and host assurance</a></li><li><a href="#local-source-binding">Local source binding</a></li><li><a href="#acceptance-scenarios">Acceptance scenarios</a></li></ul></details>
+<p><strong>Status:</strong> Proposed design · CF-0.2 alignment · 2026-09-20</p>
+<p>Implements CF-R03–CF-R11 and CF-R15 in the
+<a href="../../requirements/html/product-requirements.html">product requirements</a>.</p>
+<h2 id="integration-design">Integration design</h2>
+<p>Deliver a versioned agent skill/workflow package with a small local binding helper
+and authenticated retrieval client. These are proposed artifacts, not installed
+plugins. The package has host-specific configuration but common task/map/proposal
+contracts. Do not build a competing agent orchestrator. The initial host renders
+reviews in conversation; Studio supplies durable review pages where needed.</p>
+<p>The agent can call retrieval tools in any useful order within a stage. This freedom
+does not remove the user-review checkpoints. Retrieval granularity and workflow
+approval are separate decisions.</p>
+<h2 id="task-state-and-artifacts">Task state and artifacts</h2>
+<p>States: mapping -&gt; scope_review -&gt; investigating -&gt; proposal_review -&gt; implementing
+-&gt; validation_review -&gt; completed. Inquiry/diagnosis branches can end with findings
+after investigation. Needs_input, cancelled and rejected outcomes are explicit.
+Artifacts are append-only versions; state changes use expected_version and audit.</p>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>Required content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Task</td>
+<td>Original request, origin, intent, user constraints, task owner, selected packs</td>
+</tr>
+<tr>
+<td>Investigation map</td>
+<td>Interpreted concerns, business/product scope, evidence-backed relationships, logical file pointers, relevance, known gaps, release set</td>
+</tr>
+<tr>
+<td>Scope decision</td>
+<td>Human reviewer, map digest, accepted/corrected scope, supplements, timestamp</td>
+</tr>
+<tr>
+<td>Sufficiency assessment</td>
+<td>Question, available evidence, sufficient/inspect/unresolved judgment, rationale, intended file sections</td>
+</tr>
+<tr>
+<td>Findings</td>
+<td>Observed source identity/digests, conclusions, contradictions, evidence and unresolved risks</td>
+</tr>
+<tr>
+<td>Proposal</td>
+<td>Findings/impact, design, touched areas, execution steps, tests, risks, assumptions, baseline, exclusions</td>
+</tr>
+<tr>
+<td>Implementation decision</td>
+<td>Human identity, proposal digest, permitted actions/scope, validity and revocation</td>
+</tr>
+<tr>
+<td>Completion record</td>
+<td>Proposal linkage, changed locations, checks/results, deviations and residual risks</td>
+</tr>
+</tbody>
+</table>
+<p>Human additions are task-local assertions with attribution. Promoting one to shared
+business knowledge needs separate evidence and publication review. A suggested file
+does not become known-relevant until assessed, and does not grant filesystem access.</p>
+<h2 id="gate-semantics">Gate semantics</h2>
+<p>Gate 1 precedes deep implementation reading. Mapping can use prepared descriptors,
+contracts, docs and bounded location/freshness checks; reading whole service bodies
+to preempt the review defeats the purpose. Show missing/ambiguous areas for review.
+An added area changes the map version; confirm the resulting scope, not an older map.</p>
+<p>After Gate 1, read the smallest coherent section that can answer a question. Include
+surrounding control flow, types and callers when necessary; tiny snippets are not
+always sufficient. Ordinary dependencies within approved scope need no per-file
+approval. A new product, security boundary, major behavior or write scope returns to
+scope review. Record stale-source corrections and their implications.</p>
+<p>Gate 2 requires explicit implementation authorization for the exact proposal. A
+design approval without permission to code is recorded separately. Resume after
+interruption rechecks task state, approval validity and relevant source fingerprints.
+Any proposal revision invalidates its approval. Relevant source drift requires
+reassessment and refreshed review before continuing affected implementation.
+Neither approval authorizes commit, push, merge, deployment or destructive work.</p>
+<h2 id="human-identity-and-host-assurance">Human identity and host assurance</h2>
+<p>Guided mode pauses and asks in the host conversation. If the host cannot provide an
+authenticated human event, a copied confirmation is labelled host-reported, not a
+verified platform approval. Durable verified decisions use Studio's authenticated
+review page or a validated host human-action channel. A delegated agent credential
+may submit drafts and read decisions but cannot approve its own artifacts.</p>
+<p>Enforced mode requires host tool mediation for stage-appropriate reading and writes;
+it cannot be implemented by prompt text alone. Publish a host capability/conformance
+matrix at implementation. Initially support guided mode with verified review receipts;
+do not promise enforced mode on every host. A service-issued receipt attests a
+decision, not that an unmediated external agent obeyed it.</p>
+<h2 id="local-source-binding">Local source binding</h2>
+<p>Keep logical source IDs in the server and absolute workspace roots local. A user
+registers a source-ID-to-root mapping. The local helper canonicalizes paths, rejects
+absolute/traversal escapes and symlinks outside allowed roots, and checks access.
+Duplicate mappings require disambiguation. Repository name alone is not identity.</p>
+<p>Git adapters may report commit and dirty-file digests. Other source systems report
+snapshot/view identity and content digests through a read-only adapter. Unknown
+revision is explicitly unknown, not silently current. Changed lines are re-located
+by symbol plus digest checks; do not trust stale line numbers or silently select
+another same-named file. Missing local sources prompt a binding request or authorized
+fallback; never auto-clone, switch source views or fetch credentials.</p>
+<p>Read files with existing host tools. Persist only permitted locator/read receipts by
+default, not local source bodies. Uncommitted content is not automatically uploaded
+or published. Source findings can be task-local without changing the active pack.</p>
+<h2 id="acceptance-scenarios">Acceptance scenarios</h2>
+<p>Test API consumption without deep reading; enhancement requiring service inspection;
+human-added cross-product scope; diagnosis ending without writes; rejection/silence at
+both gates; a forged agent approval; proposal changes; revoked approvals; resume with
+dirty/stale source; missing roots; path escape; and a material discovery during coding.
+Measure useful file navigation, unnecessary reads, reviewer effort and final correctness.
+Conformance must distinguish instructed behavior from host-enforced boundaries.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/human-reviewed-engineering-workflow.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

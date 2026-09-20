@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContextFoundry · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../docs/html/index.html">Documentation</a><a href="../docs/html/review-guide.html">Review guide</a><a href="../README.md">Markdown source</a></nav>
+    <article>
+      <h1 id="contextfoundry">ContextFoundry</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#documentation">Documentation</a></li><li><a href="#project-status">Project status</a></li><li><a href="#build-the-review-pages">Build the review pages</a></li></ul></details>
+<p>Trusted engineering context for AI agents.</p>
+<p>ContextFoundry is being designed as an open-source, self-hosted platform for building and
+serving governed knowledge about enterprise software systems. It connects
+business requirements to source code, architecture, ownership, dependencies,
+tests, and validation evidence so that AI coding agents can work with context
+that is specific to an enterprise.</p>
+<p>ContextFoundry complements tools such as Codex, Claude Code, and Cursor. It
+does not replace their code-generation or agent capabilities.</p>
+<h2 id="documentation">Documentation</h2>
+<p>Start with the <a href="../docs/html/review-guide.html">design-closeout review guide</a>, or open
+<code>docs/html/index.html</code> in a browser for the complete HTML review package.</p>
+<ul>
+<li><a href="../docs/html/index.html">Documentation index</a></li>
+<li><a href="../docs/requirements/html/product-requirements.html">Product requirements</a></li>
+<li><a href="../docs/research/html/design-closeout.html">Research verdict and competitive confidence</a></li>
+<li><a href="../docs/execution/html/validation-work-packages.html">Validation implementation work packages</a></li>
+<li><a href="../docs/html/vision.html">Vision</a></li>
+<li><a href="../docs/concepts/html/engineering-context.html">Engineering context</a></li>
+<li><a href="../docs/concepts/html/knowledge-packs.html">Knowledge packs</a></li>
+<li><a href="../docs/concepts/html/evidence-and-provenance.html">Evidence and provenance</a></li>
+<li><a href="../docs/architecture/html/overview.html">Architecture overview</a></li>
+<li><a href="../docs/design/html/target-architecture-workbench.html">Target architecture workbench</a></li>
+<li><a href="../docs/design/html/test-impact-and-validation.html">Test impact and validation</a></li>
+<li><a href="../docs/design/html/identity-and-policy.html">Identity and policy</a></li>
+</ul>
+<h2 id="project-status">Project status</h2>
+<p>The project is in the design phase. CF-0.2 reconciles architecture, functional and
+technical designs with the two-gate human workflow and a Java/Spring plus TypeScript
+validation slice. Research synthesis and the design handoff are ready for review;
+prototype effectiveness, performance and market competitiveness remain unvalidated.
+Product implementation has not started.
+Open-source publication and license selection are pending.</p>
+<h2 id="build-the-review-pages">Build the review pages</h2>
+<p>Use Python 3.10+ with <code>markdown-it-py==3.0.0</code> (the tested documentation dependency):</p>
+<pre><code class="language-bash">python3 scripts/build-docs.py
+python3 scripts/build-docs.py --check
+</code></pre>
+<p>Each Markdown document generates a matching page in its sibling <code>html/</code> directory.
+The generator validates local HTML links and heading anchors. Generated files should
+be updated with the Markdown sources. HTML pages load no external scripts or fonts.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from README.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

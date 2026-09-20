@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market and technical landscape · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../market-and-technical-landscape.md">Markdown source</a></nav>
+    <article>
+      <h1 id="market-and-technical-landscape">Market and technical landscape</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#adjacent-capabilities">Adjacent capabilities</a></li><li><a href="#differentiation-hypothesis">Differentiation hypothesis</a></li></ul></details>
+<p><strong>Status:</strong> Draft</p>
+<p>This is the initial broad landscape, not an exhaustive current competitor audit.
+The bounded primary-source synthesis and competitive confidence assessment are in
+<a href="design-closeout.html">design closeout</a>. Do not infer uniqueness from this category list.</p>
+<p>Public offerings from large consulting firms commonly combine AI-assisted
+reverse engineering, dependency discovery, knowledge repositories, target
+architecture, code transformation, testing, migration, and managed delivery.
+They generally package these capabilities as proprietary platforms and
+services.</p>
+<p>ContextFoundry should occupy a narrower open-source position: the governed
+engineering-context and verification layer that can feed existing coding
+agents, consulting accelerators, and enterprise delivery systems.</p>
+<h2 id="adjacent-capabilities">Adjacent capabilities</h2>
+<ul>
+<li>Software catalogs provide ownership and service metadata.</li>
+<li>Code-intelligence systems provide search, symbol navigation, and dependency
+context.</li>
+<li>Static-analysis systems provide language- or security-specific facts.</li>
+<li>Refactoring systems perform deterministic code transformation.</li>
+<li>AI coding agents perform investigation, reasoning, and code generation.</li>
+</ul>
+<p>ContextFoundry connects these categories through product-owned terminology,
+evidence, policy, architecture proposals, and test-impact relationships.</p>
+<h2 id="differentiation-hypothesis">Differentiation hypothesis</h2>
+<p>The open-source opportunity is not to reproduce an entire modernization
+factory. It is to provide a portable and reviewable context substrate with:</p>
+<ul>
+<li>Enterprise-owned portable releases with Git-suitable configuration/metadata</li>
+<li>First-party extraction adapters and open agent interfaces, not mandatory external context providers</li>
+<li>Source- and revision-bound provenance</li>
+<li>Policy-aware retrieval</li>
+<li>Architecture and test-impact views</li>
+<li>Agent-neutral interfaces</li>
+<li>Reproducible evaluation</li>
+</ul>
+<p>The following public sources informed this initial landscape review:</p>
+<ul>
+<li><a href="https://www.accenture.com/en/services/cloud/application-transformation/genwizard">Accenture GenWizard</a></li>
+<li><a href="https://www.thoughtworks.com/perspectives/edition33-accelerating-modernization/article">Thoughtworks CodeConcise and knowledge graphs</a></li>
+<li><a href="https://www.ibm.com/think/insights/reimagining-application-modernization-migration-agentic">IBM agentic modernization</a></li>
+<li><a href="https://www.tcs.com/what-we-do/products-platforms/tcs-mastercraft/solution/tcs-mastercraft-modernization">TCS MasterCraft modernization</a></li>
+<li><a href="https://www.cognizant.com/en_us/services/documents/cognizant-unlock-innovation-with-ai-led-legacy-modernization.pdf">Cognizant AI-led modernization</a></li>
+<li><a href="https://www.capgemini.com/solutions/raise-for-software-product-x/">Capgemini RAISE for Software Product X</a></li>
+<li><a href="https://www.wipro.com/engineering/services/connected-services/hi-tech/valorize/">Wipro Valorize</a></li>
+<li><a href="https://backstage.io/docs/features/software-catalog/">Backstage Software Catalog</a></li>
+<li><a href="https://sourcegraph.com/docs">Sourcegraph documentation</a></li>
+<li><a href="https://docs.openrewrite.org/">OpenRewrite documentation</a></li>
+</ul>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/research/market-and-technical-landscape.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

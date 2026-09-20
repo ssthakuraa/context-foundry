@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enterprise knowledge and workflow modeling patterns · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../enterprise-modeling-patterns.md">Markdown source</a></nav>
+    <article>
+      <h1 id="enterprise-knowledge-and-workflow-modeling-patterns">Enterprise knowledge and workflow modeling patterns</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#conclusion">Conclusion</a></li><li><a href="#google-entity-identity-and-contextual-relationships">Google: entity identity and contextual relationships</a></li><li><a href="#meta-structural-facts-revision-aware-navigation-and-staged-ranking">Meta: structural facts, revision-aware navigation and staged ranking</a></li><li><a href="#salesforce-task-shaped-context-actions-and-business-scope">Salesforce: task-shaped context, actions and business scope</a></li><li><a href="#langgraph-durable-workflow-state-is-not-a-knowledge-graph">LangGraph: durable workflow state is not a knowledge graph</a></li><li><a href="#palantir-explicit-ontology-tied-to-actual-data">Palantir: explicit ontology tied to actual data</a></li><li><a href="#recommended-contextfoundry-model">Recommended ContextFoundry model</a></li></ul></details>
+<p><strong>Status:</strong> Primary-source comparison and proposed synthesis · 2026-09-20</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>There is no verified single best model for this entire problem. The useful pattern
+is separation: typed enterprise knowledge, revision-aware implementation facts,
+task-specific retrieval, and resumable human-reviewed workflow. This is our synthesis,
+not a claim that the following systems implement ContextFoundry's exact journey.
+Documentation and engineering reports were inspected; systems were not deployed or
+benchmarked. Sources describe different scopes and dates, not a common comparison.</p>
+<h2 id="google-entity-identity-and-contextual-relationships">Google: entity identity and contextual relationships</h2>
+<p>Gemini Enterprise documents knowledge-graph query annotation, entity linking and
+ACL-aware entities. Its described graph centers on people, content and interactions;
+the documented private graph is not a ready-made procurement-to-code ontology.
+<a href="https://docs.cloud.google.com/gemini/enterprise/docs/use-knowledge-graph-search">Google knowledge graph</a>.</p>
+<p>Transfer: separate names from identities, preserve ambiguous mentions, and use
+product/domain scope to interpret terms. Do not assume a search engine understands
+company business variants without the relevant records. Organizational proximity
+may help find an expert; it must not establish truth or grant permission.</p>
+<h2 id="meta-structural-facts-revision-aware-navigation-and-staged-ranking">Meta: structural facts, revision-aware navigation and staged ranking</h2>
+<p>Meta's Glean stores queryable code facts and supports incremental indexing; Glass
+exposes navigation with repository/path/revision and symbol identities. Meta also
+describes incident investigation using heuristic retrieval followed by model-based
+ranking. These are different systems/use cases, not one enterprise-domain assistant.
+<a href="https://engineering.fb.com/2024/12/19/developer-tools/glean-open-source-code-indexing/">Glean and Glass</a>,
+<a href="https://engineering.fb.com/2024/06/24/data-infrastructure/leveraging-ai-for-efficient-incident-response/">incident retrieval</a>.</p>
+<p>Transfer: typed extracted facts and locators underpin navigation; rank a constrained
+candidate set instead of asking a model to examine everything. Incremental cost
+depends on affected dependencies, not just the number of edited files. Meta's Glean
+is distinct from the enterprise-search company also named Glean. Neither this source
+study nor a measured result at Meta establishes ContextFoundry performance.</p>
+<h2 id="salesforce-task-shaped-context-actions-and-business-scope">Salesforce: task-shaped context, actions and business scope</h2>
+<p>Salesforce's Agentforce guide separates topics/actions, conversation variables,
+retrieved knowledge and guardrails. It describes task-based narrowing and recommends
+structured mechanisms for critical logic rather than only natural-language rules.
+<a href="https://developer.salesforce.com/blogs/2025/08/a-developers-guide-to-context-engineering-with-agentforce">Agentforce context engineering</a>.</p>
+<p>Transfer: shape context by task intent and domain; separate knowledge from authority
+to act. API consumption and service enhancement need different facets. Do not adopt
+an arbitrary vendor topic-count limit or execute business actions from our knowledge
+service. The page is architectural guidance, not proof of cross-product code impact.</p>
+<h2 id="langgraph-durable-workflow-state-is-not-a-knowledge-graph">LangGraph: durable workflow state is not a knowledge graph</h2>
+<p>LangGraph separates thread-scoped state/checkpoints from cross-session stores; its
+interrupt mechanism supports human input and resumption. This provides workflow
+primitives, not a ready-made enterprise ontology or source authorization policy.
+<a href="https://docs.langchain.com/oss/python/concepts/memory">Memory</a>,
+<a href="https://docs.langchain.com/oss/python/langgraph/interrupts">interrupts</a>.</p>
+<p>Transfer: keep the task map, reviewer additions, approvals and progress separate
+from released knowledge. Durable checkpoints help resumption but do not magically
+enforce an external coding agent's tools. A small task/review state machine is enough
+for our initial integration; LangGraph is not a required runtime dependency.</p>
+<h2 id="palantir-explicit-ontology-tied-to-actual-data">Palantir: explicit ontology tied to actual data</h2>
+<p>Foundry describes object types, properties, link types and action types bound to
+organizational data. It is a useful reference for modeling business meaning rather
+than treating documents as the only abstraction.
+<a href="https://www.palantir.com/docs/foundry/ontology/core-concepts">Ontology core concepts</a>.</p>
+<p>Transfer: define a small typed vocabulary for capabilities, flows, variants and
+implementation links, with explicit provenance. ContextFoundry models knowledge
+about software and behavior; it does not copy the enterprise's operational orders,
+customers and payments into a second transaction system or reproduce Foundry Actions.</p>
+<h2 id="recommended-contextfoundry-model">Recommended ContextFoundry model</h2>
+<p>Use four logical layers, not four new databases:</p>
+<ol>
+<li>Enterprise domain model: concepts, capabilities, flows, rules, variants and standards.</li>
+<li>Evidence/implementation model: declarations, semantic bindings, contracts, source
+locators, runtime/test receipts and assertions connecting them to domain meaning.</li>
+<li>Retrieval projections: exact, lexical, optional fuzzy/semantic lanes and bounded
+typed traversal. Ranking selects evidence; it does not write canonical facts.</li>
+<li>Task workspace: interpreted request, scope map, human corrections, sufficiency,
+findings, proposal, approvals and execution receipts.</li>
+</ol>
+<p>PostgreSQL plus canonical files remains the proposed storage implementation. A
+logical knowledge graph does not require selecting a graph database now. Do not
+start with a universal enterprise ontology; prove a small cross-product flow and
+extend namespaced types only when required. See the
+<a href="../../design/html/enterprise-knowledge-model.html">knowledge model</a> and
+<a href="../../design/html/human-reviewed-engineering-workflow.html">human-reviewed workflow</a>.</p>
+<p>The question is not whether embeddings or graphs are fashionable. It is whether
+the model can explain a company's rule, select the correct variant, and lead an
+agent to current implementation with less effort and no loss of critical context.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/research/enterprise-modeling-patterns.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

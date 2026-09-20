@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preparation and business knowledge · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../preparation-and-business-knowledge.md">Markdown source</a></nav>
+    <article>
+      <h1 id="preparation-and-business-knowledge">Preparation and business knowledge</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#user-journeys">User journeys</a></li><li><a href="#preparation-stages">Preparation stages</a></li><li><a href="#first-adapter-slice">First adapter slice</a></li><li><a href="#precision-tiers-and-semantic-index-import">Precision tiers and semantic-index import</a></li><li><a href="#incremental-maintenance">Incremental maintenance</a></li><li><a href="#business-knowledge-model">Business knowledge model</a></li><li><a href="#acceptance">Acceptance</a></li></ul></details>
+<p><strong>Status:</strong> Proposed validation-slice design · CF-0.2</p>
+<h2 id="user-journeys">User journeys</h2>
+<p>A pack maintainer declares a product scope, owners, source roots, allowed adapters,
+and publication reviewers. An extractor operator starts a scoped job. The system
+captures a coherent source manifest, produces facts and diagnostics, and presents a
+candidate diff. A reviewer accepts or rejects the candidate with reasons. Promotion
+is a separate authorized action that activates a verified query generation.</p>
+<p>A domain expert can add business definitions and review suggested mappings. They
+see the document passage, engineering target, evidence origin, and alternatives
+together. Approved associations remain reviewed associations; they do not become
+source-declared call edges.</p>
+<h2 id="preparation-stages">Preparation stages</h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Output</th>
+<th>Failure behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scope validation</td>
+<td>Approved source/adapter manifest</td>
+<td>Reject inaccessible roots and unsupported configuration</td>
+</tr>
+<tr>
+<td>Inventory/capture</td>
+<td>File/document identities, digests, supplied revisions</td>
+<td>Reject inconsistent snapshot; do not refresh user checkouts</td>
+</tr>
+<tr>
+<td>Extraction</td>
+<td>Per-input fact shards and diagnostics</td>
+<td>Isolate parser failure; mark coverage partial or fail required adapter</td>
+</tr>
+<tr>
+<td>Identity/ownership</td>
+<td>Qualified artifacts and explicit owners</td>
+<td>Preserve conflicts for review</td>
+</tr>
+<tr>
+<td>Resolution</td>
+<td>Typed edges, interface bindings, unresolved candidates</td>
+<td>Never pick a same-name target arbitrarily</td>
+</tr>
+<tr>
+<td>Business mapping</td>
+<td>Passage-backed concepts and reviewed associations</td>
+<td>Keep unreviewed model suggestions separate</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Integrity, coverage, policy, and change report</td>
+<td>Failed candidate cannot be promoted</td>
+</tr>
+<tr>
+<td>Projection/activation</td>
+<td>Verified generation and release pointer</td>
+<td>Atomic switch only after approval and successful indexing</td>
+</tr>
+</tbody>
+</table>
+<p>Source acquisition initially accepts prepared local snapshots with Git or supplied
+enterprise-view identity and approved
+document directories. GitHub/enterprise-wiki connectors are later adapter work.
+The product does not execute repository builds, package scripts, or source-view
+management commands during extraction. Parser limitations are recorded explicitly.</p>
+<h2 id="first-adapter-slice">First adapter slice</h2>
+<p>Use the private three-repository maintenance fixture plus public-safe synthetic
+conformance cases. Include narrow Java/Spring, TypeScript/Hono, OpenAPI, SQL, Markdown
+and test-source/report adapters. Java cannot wait for a later milestone when the
+selected domain implementation is Java. Extract declared facts and supported framework
+bindings; preserve ambiguity and unsupported coverage. Do not infer runtime calls
+from imports or complete data dependencies from string matches. Exact supported
+patterns and source-binding behavior are specified in
+<a href="../../technical-design/html/extraction-and-source-binding.html">extraction contracts</a>.</p>
+<h2 id="precision-tiers-and-semantic-index-import">Precision tiers and semantic-index import</h2>
+<p>Declare supported relationships per adapter: syntax declaration/reference,
+semantic symbol resolution, framework/interface binding, or observed runtime edge.
+Do not collapse them into a single &quot;precise graph&quot; label. Syntax-only operation is
+supported with explicit limits; it cannot satisfy a precise call-impact promise.</p>
+<p>Accept approved CI-produced semantic indexes through a bounded SCIP import adapter.
+Validate producer identity, repository/revision, source digests, indexer/version,
+format, document paths, symbol identities and dependency context. Imports join only
+matching source manifests. Missing build context, stale or mismatched indexes remain
+unavailable for precise resolution; do not silently substitute same-name symbols.
+Preserve source/index references and resolver method in each imported assertion.</p>
+<p>Generating these indexes belongs to the enterprise's CI/build boundary, not the
+ContextFoundry extraction service. Prototype a matching Java or TypeScript import
+where the benchmark needs precision before promising precise test impact. This adopts an
+interchange format, not a Sourcegraph runtime dependency. See the
+<a href="../../research/html/second-pass-assessment.html">second-pass rationale</a>.</p>
+<h2 id="incremental-maintenance">Incremental maintenance</h2>
+<p>Cache file contributions by source identity, relative path, content digest, parser
+and adapter versions, extraction configuration, and identity/ownership rules. Reuse
+unchanged contributions but rebind revision locators only with matching content.
+Resolve global references separately from parsing.</p>
+<p>A changed/deleted provider invalidates incoming bindings, not just its own shard.
+A newly added provider triggers previously unresolved-reference lookup. Maintain
+reverse dependencies from facts to mappings, paths, and validation assessments.
+Document edits invalidate dependent assertions and review fingerprints. Policy
+changes invalidate visibility independently of factual regeneration.</p>
+<p>Require semantic equality between full and incremental builds of the same manifest,
+including ambiguity and deletion outcomes. Timing/run IDs are excluded from equality;
+provenance is not. Fall back to rebuilding the affected scope when correctness cannot
+be established incrementally. Measure entire pipeline cost, including inventory,
+resolution, validation, indexing, and review—not only parser speed.</p>
+<h2 id="business-knowledge-model">Business knowledge model</h2>
+<p>Capture documents by stable ID, authority, edition when known, digest, and exact
+section/span. Business concepts have pack-owned kinds, names, aliases, definitions,
+and evidence. Relationships preserve conditions and documented order. A business
+object, screen, API, and database table are separate identities linked many-to-many.</p>
+<p>Mapping candidates arise from explicit references and reviewed semantic associations.
+Unstructured prose may use offline model assistance under enterprise data-routing
+policy. Record model, prompt version, inputs, output artifact, and cost. A review
+decision binds to supporting evidence hashes and becomes stale when they change.
+Query-time relevance cannot upgrade evidence trust.</p>
+<p>Use the <a href="enterprise-knowledge-model.html">enterprise model</a> for domains, products, flows,
+rules, applicability and standards. A reusable worked business procedure can be a
+reviewed knowledge artifact with prerequisites/outcomes and cited steps. It is evidence
+for the agent to assess, not a higher-priority instruction or permission to execute.
+Measure its benefit separately from generic tool/workflow guidance; do not author
+procedures that contain held-out task answers.</p>
+<p>Support both business-to-code and code-to-business retrieval. Exact code queries
+need not pass through business lookup. Conflicting documents and code remain separate
+claims; an authority rule applies to a claim type rather than making one source
+globally superior. Initial curation must describe reusable product knowledge rather
+than encode expected answers to evaluation stories.</p>
+<h2 id="acceptance">Acceptance</h2>
+<p>The first M2/M3 fixture includes a small versioned, reviewed business mapping set
+and applicable architecture constraints. It does not wait for the M4 curation UI.
+Index passages with title, section ancestry, product and edition so isolated chunks
+retain meaning. Keep contextual descriptors distinct from exact evidence quotations;
+all contributing passages remain authorization dependencies. Start with deterministic
+descriptors. Model-generated descriptions need separate provenance and evaluation.</p>
+<p>Initial local snapshots use explicitly approved publication audiences, not claims
+of live source-ACL synchronization. See <a href="../../architecture/html/security-and-authorization.html#source-authority-and-publication">source authority</a>.</p>
+<p>Exercise duplicate names across repositories, unsupported formats, deleted providers,
+newly resolvable references, ownership changes, corrupted caches, partial captures,
+conflicting business definitions, revoked passages, and stale review decisions.
+Show the actual coverage inventory to reviewers; a schema-valid release can still
+be unsuitable for a particular engineering question.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/preparation-and-business-knowledge.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

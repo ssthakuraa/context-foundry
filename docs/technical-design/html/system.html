@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Technical design · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../system.md">Markdown source</a></nav>
+    <article>
+      <h1 id="technical-design">Technical design</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#module-layout">Module layout</a></li><li><a href="#preparation-worker-protocol">Preparation worker protocol</a></li><li><a href="#job-durability">Job durability</a></li><li><a href="#query-execution">Query execution</a></li><li><a href="#authorization-cost-without-weakening-authorization">Authorization cost without weakening authorization</a></li><li><a href="#caches-and-continuations">Caches and continuations</a></li><li><a href="#concurrency-and-consistency">Concurrency and consistency</a></li><li><a href="#error-and-observability-contracts">Error and observability contracts</a></li><li><a href="#compatibility-and-testing">Compatibility and testing</a></li></ul></details>
+<p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
+<h2 id="module-layout">Module layout</h2>
+<pre><code class="language-text">apps/studio             React review and administration UI
+apps/server             HTTP, MCP, authentication/session boundary
+apps/worker             isolated job runner
+apps/cli                authenticated client and offline validation commands
+packages/contracts      JSON schemas, generated types, compatibility fixtures
+packages/domain         identity, record/release rules, evidence lifecycle
+packages/preparation    inventory, adapter runner, resolution, candidate validation
+packages/retrieval      exact/text search, typed traversal, selection, rendering
+packages/policy         actions/resources, effective grants, enforcement helpers
+packages/reviews        task state, human decisions, mappings, proposals, test assessments
+packages/local-client   authenticated client, source-root binding, locator checks
+packages/storage        PostgreSQL repositories, blobs, release manifests
+packages/adapters       first-party source/metadata extractors
+packages/evaluation     replay, experiments, scoring, accounting
+</code></pre>
+<p>This is a proposed implementation layout; no packages have been created. The domain
+and contract packages do not import transport, UI, or database drivers. Application
+services authorize operations before calling repositories. Offline validators may
+read explicitly supplied files; they do not bypass enterprise serving policy.</p>
+<p>The first implementation follows <a href="../../execution/html/validation-work-packages.html">validation work packages</a>,
+not creation of every module/UI feature at once. The initial extraction scope includes
+Java/Spring and TypeScript. <a href="extraction-and-source-binding.html">Extraction/source binding</a>
+and <a href="task-and-review-contracts.html">task/review contracts</a> specify the CF-0.2 boundaries.
+The local client is not a second agent runtime; its root mappings remain on the host.</p>
+<h2 id="preparation-worker-protocol">Preparation worker protocol</h2>
+<p>Each run receives a trusted job descriptor: principal/delegation, pack, source
+manifest, allowed adapter digests, configuration digest, resource limits, policy
+generation, and output namespace. Inputs are immutable capture handles, not arbitrary
+paths from an agent. Adapter results are bounded streams of records/diagnostics and
+coverage declarations. Their claimed scope/identity is checked by the runner.</p>
+<p>Use a workspace per attempt with read-only input mounts, no default egress, maximum
+wall time/RSS/output bytes, and cancellation. Approved network capture runs separately
+from parsing. JSON/XML parsing disables remote references/entity expansion; archive
+ingestion checks path traversal, symlinks, expansion size, and file count. Download
+connectors reject unexpected redirect destinations. Untrusted plugin execution is
+never equivalent to a normal Node module imported into the API server.</p>
+<h2 id="job-durability">Job durability</h2>
+<p>Job states: queued -&gt; leased -&gt; running -&gt; succeeded/failed/cancelled. Attempts have
+monotonic fencing tokens, expiry, heartbeat, and checkpoints. Lease acquisition uses
+a short database transaction; a worker commits outputs only if its fence still owns
+the job. External side effects are idempotent. A stale worker cannot activate results.</p>
+<p>Retries are bounded with backoff. Invalid configuration, unauthorized source, or
+deterministic parser failure requires intervention; transient I/O may retry. Distinguish
+cancel requested from cancelled. Worker death leaves verified shards reusable and
+unverified staging ignored. Database job leasing can use SKIP LOCKED for queue-like
+selection; it is not a general consistent-read strategy.
+<a href="https://www.postgresql.org/docs/current/sql-select.html">PostgreSQL SELECT</a>.</p>
+<h2 id="query-execution">Query execution</h2>
+<ol>
+<li>Validate transport schema and authenticate principal/delegation.</li>
+<li>Resolve allowed action and resource scope; reject absent grants.</li>
+<li>Pin active generation and current access epoch; set transaction-local context.</li>
+<li>Query only authorized descriptors and supporting evidence. Exact lookup has a
+separate index. Lexical rank is computed over authorized text contributions.</li>
+<li>Expand typed adjacency in batches with visited-state and deadline limits; traversal
+state includes entity and relation-pattern position. Preserve edge direction even
+when traversing a dependency backward.</li>
+<li>Materialize selected evidence summaries; retain full authorized evidence handles.</li>
+<li>Serialize under result limits and reauthorize using the current access epoch from
+the primary authority outside the pinned content snapshot before responding.</li>
+<li>Commit a minimal audit receipt; return outcome, generation, limits and timing.</li>
+</ol>
+<p>Source changes do not trigger reindexing during query. An old generation may still
+provide useful navigation, but current implementation behavior requires appropriate
+source verification. Degraded coverage is represented per affected operation.</p>
+<h2 id="authorization-cost-without-weakening-authorization">Authorization cost without weakening authorization</h2>
+<p>Precompute each derived record's transitive visibility requirements at projection
+build time, rejecting missing support and diagnosing cycles. A dependency cycle can
+be represented as a strongly connected group for visibility; it is not proof of a
+semantic causal cycle. Requirement sets preserve source/domain identities, not
+snapshotted user grants. Evaluate against current grants at query time.</p>
+<p>Dense dependency sets may be costly; benchmark normalized joins versus materialized
+sets. Exceeding supported proof size yields an explicit unsupported/limited outcome,
+never an allow shortcut. Compare the optimized predicate with a reference recursive
+implementation using hidden support, missing evidence, cycles, and policy changes.
+Fast unrestricted queries do not establish restricted-user performance.</p>
+<h2 id="caches-and-continuations">Caches and continuations</h2>
+<p>Authorization oracle tests cover source-inherited ACL expiry, explicit publication,
+withdrawal across old releases, and local revocation during a query. See the
+<a href="../../architecture/html/security-and-authorization.html#revocation-semantics">access consistency contract</a>.</p>
+<p>Initial response cache is disabled to expose true query cost. Connection pools and
+immutable metadata caching are allowed. If later enabled, response keys include
+request hash, principal/effective-access fingerprint, policy generation, access epoch, release set,
+schema, and ranking profile. In-flight coalescing uses the same key. Never share
+content across merely similar roles. Denied/failed/partial requests are not successful
+cache entries. Blob caches remain behind authorization on every read.</p>
+<p>Continuation tokens are signed opaque handles binding query hash, operation,
+generation, principal/access fingerprint, policy generation, access epoch, position, and expiry.
+Access-epoch change returns CURSOR_STALE; the client restarts under current policy. No
+cross-principal replay or caller-edited offsets into private ranked results.</p>
+<h2 id="concurrency-and-consistency">Concurrency and consistency</h2>
+<p>Review and configuration mutations require expected_version plus idempotency key.
+Activation uses compare-and-swap on current generation. Job scheduling and outbox
+insertion share a transaction. File writes use temporary objects plus digest check
+and atomic rename/commit; never overwrite released content. No claim of a distributed
+transaction across blob storage and PostgreSQL: upload first, commit references,
+collect unreferenced objects later after a grace period.</p>
+<h2 id="error-and-observability-contracts">Error and observability contracts</h2>
+<p>Public codes: INVALID_INPUT, NOT_FOUND_OR_NOT_VISIBLE, FORBIDDEN_ACTION,
+CONFLICT, CURSOR_STALE, RELEASE_UNAVAILABLE, WORK_LIMIT, DEADLINE, BUSY,
+EVIDENCE_UNAVAILABLE, TASK_STATE_CONFLICT, REVIEW_REQUIRED, APPROVAL_STALE, INTERNAL.
+Task-specific codes require prior task visibility. Typed internal causes map to safe messages and a
+correlation ID. Generic 500 errors contain no paths, source, policy text, or secrets.
+WORK_LIMIT carries continuation only when an authorized consistent continuation exists.</p>
+<p>Trace stages independently. Count bytes examined and returned, candidates admitted,
+edges visited, omitted results, time, and declared token estimate. Logs and metrics
+must not introduce high-cardinality sensitive labels. Full trajectories require
+explicit retention configuration and access control.</p>
+<h2 id="compatibility-and-testing">Compatibility and testing</h2>
+<p>Transport parity fixtures invoke HTTP/MCP/CLI application paths under the same
+principal. Contract tests assert qualified identity, evidence references, authorized
+result equivalence, stale cursor behavior, and serializer bounds. Parser conformance
+is distinct from semantic resolution coverage. Property-style fixtures cover repeated
+builds, incremental/full equivalence, activation races, and permission narrowing.
+Load tests exercise actual scoped queries and simultaneous extraction rather than
+only tiny in-memory fixtures. See <a href="../../evaluation/html/methodology.html">evaluation</a>.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/technical-design/system.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

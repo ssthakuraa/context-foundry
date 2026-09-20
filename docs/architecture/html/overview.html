@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture overview · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../overview.md">Markdown source</a></nav>
+    <article>
+      <h1 id="architecture-overview">Architecture overview</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#planes">Planes</a></li><li><a href="#deployment-principle">Deployment principle</a></li></ul></details>
+<p><strong>Status:</strong> Proposed for review · <strong>Design baseline:</strong> CF-0.2 · <strong>Date:</strong> 2026-09-20</p>
+<p>The detailed component boundaries, release lifecycle, and agent interaction are
+specified in <a href="system.html">system architecture</a>. Read this overview first, followed
+by the <a href="technology-stack.html">technology stack</a> and
+<a href="../../technical-design/html/system.html">technical design</a>.</p>
+<p>ContextFoundry is a single-enterprise deployment composed of independently
+testable planes.</p>
+<pre><code class="language-text">Enterprise sources and systems
+          ↓
+Authoring and extraction plane
+          ↓
+Versioned knowledge-pack release
+          ↓
+Serving and policy-aware context plane
+          ↓
+UI · CLI · API · MCP · agent integrations
+          ↓
+Architecture proposals · test impact · validation evidence
+</code></pre>
+<h2 id="planes">Planes</h2>
+<h3 id="authoring-and-extraction">Authoring and extraction</h3>
+<p>Reads explicitly authorized source snapshots and enterprise metadata. It
+produces candidate facts, relationships, diagnostics, and provenance. It does
+not silently broaden source scope or publish directly to serving.</p>
+<h3 id="canonical-knowledge">Canonical knowledge</h3>
+<p>Stores the reviewable pack release in Git-compatible JSON, JSONL, Markdown, or
+equivalent portable formats. This is the authoritative representation.</p>
+<h3 id="serving-and-retrieval">Serving and retrieval</h3>
+<p>Builds disposable projections for lexical search, exact lookup, relationship
+navigation, and bounded context delivery. Every operation passes through
+authorization before results are returned.</p>
+<h3 id="agent-integration">Agent integration</h3>
+<p>Exposes stable operations through the CLI, API, and MCP, plus a local source-binding
+helper and versioned workflow guide. The service supplies evidence/navigation; the
+existing agent authors findings and plans after human scope review. Implementation
+requires a separate version-bound human decision. No competing agent orchestrator
+or server enforcement of independent host tools is implied.</p>
+<h3 id="architecture-and-verification">Architecture and verification</h3>
+<p>Consumes current-state context to produce proposed target architectures,
+change-impact views, test-impact analysis, and validation reports. Proposed
+outputs remain separate from canonical observed facts.</p>
+<h3 id="security-and-control">Security and control</h3>
+<p>Authenticates human and machine principals, evaluates policy, records audit
+events, and applies authorization consistently across UI, API, MCP, CLI,
+extractors, and source providers.</p>
+<h2 id="deployment-principle">Deployment principle</h2>
+<p>The default deployment boundary is one enterprise installation. It may contain
+multiple internal business units and packs, but it does not serve unrelated
+enterprises from the same shared instance.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/architecture/overview.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

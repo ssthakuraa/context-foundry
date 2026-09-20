@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research verdict and design closeout · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../design-closeout.md">Markdown source</a></nav>
+    <article>
+      <h1 id="research-verdict-and-design-closeout">Research verdict and design closeout</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#verdict">Verdict</a></li><li><a href="#evidence-ledger-and-transfer-limits">Evidence ledger and transfer limits</a></li><li><a href="#v2-failure-decomposition">V2 failure decomposition</a></li><li><a href="#architecture-alternatives-and-decision">Architecture alternatives and decision</a></li><li><a href="#competitive-position-and-confidence">Competitive position and confidence</a></li><li><a href="#research-stop-rule">Research stop rule</a></li></ul></details>
+<p><strong>Status:</strong> Research synthesis complete for the validation slice; empirical validation pending
+<strong>Baseline:</strong> CF-0.2 · 2026-09-20</p>
+<h2 id="verdict">Verdict</h2>
+<p>Proceed to a bounded validation implementation, not a full enterprise platform build.
+The defensible hypothesis is that company-specific business meaning, qualified code
+facts, and task-appropriate evidence can improve an existing agent's investigation.
+A larger graph, more context, or stronger instructions alone is not the hypothesis.</p>
+<p>The owner-confirmed requirements are in <a href="../../requirements/html/product-requirements.html">product requirements</a>.
+The proposed implementation baseline is <a href="../../decisions/html/0005-validation-slice-baseline.html">ADR 0005</a>.
+This closes the bounded literature review and design reconciliation, not the product
+validation gate. No comparative agent runs, database spike, or customer study has run.</p>
+<h2 id="evidence-ledger-and-transfer-limits">Evidence ledger and transfer limits</h2>
+<p>Sources were read as primary research or first-party engineering/product accounts.
+Author-reported experiments are not our reproductions. Product pages establish
+overlapping positioning, not independent performance. No numerical improvement from
+another workload is a ContextFoundry forecast.</p>
+<table>
+<thead>
+<tr>
+<th>Source and evidence type</th>
+<th>Observation</th>
+<th>Adopt, test, or reject</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://research.google/blog/deeper-insights-into-retrieval-augmented-generation-the-role-of-sufficient-context/">Google sufficient-context research</a> — QA experiments</td>
+<td>Relevant context can still be insufficient; adding context can discourage appropriate abstention</td>
+<td>Adopt per-question sufficiency and explicit gaps. Test against expert obligations; agent self-confidence is not a correctness oracle. QA evidence does not establish safe software impact analysis.</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2406.04744">Meta CRAG</a> — benchmark</td>
+<td>RAG evaluation spans varied domains, question complexity and knowledge dynamics</td>
+<td>Adopt stale, ambiguous and unanswerable cases, not only easy lookup. Public QA differs from private cross-repository engineering.</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2505.18878">Salesforce CRMArena-Pro</a> — enterprise simulation</td>
+<td>The reported multi-turn outcomes and confidentiality failures show that enterprise tasks cannot be judged by single-turn answer quality alone</td>
+<td>Adopt multi-stage review/resume and confidentiality scenarios. Historical models, synthetic CRM tasks and coding-agent tasks are not interchangeable.</td>
+</tr>
+<tr>
+<td><a href="https://www.salesforce.com/blog/llm-agents-for-crm/">Salesforce follow-up experiments</a> — small task-family intervention</td>
+<td>Specialized function headers did not help unseen tasks; correct implementations and worked workflows helped more. Buggy refactored helpers weakened results</td>
+<td>Test reusable, evidence-backed domain procedures as context, separately from agent-control directives. Do not encode benchmark answers in recipes. The study is small; its workflow labels include privileged expert knowledge. The article's result table and concluding percentage differ, so no headline percentage is imported.</td>
+</tr>
+<tr>
+<td><a href="https://www.anthropic.com/engineering/contextual-retrieval">Anthropic contextual retrieval</a> — author-reported retrieval experiments</td>
+<td>Contextualized chunks, lexical/embedding retrieval and reranking improved their retrieval results</td>
+<td>Start with deterministic title/product/section descriptors; add model-generated descriptors, embeddings or reranking one at a time against diagnosed misses. Retrieval gains alone do not establish engineering-task gains.</td>
+</tr>
+<tr>
+<td><a href="https://www.microsoft.com/en-us/research/blog/graphrag-improving-global-search-via-dynamic-community-selection/">Microsoft GraphRAG global search</a> — engineering/experimental account</td>
+<td>Community selection addresses broad corpus-level questions and query cost</td>
+<td>Keep local evidenced traversal distinct from global summarization. Defer generated community summaries until broad landscape queries justify their build, refresh and ACL costs.</td>
+</tr>
+<tr>
+<td><a href="https://engineering.fb.com/2024/12/19/developer-tools/glean-open-source-code-indexing/">Meta Glean</a> — implementation account</td>
+<td>Typed code facts and revision-aware navigation support large-scale code tooling</td>
+<td>Adopt identities, precision tiers and incremental facts. It is not evidence that syntax reveals all company business rules; this Glean is not the enterprise-search company.</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2602.11988v2">Evaluating AGENTS.md, v2</a> and <a href="https://arxiv.org/abs/2601.20404">efficiency study</a> — coding-agent studies</td>
+<td>The studies examine different task sets and outcomes; context-file benefits are not universal, and additional instructions can impose cost</td>
+<td>Keep guidance short; measure task success separately from tokens/time. Preserve required safety/review gates while ablating optional advice. Do not turn either study into a universal instruction-file verdict.</td>
+</tr>
+<tr>
+<td><a href="https://docs.langchain.com/oss/python/langgraph/interrupts">LangGraph interrupts</a> — framework mechanism</td>
+<td>Durable pause/resume is distinct from knowledge retrieval</td>
+<td>Adopt versioned task decisions; do not add a mandatory agent orchestrator or claim prompts enforce host filesystem tools.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="v2-failure-decomposition">V2 failure decomposition</h2>
+<p>The <a href="v2-disposition.html">v2 disposition</a> records source inspection and reported metrics.
+Different models and payloads prevent a causal productivity conclusion. Trace each
+obligation through these stages before choosing a repair:</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Failure hypothesis</th>
+<th>Diagnostic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source knowledge</td>
+<td>A business rule was never recorded</td>
+<td>Expert/source comparison; mark unknown instead of tuning search</td>
+</tr>
+<tr>
+<td>Preparation</td>
+<td>A recorded rule, identity or binding was lost</td>
+<td>Compare captures with extracted records and ambiguity diagnostics</td>
+</tr>
+<tr>
+<td>Retrieval</td>
+<td>Correct records exist but anchors/paths are not found</td>
+<td>Frozen-corpus candidate and path recall</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>Necessary evidence is truncated, buried or stripped of applicability</td>
+<td>Compare selected records with actual wire bytes</td>
+</tr>
+<tr>
+<td>Consumption</td>
+<td>Evidence arrives but the agent ignores or misinterprets it</td>
+<td>Same content, varied guidance; blind outcome review</td>
+</tr>
+<tr>
+<td>Investigation</td>
+<td>Local source is stale or the agent stops too early</td>
+<td>Locator/read receipts, contradictions and obligation completion</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>Scoped queries or repeated proof checks dominate effort</td>
+<td>Actual-scope query plans and phase timing, with response cache disabled</td>
+</tr>
+</tbody>
+</table>
+<p>The next action is the cheapest diagnostic that separates these causes. Two failed
+bounded repair iterations reopen the hypothesis; do not indefinitely enlarge prompts,
+payloads, mappings or graph heuristics.</p>
+<h2 id="architecture-alternatives-and-decision">Architecture alternatives and decision</h2>
+<table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Strength</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agent plus ordinary search</td>
+<td>No preparation service; strong baseline for source-local tasks</td>
+<td>Mandatory same-information baseline</td>
+</tr>
+<tr>
+<td>Document retrieval with precise pointers</td>
+<td>Simpler preparation and operation</td>
+<td>Mandatory simple baseline; ship this simpler approach if richer structure adds no useful outcome</td>
+</tr>
+<tr>
+<td>Typed business/evidence model with selective retrieval</td>
+<td>Represents applicability, cross-product connections and uncertainty</td>
+<td>Proposed ContextFoundry slice; must earn curation and resolution cost</td>
+</tr>
+<tr>
+<td>Generated global GraphRAG summaries</td>
+<td>Broad thematic synthesis</td>
+<td>Defer; not a replacement for exact change-impact evidence</td>
+</tr>
+<tr>
+<td>Autonomous multi-agent investigation platform</td>
+<td>Centralized orchestration</td>
+<td>Reject for initial product: duplicates the host agent and increases scope</td>
+</tr>
+<tr>
+<td>Fine-tuning a company expert model</td>
+<td>Potentially changes behavior/style</td>
+<td>Defer; not an initial solution to current source identity, provenance and revocable access</td>
+</tr>
+</tbody>
+</table>
+<p>Use one modular TypeScript application, PostgreSQL operations/projections, immutable
+canonical releases, isolated extractors, and a local binding helper. Include narrow
+Java/Spring, TypeScript, SQL and Markdown extraction now. No graph server, vector
+server, model training or hidden answer-generation agent is mandatory. PostgreSQL
+retrieval remains reversible if the scoped spike fails.</p>
+<h2 id="competitive-position-and-confidence">Competitive position and confidence</h2>
+<p>The category is already competitive. <a href="https://www.augmentcode.com/product/context-engine-mcp">Augment Context Engine MCP</a>
+advertises agent-independent context across repositories and documentation.
+<a href="https://getunblocked.com/blog/context-layer-ai-agents/">Unblocked</a> explicitly targets
+institutional engineering knowledge across code, documents and conversations.
+These are vendor claims, not a head-to-head evaluation. Neither code-plus-docs nor
+MCP integration is a unique advantage.</p>
+<p>Our proposed focus is self-hosted, auditable, company-variant-aware investigation:
+business rule -&gt; applicable implementation -&gt; scoped source reading -&gt; reviewed
+impact/design -&gt; test obligations, alongside existing coding agents. This is a
+positioning hypothesis, not a verified exclusive feature set. Open source helps
+inspectability and control, but also requires packaging, upgrades, documentation,
+community support and a viable maintenance model.</p>
+<p>Current subjective assessment, not calibrated probabilities:</p>
+<ul>
+<li><strong>High confidence:</strong> the slice is technically buildable with the proposed components.</li>
+<li><strong>Moderate confidence:</strong> it can improve selected enterprise-context-heavy tasks;
+competing simple baselines and curation burden remain unmeasured.</li>
+<li><strong>Low-to-moderate confidence:</strong> it will be highly competitive across enterprises.
+We have no independent pilots, head-to-head results or adoption evidence.</li>
+<li><strong>Market leadership:</strong> not defensibly predictable from a design document.</li>
+</ul>
+<p>Raise confidence only after held-out quality/effort gains, manageable refresh costs,
+another independently maintained enterprise corpus, and design-partner evidence
+that this solves a frequent painful problem. A successful rentalapp experiment alone
+does not meet that bar. See <a href="../../execution/html/readiness-and-risks.html">risks and readiness</a>.</p>
+<h2 id="research-stop-rule">Research stop rule</h2>
+<p>This evidence is sufficient to choose the next bounded experiments. Further broad
+survey work is deferred. Reopen source research only for a specific failed hypothesis,
+security/protocol requirement, or implementation dependency. Pin library versions and
+borrowed algorithm references during the relevant work package, not by claiming that
+all current external software was audited in this review.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/research/design-closeout.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

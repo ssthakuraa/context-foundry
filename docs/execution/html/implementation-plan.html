@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detailed implementation plan · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../implementation-plan.md">Markdown source</a></nav>
+    <article>
+      <h1 id="detailed-implementation-plan">Detailed implementation plan</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#execution-rule">Execution rule</a></li><li><a href="#dependency-order">Dependency order</a></li><li><a href="#m0-review-research-ledger-and-experiment-specification">M0 — Review, research ledger, and experiment specification</a></li><li><a href="#m1-contracts-application-skeleton-and-access-boundaries">M1 — Contracts, application skeleton, and access boundaries</a></li><li><a href="#m2-complete-preparation-slice">M2 — Complete preparation slice</a></li><li><a href="#m3-retrieval-content-and-agent-usefulness-gate">M3 — Retrieval content and agent-usefulness gate</a></li><li><a href="#m4-business-knowledge-and-studio-review">M4 — Business knowledge and Studio review</a></li><li><a href="#m5a-architecture-workbench">M5A — Architecture workbench</a></li><li><a href="#m5b-test-impact-and-validation">M5B — Test impact and validation</a></li><li><a href="#m6-enterprise-beta-and-operational-readiness">M6 — Enterprise beta and operational readiness</a></li><li><a href="#work-item-discipline">Work-item discipline</a></li><li><a href="#deferred-work">Deferred work</a></li></ul></details>
+<p><strong>Status:</strong> Proposed roadmap; implementation has not started · CF-0.2</p>
+<h2 id="execution-rule">Execution rule</h2>
+<p>Review this package before product implementation. Work proceeds by evidence-bearing
+milestones. A milestone completes only when its acceptance evidence exists; documents,
+schema counts, or test counts alone do not establish product usefulness. No deadline
+estimate is implied by the sequence. Record actual effort during the first slice.</p>
+<h2 id="dependency-order">Dependency order</h2>
+<p>The immediate coding queue is the narrower <a href="validation-work-packages.html">WP0–WP7 validation slice</a>,
+which implements only the necessary M0–M3 capabilities. Do not build full M1 platform
+administration or rich M4/M5 screens before the usefulness gate. Review
+<a href="readiness-and-risks.html">readiness/risks</a> and <a href="../../decisions/html/0005-validation-slice-baseline.html">ADR 0005</a>.</p>
+<pre><code class="language-text">M0 design/fixtures -&gt; M1 contracts/security skeleton -&gt; M2 preparation
+      |                                                  |
+      +-&gt; fixed-corpus response/directive experiment      v
+                                               M3 retrieval/agent gate
+                                                         |
+                                        M4 Studio/business review
+                                                         |
+                                 M5 architecture + test-impact tracks
+                                                         |
+                                               M6 enterprise beta
+</code></pre>
+<p>The fixed-corpus experiment may begin as soon as inputs and a safe evaluation
+harness are available. It must not wait for a large platform build. M1-M3 include
+the minimum UI needed to operate the slice; M4 expands the review experience.</p>
+<p>Second-pass amendment: follow <a href="../../evaluation/html/validation-sequence.html">E0–E5</a>. A small
+reviewed business/constraint dataset belongs in M2/M3; M4 expands its authoring UI.
+Run the permission-scoped projection spike before broad platform investment. Semantic
+retrieval experiments may move earlier when E2 diagnoses vocabulary misses.</p>
+<h2 id="m0-review-research-ledger-and-experiment-specification">M0 — Review, research ledger, and experiment specification</h2>
+<p>Tasks:</p>
+<ol>
+<li>Review proposed ADRs, tech stack, security scope, and scoring/latency targets.</li>
+<li>Freeze the private rentalapp/platform/agentic-platform maintenance fixture and
+a separate public-safe synthetic conformance corpus. Ratify expert obligations,
+data authority, execution budget and leasing holdouts before tuning.</li>
+<li>Record v2 carry/adapt/rework decisions at component level. Establish provenance
+before any literal source reuse; independent implementation is the default.</li>
+<li>Pin relevant reference-project revisions and record mechanisms without importing
+their platforms. Confirm parser/protocol/library compatibility.</li>
+<li>Define scored impact questions, negative controls, and unseen-task reservation.</li>
+<li>Specify frozen-corpus response/directive variants before tuning them.</li>
+<li>Specify same-information baselines, reviewer-selected evidence diagnostic, and
+minimal-guidance control. Reserve independent must-find facts and unseen tasks.</li>
+<li>Design the PostgreSQL authorization/query-plan spike, including hidden distractors,
+expired source entitlements, support density, and concurrent preparation.</li>
+<li>Map CF-R01–16 to executable acceptance; freeze both review-gate semantics and host
+assurance level. Decide exact schema/runtime versions in WP1.</li>
+</ol>
+<p>Deliverables: accepted/rejected ADR record, fixture manifest, expected-evidence rubric,
+trace classification guide, dependency inventory, and prioritized issues.
+Exit: original story is separate from instructions; baseline can be reproduced or
+its limits explicitly labelled. No unresolved license/data authority blocks the
+selected public fixture. Review choices are recorded rather than silently assumed.</p>
+<h2 id="m1-contracts-application-skeleton-and-access-boundaries">M1 — Contracts, application skeleton, and access boundaries</h2>
+<p>Tasks:</p>
+<ol>
+<li>Bootstrap pnpm workspace, strict TypeScript, lint/type/test tooling and CI.</li>
+<li>Define JSON schemas and generated types for identity, evidence, release, errors,
+operations, and review state. Add compatibility fixtures.</li>
+<li>Create PostgreSQL migrations for operational state and scoped projection skeleton.</li>
+<li>Implement authenticated application context, OIDC browser flow, API credentials,
+explicit action/resource grants, policy versions, and minimal durable audit.</li>
+<li>Build Studio shell with current identity/pack and authorized navigation.</li>
+<li>Implement jobs with leases/fences, blob storage interface, and cancellation.</li>
+<li>Separate acquisition and publication permissions; implement explicit publication
+receipts, access epochs, withdrawal and source-inherited ACL expiry contracts.</li>
+<li>Implement task/map/proposal versions and human-only review decisions with CAS,
+revocation and minimal authenticated review pages; keep draft submission separate.</li>
+</ol>
+<p>Acceptance: unauthenticated enterprise operations denied; a principal cannot invoke
+hidden UI functions via HTTP; runtime DB role cannot bypass protected data; schema
+failures are sanitized; job lease races cannot commit stale results. Secret-free
+Compose demo boots and authenticates with its documented test identity setup.
+Evidence: transport tests, database privilege checks, browser smoke, crash/retry test.</p>
+<h2 id="m2-complete-preparation-slice">M2 — Complete preparation slice</h2>
+<p>Tasks:</p>
+<ol>
+<li>Inventory supplied local snapshots and Markdown captures; validate safe paths.</li>
+<li>Implement isolated adapter runner, contribution cache, coverage inventory, and
+narrow Java/Spring and TypeScript/Hono/OpenAPI/SQL/Markdown adapters with declared limitations.</li>
+<li>Add qualified identity, explicit ownership, provider/consumer resolution, and
+unresolved/ambiguous reference records.</li>
+<li>Implement canonical JSONL manifests and candidate validation/diff report.</li>
+<li>Build full projection, indexed dependency requirements, and atomic activation.</li>
+<li>Add per-input incrementality plus reverse invalidation and full-build parity.</li>
+<li>Include minimal reviewed business mappings and architecture constraints via
+validated import; bind publication approval to captured evidence and audience.</li>
+<li>Prototype a revision/digest-checked Java or TypeScript SCIP import where required; keep syntax,
+semantic, framework and observed relationships distinguishable. Do not run builds
+inside the extractor. Semantic coverage gates any later precise-impact claim.</li>
+<li>Implement safe local root binding and exact/changed/ambiguous/missing locator
+results. Source-control-neutral snapshots are required; no automatic source upload.</li>
+</ol>
+<p>Acceptance: a complete candidate can be reviewed and activated; malformed archives,
+hidden source, ambiguous routes, deleted providers, and changed ownership are handled
+correctly. Interrupted jobs leave active release intact. Fresh/full and delta output
+match semantically. Every selected fact has valid evidence; unsupported facets remain
+visible as gaps. Measure actual build stages and memory.
+Evidence: fixture release, source/record manifests, validation report, parity report,
+worker isolation tests, activation/rollback drill. Test count alone is not acceptance.</p>
+<h2 id="m3-retrieval-content-and-agent-usefulness-gate">M3 — Retrieval content and agent-usefulness gate</h2>
+<p>Tasks:</p>
+<ol>
+<li>Implement exact and authorized lexical search with per-concern candidates.</li>
+<li>Implement typed directional traversal, coherent path selection, and focused
+inspection/evidence operations; test connectors without lexical matches.</li>
+<li>Add serialization bounds, signed continuations, safe errors and telemetry.</li>
+<li>Expose HTTP, MCP, and CLI through shared authorized services. Retain trusted task
+text separately from agent search questions and output instructions.</li>
+<li>Build compact content rendering and the first agent guidance profile.</li>
+<li>Run fixed-corpus response/directive ablation before attributing changes to storage
+or preparation. Compare compact one-call vs focused follow-up delivery separately.</li>
+<li>Run actual-scope performance and matched agent baseline experiments.</li>
+<li>Include ordinary access to the same business documents in comparison arms, test
+minimal guidance, and record failure by pipeline stage. Complete the projection
+spike and evaluate semantic recall only if diagnosed misses justify it.</li>
+<li>Complete map -&gt; Gate 1 -&gt; selective source investigation -&gt; minimal findings,
+design/execution/validation proposal -&gt; Gate 2 -&gt; completion workflow. Inquiries
+end without coding. Test forged approvals, source drift and resume before rich UI.</li>
+</ol>
+<p>Acceptance: hidden support cannot affect visible matches/ranks/paths; no partial path
+masquerades as complete; cursor replay after revocation fails; wire output matches
+offline semantics. Meet or explicitly reopen the proposed operational/usefulness
+gates. Failure blocks broad workbench development. Limit tuning to two reasoned
+iterations before architecture/product review.
+Evidence: request/response fixtures, restricted-scope query plans, frozen run manifests,
+blind scorecards, trace review, and per-task cost/time distributions.</p>
+<h2 id="m4-business-knowledge-and-studio-review">M4 — Business knowledge and Studio review</h2>
+<p>Tasks:</p>
+<ol>
+<li>Create document capture/section/assertion and many-to-many mapping workflows.</li>
+<li>Add business-to-code and reverse lookup with scoped evidence.</li>
+<li>Implement mapping review bound to evidence fingerprints, conflicts, and stale
+approval invalidation. Offline model suggestions are a separate optional increment.</li>
+<li>Complete pack configuration, candidate diff, evidence drawer, targeted graph view,
+jobs, and access administration with accessible alternatives.</li>
+<li>Add authorized export and token expiry/revocation behavior.</li>
+</ol>
+<p>Acceptance: terminology helps unseen business queries without adding expected-answer
+lists. A changed document invalidates affected mappings; restricted passages do not
+leak through aliases or reverse lookup. Browser journeys pass keyboard, narrow/wide
+layout, session-expiry, concurrency, and direct-API denial tests.
+Evidence: reviewed mapping corpus, quality/error analysis, Playwright reports, expert
+review records. Creation/curation cost is reported alongside retrieval benefit.</p>
+<h2 id="m5a-architecture-workbench">M5A — Architecture workbench</h2>
+<p>This extends the minimal proposal and approval already delivered in M3/WP5. It does
+not postpone basic high-level design or implementation authorization until M5.</p>
+<p>Tasks: version structured proposals against a baseline; import agent-authored options;
+link enterprise constraints; show current/proposed diagrams and tables; manage review,
+exceptions, supersession, and migration increments; connect validation obligations.</p>
+<p>Acceptance: current-state claims resolve to authorized evidence; future components
+remain proposed; stale baseline changes prompt re-review; approval never writes source
+or changes observed facts. A reviewer can compare two realistic options and their
+tradeoffs without reconstructing the evidence manually.
+Evidence: architecture review example, citation checks, concurrency/revocation tests,
+reviewer correction/time measurement.</p>
+<h2 id="m5b-test-impact-and-validation">M5B — Test impact and validation</h2>
+<p>M3/WP5 already identifies validation obligations and test-evidence gaps. This milestone
+adds richer analysis and verified-run ingestion; test migration/parity remains later.</p>
+<p>Tasks: represent before/after change sets; map changed symbols/contracts to possible
+dependents; classify test references vs observed coverage vs requirement mappings;
+ingest authenticated CI reports; present recommendations and evidence gaps.</p>
+<p>Acceptance: seeded changes recover known relevant tests; excess recommendations are
+measured; stale coverage and wrong-commit runs cannot validate a change. CI is not
+automatically pruned. A fault that should affect a test but is missed is investigated
+before any claim of safe selection. Later test migration/parity needs its own fixtures.
+Evidence: change/test truth set, fault-injection results, import integrity checks,
+business-behavior review. M5A and M5B may run in parallel after shared contracts stabilize.</p>
+<h2 id="m6-enterprise-beta-and-operational-readiness">M6 — Enterprise beta and operational readiness</h2>
+<p>Tasks: complete deployment documentation, upgrade/rollback, coordinated backups,
+retention, audit export, source/adapter administration, bounded concurrency, and
+supported runtime matrix. Test one representative enterprise identity setup and a
+second independent product corpus. Run external-agent compatibility checks without
+assuming all hosts report complete token usage or enforce identical instructions.</p>
+<p>Acceptance: restored database/blobs reproduce active knowledge and reviews; policy
+revocation and worker compromise boundaries are tested; declared scoped workload meets
+latency limits; unseen tasks satisfy quality/usefulness criteria. Publish only verified
+claims with corpus/model/configuration limits. Beta readiness does not claim market
+leadership or universal language/framework coverage.</p>
+<h2 id="work-item-discipline">Work-item discipline</h2>
+<p>Each implementation issue specifies input/output contract, dependencies, observable
+behavior, failure cases, tests, documentation, and a concrete completion artifact.
+Keep preparation, selection, rendering, and guidance commits distinguishable during
+experiments. Record decisions, discovered gaps, and failed trials in the execution
+ledger. Update Markdown and generated HTML together. No public publication, license
+selection, or broad source migration is implied by completing a local milestone.</p>
+<h2 id="deferred-work">Deferred work</h2>
+<p>Additional enterprise adapters, embedding retrieval, standalone graph/vector services,
+HA/Kubernetes, automatic test pruning, code conversion, deployment orchestration,
+and full behavior-parity automation follow evidence of need. Their extension points
+exist in the design; they are not requirements for the first outcome demonstration.</p>
+<p>Embedding retrieval is deferred as a production requirement, not prohibited as an
+early diagnostic experiment. Likewise, enterprise CI semantic-index import does not
+require supporting arbitrary builds or an external code-intelligence platform.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/execution/implementation-plan.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

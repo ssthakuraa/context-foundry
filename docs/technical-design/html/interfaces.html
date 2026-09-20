@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API, MCP and CLI contracts · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../interfaces.md">Markdown source</a></nav>
+    <article>
+      <h1 id="api-mcp-and-cli-contracts">API, MCP and CLI contracts</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#surface-and-transport">Surface and transport</a></li><li><a href="#query-envelope-example">Query envelope example</a></li><li><a href="#response-envelope">Response envelope</a></li><li><a href="#authentication-and-authorization">Authentication and authorization</a></li><li><a href="#mutations-export-and-compatibility">Mutations, export and compatibility</a></li></ul></details>
+<p><strong>Status:</strong> Proposed interface specification · CF-0.2</p>
+<h2 id="surface-and-transport">Surface and transport</h2>
+<p>HTTP routes use /api/v1. MCP exposes read operations through the same application
+services; administrative changes initially use UI/HTTP/CLI. The CLI is an API client
+for enterprise actions. Local validate/import-preview commands operate only on
+explicit files and do not activate releases. REST and MCP share response semantics,
+not necessarily identical transport envelopes.</p>
+<table>
+<thead>
+<tr>
+<th>HTTP operation</th>
+<th>MCP tool</th>
+<th>Essential request</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST /context/orient</td>
+<td>cf_orient</td>
+<td>task_ref or submitted requirement, concerns, scope preferences</td>
+</tr>
+<tr>
+<td>POST /context/search</td>
+<td>cf_search</td>
+<td>query, allowed kind filters, scope preferences, page limit</td>
+</tr>
+<tr>
+<td>POST /context/inspect</td>
+<td>cf_inspect</td>
+<td>qualified entity, requested facets</td>
+</tr>
+<tr>
+<td>POST /context/trace</td>
+<td>cf_trace</td>
+<td>starting entity, optional target, relation/direction, bounds</td>
+</tr>
+<tr>
+<td>POST /context/evidence</td>
+<td>cf_evidence</td>
+<td>evidence references and range/page request</td>
+</tr>
+<tr>
+<td>POST /context/impact</td>
+<td>cf_impact</td>
+<td>change-set reference, relation categories, requested test scope</td>
+</tr>
+<tr>
+<td>GET /packs</td>
+<td>cf_list_packs</td>
+<td>authorized pagination only</td>
+</tr>
+<tr>
+<td>POST /packs/{id}/jobs</td>
+<td>None initially</td>
+<td>approved source manifest/configuration, expected version</td>
+</tr>
+<tr>
+<td>POST /candidates/{id}/reviews</td>
+<td>None initially</td>
+<td>decision, rationale, candidate digest</td>
+</tr>
+<tr>
+<td>POST /packs/{id}/activations</td>
+<td>None initially</td>
+<td>release digest, expected active version</td>
+</tr>
+<tr>
+<td>POST /architecture/proposals</td>
+<td>None initially</td>
+<td>baseline, structured proposal and evidence</td>
+</tr>
+<tr>
+<td>POST /validation/runs</td>
+<td>None initially</td>
+<td>signed/authenticated CI evidence receipt</td>
+</tr>
+<tr>
+<td>POST /semantic-indexes</td>
+<td>None initially</td>
+<td>bounded index artifact, source manifest, producer receipt</td>
+</tr>
+<tr>
+<td>POST /sources/{id}/publications</td>
+<td>None initially</td>
+<td>captured digest set, audience, owner approval, expected version</td>
+</tr>
+<tr>
+<td>POST /sources/{id}/withdrawals</td>
+<td>None initially</td>
+<td>authorized withdrawal reason and expected version</td>
+</tr>
+<tr>
+<td>GET /tasks/{id}</td>
+<td>cf_task_status</td>
+<td>authorized task identity; artifact/decision status</td>
+</tr>
+<tr>
+<td>POST /tasks</td>
+<td>None initially</td>
+<td>original request and intent; origin/owner set by authenticated channel</td>
+</tr>
+<tr>
+<td>POST /tasks/{id}/artifacts</td>
+<td>None initially</td>
+<td>draft map/findings/proposal/completion, digest and expected version</td>
+</tr>
+<tr>
+<td>POST /tasks/{id}/decisions</td>
+<td>None</td>
+<td>verified human decision on exact artifact; never agent-token approval</td>
+</tr>
+</tbody>
+</table>
+<h2 id="query-envelope-example">Query envelope example</h2>
+<p>Illustrative contract, not an implemented endpoint:</p>
+<pre><code class="language-json">{
+  &quot;contract_version&quot;: &quot;0.2.0&quot;,
+  &quot;task_ref&quot;: &quot;task:123@1&quot;,
+  &quot;questions&quot;: [{&quot;id&quot;: &quot;q1&quot;, &quot;text&quot;: &quot;Where is the billing preference captured?&quot;}],
+  &quot;scope&quot;: {&quot;pack_ids&quot;: [&quot;billing&quot;]},
+  &quot;limits&quot;: {&quot;max_bytes&quot;: 16384},
+  &quot;cursor&quot;: null
+}
+</code></pre>
+<p>No request accepts a principal, role grant, physical source root, SQL expression,
+arbitrary extractor command, or privileged policy override. Client limits only
+narrow server limits. Agent-submitted requirements are labelled as submitted;
+trusted task references bind to immutable host records. Output instructions belong
+to the agent conversation or proposal request, not retrieval requirement text.</p>
+<h2 id="response-envelope">Response envelope</h2>
+<pre><code class="language-json">{
+  &quot;contract_version&quot;: &quot;0.2.0&quot;,
+  &quot;request_id&quot;: &quot;request:456&quot;,
+  &quot;release_set&quot;: &quot;release-set:17&quot;,
+  &quot;status&quot;: &quot;partial&quot;,
+  &quot;results&quot;: [{
+    &quot;entity_id&quot;: &quot;repo:billing:symbol:Cycle.start&quot;,
+    &quot;reason&quot;: &quot;Declared cycle creation entry point&quot;,
+    &quot;evidence_refs&quot;: [&quot;ev:12&quot;],
+    &quot;locator&quot;: {&quot;source_id&quot;: &quot;billing&quot;, &quot;snapshot_id&quot;: &quot;capture:17&quot;, &quot;revision_kind&quot;: &quot;supplied_snapshot&quot;, &quot;revision_value&quot;: &quot;r17&quot;, &quot;path&quot;: &quot;src/cycle.ts&quot;, &quot;file_digest&quot;: &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;, &quot;start_line&quot;: 42, &quot;end_line&quot;: 78},
+    &quot;origin&quot;: &quot;source_declared&quot;
+  }],
+  &quot;gaps&quot;: [{&quot;code&quot;: &quot;COVERAGE_PARTIAL&quot;, &quot;question_id&quot;: &quot;q1&quot;}],
+  &quot;continuation&quot;: null,
+  &quot;limits&quot;: {&quot;truncated&quot;: false, &quot;encoded_bytes&quot;: 0}
+}
+</code></pre>
+<p>The example's file digest and encoded_bytes are illustrative placeholders, not actual
+source validation. Implementation computes final encoded
+size including metadata consistently, with a fixed-point sizing pass if necessary.
+Result status describes delivery/coverage, never successful semantic completion of
+the user's task. Evidence reads reauthorize every locator; identifiers are not bearer
+capabilities. No result emits hidden object names/counts through gap explanations.</p>
+<p>Task artifact/decision bodies, revocation/cancel routes, current-state reads and
+human-only decision authority are specified in <a href="task-and-review-contracts.html">task contracts</a>.
+Local absolute roots never appear in retrieval requests/results; resolve logical
+locators using <a href="extraction-and-source-binding.html">source binding</a>. Generic retrieval
+does not require a task; task-stage enforcement is a conforming integration behavior,
+not a claimed restriction on independent host tools.</p>
+<h2 id="authentication-and-authorization">Authentication and authorization</h2>
+<p>Limit metadata distinguishes output/page/work limits and coverage gaps; a null
+continuation does not imply completeness. Semantic-index imports require a dedicated
+ingestion grant and validated provenance; publication needs a separate data-owner
+grant. Both enter review before activation. Withdrawal updates the access epoch
+immediately and schedules storage cleanup independently.</p>
+<p>Browser login uses OIDC with secure server-side sessions, HttpOnly/Secure cookies,
+CSRF protection for mutations, and allowed redirect/origin checks. API/CLI machine
+tokens have issuer/audience/expiry validation and explicit action/resource grants.
+MCP HTTP authorization follows the published protocol profile, including resource
+metadata and audience-bound access. Do not reuse arbitrary upstream provider tokens
+as ContextFoundry credentials. Pin the supported protocol version at implementation.
+<a href="https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization">MCP authorization</a>.</p>
+<p>STDIO is initially a local client proxy to the authenticated service. Offline demo
+STDIO may expose synthetic packs under OS ownership; it must not be described as
+enforcing enterprise policy for arbitrary local files.</p>
+<h2 id="mutations-export-and-compatibility">Mutations, export and compatibility</h2>
+<p>Mutations use expected_version and Idempotency-Key; retries return the original
+receipt or a conflict for a different body. Review creates an immutable decision,
+not an edit of the approved candidate. Exports are jobs with a frozen content set,
+current-policy checks before generation and download, expiry, and audit. A revoked
+artifact cancels download eligibility even if the export has already been built.</p>
+<p>Unknown request fields fail validation. Additive response fields are permitted
+within a major version; clients ignore unknown optional fields but reject unknown
+required variants. First-party route schemas are versioned application assets.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/technical-design/interfaces.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Three-repository benchmark dossier · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../three-repository-benchmark.md">Markdown source</a></nav>
+    <article>
+      <h1 id="three-repository-benchmark-dossier">Three-repository benchmark dossier</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#corpus-and-authority">Corpus and authority</a></li><li><a href="#why-this-is-representative-enough-to-start">Why this is representative enough to start</a></li><li><a href="#bounded-first-capture">Bounded first capture</a></li><li><a href="#candidate-task-families">Candidate task families</a></li><li><a href="#baseline-arms-and-quota-staging">Baseline arms and quota staging</a></li><li><a href="#rubric-and-proposed-decision-gates">Rubric and proposed decision gates</a></li><li><a href="#deliverables">Deliverables</a></li></ul></details>
+<p><strong>Status:</strong> Candidate specification; owner rubric and execution approval pending
+<strong>Inspection date:</strong> 2026-09-20 · CF-0.2</p>
+<h2 id="corpus-and-authority">Corpus and authority</h2>
+<p>Use the owner's local rentalapp, platform and agentic-platform clones privately.
+Inspection was read-only: representative source, manifests, module documentation and
+test declarations were examined. No application, database, test or model benchmark
+was executed. Git status was clean when these revisions were recorded:</p>
+<table>
+<thead>
+<tr>
+<th>Logical source</th>
+<th>Revision</th>
+<th>Evaluation role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rentalapp</td>
+<td>9b57b0e871555e815417c6654d193e0554bd6964</td>
+<td>Java/Spring domain implementation, React UI, SQL, functional/technical requirements</td>
+</tr>
+<tr>
+<td>platform</td>
+<td>3781720a74937e5a4ab67b98b441ca31f4ec0c64</td>
+<td>Shared Java infrastructure and TypeScript packages</td>
+</tr>
+<tr>
+<td>agentic-platform</td>
+<td>0159c29896ece2405a67d5a0db211f3622ccdfd8</td>
+<td>TypeScript API and shared integration/audit contracts</td>
+</tr>
+</tbody>
+</table>
+<p>These identifiers are observations, not an immutable capture manifest. WP0 freezes
+authorized file digests without checkout changes. Local root mappings remain outside
+the distributable corpus. Do not publish source, derived facts, answer keys or traces
+without separate authority. Repository access is not open-source redistribution consent.</p>
+<h2 id="why-this-is-representative-enough-to-start">Why this is representative enough to start</h2>
+<p>Rentalapp contains module-level functional specifications, technical specifications,
+worklists and implementation, including maintenance, leasing, revenue and other
+domains. Dependencies on platform appear in actual package/Maven manifests; maintenance
+audit names also appear in agentic-platform contracts. This supports business-to-code,
+shared-framework and cross-product tasks rather than an isolated repository demo.</p>
+<p>It is still one related ecosystem with common development practices. It cannot
+establish generality across legacy languages, other source-control systems, or
+independently operated enterprises. Non-Git/path/security cases use synthetic fixtures.</p>
+<h2 id="bounded-first-capture">Bounded first capture</h2>
+<p>Capture maintenance requirements/technical documentation and explicitly relevant
+historical decisions; Java maintenance services/resources/entities/repositories;
+related schema and UI sections; the shared Java primitives they use; and matching
+TypeScript contract declarations and consumers. Include dependency manifests and
+test sources. Record dependency omissions rather than pretending the capture is complete.</p>
+<p>Keep historical prompts/worklists as labelled untrusted reference material. They
+do not authorize running commands. Distinguish draft intent, reported completion,
+current declarations and executed behavior. Add a controlled distractor set from
+other modules after the bounded case works; do not curate a corpus containing only
+the answer-bearing files and then advertise full-repository retrieval performance.</p>
+<h2 id="candidate-task-families">Candidate task families</h2>
+<p>The following are development themes, not sealed gold answers. Owner-confirmed exact
+stories, required facts, accepted uncertainty and distractors are frozen in WP0.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Task</th>
+<th>Main capability tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>Explain when maintenance dispatch requires human approval</td>
+<td>Business meaning, applicability and current implementation reconciliation</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>Explain how to consume the maintenance triage API</td>
+<td>Contract-sufficient answer without unnecessary implementation reads</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>Plan a change to a dispatch approval rule</td>
+<td>Selective deep reading, impacts, validation plan and Gate 2</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>Diagnose a document/implementation mismatch</td>
+<td>Authority, freshness, contradictions and appropriate uncertainty</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>Trace a maintenance audit-contract change across products</td>
+<td>Producer/consumer identity without claiming transport from name equality</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>Assess a shared permission/tenant-context change</td>
+<td>Shared-library consumers and security obligations</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>Recommend validation for a maintenance change</td>
+<td>Relevant tests versus skip markers, missing coverage and actual run evidence</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>Investigate an underspecified business variant</td>
+<td>Ask for missing applicability; do not invent a universal rule</td>
+</tr>
+<tr>
+<td>D9</td>
+<td>Resume after a human adds an overlooked subsystem</td>
+<td>Revised scope, selective reading and invalidated approvals</td>
+</tr>
+</tbody>
+</table>
+<p>Reserve three exact leasing/renewal stories (H1–H3) with an owner/independent reviewer
+before tuning. Only high-level themes—API use, behavior change and cross-module
+impact—are specified here. They become valid holdouts only after exact stories and
+rubrics are sealed from retrieval/guidance tuning. The earlier orientation read of
+leasing documentation must be recorded; these are not a wholly unseen domain to the
+design author. Prefer a separate evaluator for final held-out scoring.</p>
+<p>Synthetic conformance cases additionally cover unanswerable queries, inaccessible
+support, injected instructions, dirty/renamed sources, duplicate names, source
+withdrawal, and test receipts for the wrong revision. Application tenant isolation
+is domain evidence; it does not test ContextFoundry's own authorization automatically.</p>
+<h2 id="baseline-arms-and-quota-staging">Baseline arms and quota staging</h2>
+<ul>
+<li>A: existing agent with normal authorized source/document access.</li>
+<li>B: same agent plus simple lexical document/code-chunk retrieval with precise pointers.</li>
+<li>C: same agent plus typed business/implementation context and selective retrieval.</li>
+<li>O: reviewer-selected evidence packet, diagnostic only, never advertised as retrieval.</li>
+</ul>
+<p>Use identical model/effort, host instructions, gates, source permissions and task
+limits across product comparisons. Any reusable expert-authored mapping or procedure
+that adds information must also be available as readable reference material to A/B;
+otherwise label a separate added-knowledge experiment, not a retrieval-only gain.
+A representative external product is a later
+head-to-head arm only if available and authorized; do not claim a win without it.
+Optional fuzzy/semantic/reranking/procedure lanes are separate treatments, not bundled
+changes. An oracle packet that fails to help is a signal to reconsider task/consumption.</p>
+<p>First perform static extraction/locator/authorization checks without paid inference.
+Then authorize a small O-vs-A evidence-utility diagnostic. Expand to A/B/C paired
+runs only if useful; the four-arm v2 content/directive replay is separate and conditional
+on comparable captured payloads. Do not pay to reproduce an unavailable historical
+runtime merely to claim methodological completeness. Stop runs at the approved budget.</p>
+<h2 id="rubric-and-proposed-decision-gates">Rubric and proposed decision gates</h2>
+<p>For each task record: intent, answerability, required facts/impacts, criticality,
+evidence locations, acceptable alternatives, forbidden claims, expected source depth,
+review transitions, validation obligations and scoring rationale. Owner judgments
+about intended business rules are separate from source-observed behavior. A conflict
+can be the correct result. Freeze all candidate-arm preparation before holdout reveal.</p>
+<p>Proposed pilot gates, to ratify before runs:</p>
+<ol>
+<li>No unauthorized disclosure, forged approval or unacknowledged critical false claim.</li>
+<li>No silent critical omission against independent obligations. Explicitly unresolved
+cases are not counted as successful resolutions; report resolved-task rate separately.</li>
+<li>At least 80% of the owner-labelled answerable pilot tasks satisfy all required
+obligations, and no regression against the strongest eligible baseline. Small
+samples are exploratory; this is a stop/go rule, not a population estimate.</li>
+<li>Meet the quality-first effort gate in <a href="methodology.html">methodology</a>, including human
+review and knowledge preparation/refresh labor. Report both active work and waiting.</li>
+<li>Carry useful performance to held-out stories without task-specific mapping repair.</li>
+</ol>
+<p>Test files inspected include real unit assertions as well as contract tests with
+unconditional or environment-dependent skips. Do not count all files as equivalent
+coverage. Some historical handoff references no longer match current test paths;
+staleness detection is part of the benchmark, not an error to silently clean away.</p>
+<h2 id="deliverables">Deliverables</h2>
+<p>Private capture manifest, task split/exposure ledger, independent obligation rubric,
+run budget, per-arm receipts, failure-stage analysis and keep/change/stop decision.
+The public product repo receives only approved synthetic equivalents and non-sensitive
+aggregate outcomes. A second independent enterprise pilot follows before broad
+competitive claims. The three source repositories remain unmodified by this plan.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/evaluation/three-repository-benchmark.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

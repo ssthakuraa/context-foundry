@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Validation-slice implementation work packages · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../validation-work-packages.md">Markdown source</a></nav>
+    <article>
+      <h1 id="validation-slice-implementation-work-packages">Validation-slice implementation work packages</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#order-and-scope">Order and scope</a></li><li><a href="#wp0-freeze-scope-truth-and-execution-authority">WP0 — Freeze scope, truth and execution authority</a></li><li><a href="#wp1-executable-contracts-and-conformance-fixtures">WP1 — Executable contracts and conformance fixtures</a></li><li><a href="#wp2-bounded-preparation-and-local-binding">WP2 — Bounded preparation and local binding</a></li><li><a href="#wp3-minimal-task-identity-and-policy-core">WP3 — Minimal task, identity and policy core</a></li><li><a href="#wp4-secured-retrieval-and-postgresql-decision-spike">WP4 — Secured retrieval and PostgreSQL decision spike</a></li><li><a href="#wp5-complete-guided-agent-journey">WP5 — Complete guided agent journey</a></li><li><a href="#wp6-evidence-utility-and-controlled-comparison">WP6 — Evidence utility and controlled comparison</a></li><li><a href="#wp7-investment-decision-and-handoff">WP7 — Investment decision and handoff</a></li><li><a href="#work-item-handoff-template">Work-item handoff template</a></li></ul></details>
+<p><strong>Status:</strong> Ready for owner review and bounded implementation authorization · CF-0.2</p>
+<p>These packages implement the first slice of the <a href="implementation-plan.html">milestone plan</a>.
+They replace broad M1–M3 bootstrap work as the immediate coding queue. No package is
+complete until its acceptance receipts exist. No product code has been created by
+this document. Rich Studio, connectors and workbenches are excluded from this slice.</p>
+<h2 id="order-and-scope">Order and scope</h2>
+<pre><code class="language-text">WP0 fixture/rubric approval -&gt; WP1 executable contracts
+                                  |             |
+                           WP2 extraction   WP3 task/policy core
+                                  \             /
+                            WP4 secured retrieval spike
+                                       |
+                            WP5 end-to-end guided integration
+                                       |
+                            WP6 controlled evaluation
+                                       |
+                            WP7 keep/change/stop review
+</code></pre>
+<p>WP2 and WP3 can proceed independently after WP1 freezes their contracts. Shared schema
+changes require a coordinated review; do not let parallel implementations invent
+different identity or approval semantics. WP4 can start with synthetic WP1 records
+while WP2 develops, but cannot pass without real captured-shape evidence.</p>
+<h2 id="wp0-freeze-scope-truth-and-execution-authority">WP0 — Freeze scope, truth and execution authority</h2>
+<p><strong>Inputs:</strong> <a href="../../evaluation/html/three-repository-benchmark.html">benchmark dossier</a>, product
+requirements and owner review. <strong>Outputs:</strong> private capture manifest, exact development
+tasks, sealed held-outs, independent rubric, approved workload and experiment budget.</p>
+<p>Reconfirm revisions and allowed capture paths without changing checkouts. Establish
+data publication audience, expected behavior owner, acceptable uncertainty, and
+whether private code may be sent to a selected model. Record model/effort and host
+capabilities; missing usage receipts stay unknown. Approve proposed thresholds before
+results exist. Synthetic fixtures contain no copied private business/source content.</p>
+<p><strong>Acceptance:</strong> owner confirms the slice and rubric; all required facts have source
+or attributed expert support; holdouts are not tuning inputs; no open data authority
+or paid-run ambiguity. <strong>Stop:</strong> no rubric owner or necessary source authority.
+Work may still proceed on approved synthetic contract fixtures, not private runs.</p>
+<h2 id="wp1-executable-contracts-and-conformance-fixtures">WP1 — Executable contracts and conformance fixtures</h2>
+<p><strong>Packages:</strong> contracts, domain, evaluation fixture schemas; minimal workspace/tooling.
+<strong>Inputs:</strong> <a href="../../technical-design/html/data-contracts.html">data contracts</a>,
+<a href="../../technical-design/html/task-and-review-contracts.html">task contracts</a>,
+<a href="../../technical-design/html/extraction-and-source-binding.html">extraction/binding</a>.</p>
+<p>Implement strict schemas/types for captures, envelopes, assertions, locators, coverage,
+release sets, task artifacts/decisions, errors and run manifests. Pin runtime/library
+versions after compatibility/license checks. Define canonical serialization and hash
+fixtures, including Unicode, numbers, duplicate keys, ordering and unsupported variants.</p>
+<p><strong>Tests:</strong> valid/invalid payloads, unknown fields, missing support, digest mismatch,
+overloaded symbols, distinct source identities, unsupported kind handling, serialization
+roundtrip. <strong>Acceptance:</strong> examples validate; generated types and runtime validators
+agree; modules do not import UI/transport/database from domain. <strong>Receipt:</strong> schema
+inventory, compatibility report and dependency lock. <strong>Review:</strong> high-attention contract
+freeze before downstream work; no broad application skeleton or UI design exercise.</p>
+<h2 id="wp2-bounded-preparation-and-local-binding">WP2 — Bounded preparation and local binding</h2>
+<p><strong>Packages:</strong> preparation, adapters, local-client binding module. <strong>Depends on:</strong> WP1.
+Implement the declared Java/Spring, TypeScript/Hono, SQL, Markdown and test-source
+patterns, qualified identities, ambiguity outcomes and approved reviewed-mapping import.
+Add support closure, candidate validation and canonical release files. No compiler
+build or runtime execution inside extraction. CI semantic import is an optional
+precision sub-spike, not a substitute for supported syntax/framework fixtures.</p>
+<p>Implement local source-root registration and digest-checked resolution; never upload
+dirty bodies or auto-clone. Cache contributions only after full-build correctness.</p>
+<p><strong>Tests:</strong> full matrix in extraction/binding design; rename/delete/rebind/ambiguity,
+partial parse, content limits, path traversal, stale local files and full/delta parity.
+<strong>Acceptance:</strong> all expected supported facts recovered with no false exact bindings;
+unsupported facts visible as coverage gaps; reusable business mappings predating task
+tuning. <strong>Receipts:</strong> capture/release digest set, coverage report, reviewed mapping
+receipt, parity report, preparation/curation time. <strong>Stop:</strong> required critical behavior
+depends on unsupported extraction; review scope or add explicit reviewed evidence.</p>
+<h2 id="wp3-minimal-task-identity-and-policy-core">WP3 — Minimal task, identity and policy core</h2>
+<p><strong>Packages:</strong> policy, reviews, storage, minimal server routes and two review pages.
+<strong>Depends on:</strong> WP1. Implement PostgreSQL migrations, server-side principal/delegation,
+OIDC/session boundary for human decisions, explicit scoped grants, task CAS/idempotency,
+publication receipts and current access epoch. Demo identities are loopback/synthetic
+only; no production bypass. Stage private local evaluation only after valid identity
+and publication configuration. Initial review pages show exact artifact versions and
+Accept/Request changes/Reject; postpone broad Studio administration.</p>
+<p><strong>Tests:</strong> deny/no-grant/hidden-support, agent self-approval, CSRF, digest/version drift,
+concurrent decision, cross-task replay, revocation and task-artifact visibility.
+<strong>Acceptance:</strong> human decision receipts cannot be forged by agent credentials;
+direct HTTP cannot bypass hidden UI; policy failure denies access. <strong>Receipts:</strong>
+transition table tests, authorization matrix, database-role checks, review screenshots.
+<strong>Stop:</strong> identity/authorization uncertainty; never compensate with prompt instructions.</p>
+<h2 id="wp4-secured-retrieval-and-postgresql-decision-spike">WP4 — Secured retrieval and PostgreSQL decision spike</h2>
+<p><strong>Packages:</strong> retrieval, storage projections, evaluation. <strong>Depends on:</strong> WP1 plus
+WP2/WP3 contracts and sufficient outputs. Build exact/lexical/alias retrieval,
+bounded directed traversal, support authorization, inspect/evidence rendering and
+signed continuations. Implement B (simple retrieval) before C (typed enrichment)
+using common authorized captures. Keep response caching disabled.</p>
+<p><strong>Tests:</strong> independent recursive authorization oracle; scope fractions and hidden
+distractors; connectors without lexical matches; overloaded/duplicate names; revocation
+during query; malformed/stale cursors; serializer bounds and coverage outcomes.
+<strong>Acceptance:</strong> oracle-equivalent visible results, no hidden rank/count/pointer leaks,
+actual-scope latency/resource results at the approved envelope, with quality retained
+at output limits. <strong>Receipts:</strong> SQL plans, phase timings, result parity and failure
+traces. <strong>Decision:</strong> retain PostgreSQL projections or reopen ADR 0003. Do not add a
+graph/vector server without this evidence. Model lanes require separate budget/data
+approval and a diagnosed recall or ranking failure.</p>
+<h2 id="wp5-complete-guided-agent-journey">WP5 — Complete guided agent journey</h2>
+<p><strong>Packages:</strong> CLI/client, MCP read tools, versioned integration guide and minimal Studio.
+<strong>Depends on:</strong> WP2–4. Render scope map, verified Gate 1 receipt, sufficiency/read
+receipts, findings and minimal design/execution/validation proposal, Gate 2, completion.
+Source reads and edits remain with the host. Task status is read-only via MCP; drafts
+use HTTP/CLI; human approval uses authenticated UI. An inquiry completes without code.</p>
+<p><strong>Tests:</strong> contract-sufficient API question; enhancement with selective source reads;
+human-added area; silence/rejection; missing/dirty local root; material expansion;
+proposal/source drift; interrupted resume; injected source instructions; expired access.
+Compare HTTP/MCP/CLI semantics. Test both review pages at narrow/wide widths and keyboard
+only. <strong>Acceptance:</strong> no conforming workflow codes before verified Gate 2; no claim of
+server-enforced host isolation. <strong>Receipts:</strong> state/event trace, host capability matrix,
+UI checks and required-versus-actual read audit. No production application edits are
+needed for read-only planning tasks; coding experiments use separately authorized copies.</p>
+<h2 id="wp6-evidence-utility-and-controlled-comparison">WP6 — Evidence utility and controlled comparison</h2>
+<p><strong>Depends on:</strong> WP0–5, or approved offline diagnostic packets before the full service.
+Start O-vs-A; then A/B/C development comparisons; then held-outs. Keep information,
+model/effort, gates, task limits and cache conditions matched. Separate active model/tool
+work, reviewer work and wait time. Record all failed/skipped attempts and preparation cost.</p>
+<p>Use a small preapproved batch first; expand repetitions only when variance and budget
+justify them. If a reviewer supplies new hints, record content and cost and apply an
+equivalent policy across arms. Optional guidance/semantic treatments vary one factor.
+Agent-generated judges assist but cannot replace independent critical-impact adjudication.</p>
+<p><strong>Acceptance:</strong> adjudicated scorecards and all gate outcomes; no tuning on sealed tasks;
+usage estimates distinguished from receipts. <strong>Receipts:</strong> immutable run manifests,
+per-task quality/effort, pipeline loss analysis and maintenance ledger. <strong>Stop:</strong> budget
+ceiling, unauthorized disclosure or two failed diagnosed repair cycles.</p>
+<h2 id="wp7-investment-decision-and-handoff">WP7 — Investment decision and handoff</h2>
+<p>Choose keep/change/stop for each mechanism, not only an overall verdict. If B is as
+useful as C at lower maintenance cost, simplify. If even O fails, reconsider evidence
+utility and task fit. If quality succeeds but costs fail, improve preparation/ranking
+before adding UI features. If scoped query implementation fails, isolate storage from
+the knowledge-model decision.</p>
+<p><strong>Acceptance:</strong> owner review of evidence; next milestone scope expressly authorized.
+Only then expand M4/M5 workbenches and enterprise operations. A competitive market
+claim additionally needs independent pilots and available fair external comparisons.</p>
+<h2 id="work-item-handoff-template">Work-item handoff template</h2>
+<p>Every coding task includes: package/goal, requirement IDs, frozen input/output schema,
+in-scope files, excluded work, dependencies, positive/negative tests, commands, expected
+receipts and escalation conditions. One package may be split into smaller coherent
+changes; do not combine unresolved policy, extraction and ranking redesign in one task.
+Use the selected implementation model at normal effort; reserve deeper review for
+contract/security decisions, hard failures and milestone verdicts.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/execution/validation-work-packages.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

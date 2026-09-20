@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Studio user experience · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../studio-experience.md">Markdown source</a></nav>
+    <article>
+      <h1 id="studio-user-experience">Studio user experience</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#navigation">Navigation</a></li><li><a href="#core-screens">Core screens</a></li><li><a href="#interaction-detail">Interaction detail</a></li><li><a href="#states-and-accessibility">States and accessibility</a></li><li><a href="#browser-acceptance-journeys">Browser acceptance journeys</a></li></ul></details>
+<p><strong>Status:</strong> Proposed for review · CF-0.2</p>
+<h2 id="navigation">Navigation</h2>
+<p>Studio offers Tasks, Packs, Explore, Architecture, Test Impact, Jobs, and Administration.
+Visible navigation follows effective capabilities; every action is still checked by
+the backend. Pack counts and search suggestions include only visible resources.
+The header shows the active pack/release and freshness. Clearly distinguish a
+candidate review from the active served release.</p>
+<h2 id="core-screens">Core screens</h2>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>Primary user task</th>
+<th>Required content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pack overview</td>
+<td>Determine readiness</td>
+<td>Owner, release, source coverage, freshness, unresolved diagnostics</td>
+</tr>
+<tr>
+<td>Source configuration</td>
+<td>Define extraction scope</td>
+<td>Logical roots, supplied revision, adapters, exclusions, secret reference</td>
+</tr>
+<tr>
+<td>Candidate review</td>
+<td>Decide whether to release</td>
+<td>Added/removed/changed facts, mapping changes, gaps, validation and policy results</td>
+</tr>
+<tr>
+<td>Explore</td>
+<td>Resolve an engineering question</td>
+<td>Concern-grouped results with evidence drawer and targeted expansion</td>
+</tr>
+<tr>
+<td>Business mapping</td>
+<td>Review an association</td>
+<td>Source passage beside artifact evidence, alternatives, approval rationale</td>
+</tr>
+<tr>
+<td>Task scope review</td>
+<td>Confirm the investigation target</td>
+<td>Original request, interpreted map/version, local-source pointers, gaps and human additions</td>
+</tr>
+<tr>
+<td>Implementation review</td>
+<td>Authorize or reject an exact proposal</td>
+<td>Findings, design, affected areas, steps, validation obligations, exclusions and explicit coding authority</td>
+</tr>
+<tr>
+<td>Task completion</td>
+<td>Review outcome and residual risks</td>
+<td>Approved proposal, deviations, executed/skipped checks and unresolved behavior</td>
+</tr>
+<tr>
+<td>Architecture review</td>
+<td>Compare proposed options</td>
+<td>Baseline, constraints, proposed changes, tradeoffs, evidence and review state</td>
+</tr>
+<tr>
+<td>Test impact</td>
+<td>Decide validation scope</td>
+<td>Affected tests/behaviors, relation reasons, actual execution evidence and unknowns</td>
+</tr>
+<tr>
+<td>Job detail</td>
+<td>Diagnose preparation</td>
+<td>Stage progress, resource usage, retry/cancel, sanitized diagnostics</td>
+</tr>
+<tr>
+<td>Access administration</td>
+<td>Manage effective grants</td>
+<td>Principal/group, action, resource scope, expiry, policy history</td>
+</tr>
+</tbody>
+</table>
+<h2 id="interaction-detail">Interaction detail</h2>
+<p>Explore begins with the user's question and a list of useful starting points. Selecting
+a result opens its evidence drawer without losing query state. The drawer shows origin,
+revision, review, freshness, and relevant passage. Expanding connections records the
+selected relation and direction; a bounded diagram accompanies an accessible table.
+Graph degree is never presented as certainty of impact.</p>
+<p>Candidate approval and activation are separate controls. The confirmation identifies
+the exact candidate digest and policy decision. A newer candidate invalidates an old
+approval; optimistic concurrency prevents two reviewers silently overwriting decisions.</p>
+<p>Saved architecture and test assessments use explicit Save actions. Reading evidence
+does not silently publish analysis or add a business mapping. Export requires separate
+permission and a current access check on all included material.</p>
+<p>The first slice needs only minimal authenticated scope/proposal review pages and
+task status, alongside conversation rendering of the same artifacts. It does not
+wait for full Studio navigation or authoring tools. Reject/request changes is distinct
+from approval; design acceptance alone is distinct from coding authorization. New
+artifact versions visibly invalidate prior decisions. Plain conversation confirmations
+without trusted human provenance are not displayed as verified platform approval.
+See <a href="../../technical-design/html/task-and-review-contracts.html">task contracts</a>.</p>
+<h2 id="states-and-accessibility">States and accessibility</h2>
+<p>Every list handles loading, empty authorized result, stale data, unavailable service,
+partial coverage, work-limit exhaustion, and conflicting evidence. A missing or hidden
+resource has one non-disclosing presentation. Job failure shows a correlation ID and
+next operator action rather than internal paths or secrets.</p>
+<p>Use keyboard focus management, semantic headings, labelled forms, contrast-tested
+tokens, and table alternatives to diagrams. Evidence state must have text, not color
+alone. Narrow screens stack evidence and results; wide tables scroll within their own
+container. Browser navigation preserves filters but excludes sensitive story text
+from shareable URLs unless explicitly saved and authorized.</p>
+<h2 id="browser-acceptance-journeys">Browser acceptance journeys</h2>
+<p>Test a maintainer configuring a source and reviewing a candidate, an engineer tracing
+a result into evidence, an unauthorized user attempting direct API/navigation access,
+and a reviewer comparing a proposal with its baseline. Repeat core journeys using
+keyboard only and at 390px/1440px widths. Reload, expired sessions, stale revisions,
+cancelled jobs, and revoked export permission must remain understandable.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/studio-experience.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

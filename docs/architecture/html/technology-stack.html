@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Technology stack and tradeoffs · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../technology-stack.md">Markdown source</a></nav>
+    <article>
+      <h1 id="technology-stack-and-tradeoffs">Technology stack and tradeoffs</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#recommended-baseline">Recommended baseline</a></li><li><a href="#postgresql-decision">PostgreSQL decision</a></li><li><a href="#semantic-retrieval">Semantic retrieval</a></li><li><a href="#library-evidence-and-constraints">Library evidence and constraints</a></li><li><a href="#alternatives">Alternatives</a></li></ul></details>
+<p><strong>Status:</strong> Proposed validation-slice baseline · CF-0.2</p>
+<h2 id="recommended-baseline">Recommended baseline</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Selection</th>
+<th>Reason and cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Studio</td>
+<td>React, TypeScript, Vite; React Router and TanStack Query</td>
+<td>Rich review interactions, static assets served by API, no SSR requirement</td>
+</tr>
+<tr>
+<td>UI components</td>
+<td>HTML/CSS with Radix primitives; TanStack Table</td>
+<td>Accessible evidence tables and progressive disclosure</td>
+</tr>
+<tr>
+<td>Diagrams</td>
+<td>React Flow for bounded architecture views</td>
+<td>Supply an equivalent textual view; no full-estate graph landing page</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>Supported Node.js LTS, strict TypeScript</td>
+<td>Shared contracts and extension authoring</td>
+</tr>
+<tr>
+<td>HTTP</td>
+<td>Fastify with first-party JSON Schema/Ajv</td>
+<td>Explicit input/output schemas; services shared with MCP</td>
+</tr>
+<tr>
+<td>Database access</td>
+<td>PostgreSQL driver and versioned SQL migrations</td>
+<td>Inspectable permission, search, and adjacency queries</td>
+</tr>
+<tr>
+<td>Workers</td>
+<td>Isolated Node processes/containers; Tree-sitter and format parsers</td>
+<td>Bounded CPU/memory; framework semantics remain explicit</td>
+</tr>
+<tr>
+<td>Semantic index ingestion</td>
+<td>First-party SCIP import from approved enterprise CI</td>
+<td>Revision-bound symbol resolution; no required external code-intelligence server</td>
+</tr>
+<tr>
+<td>Operational storage</td>
+<td>PostgreSQL 18 major as provisional baseline</td>
+<td>Transactions for configuration, permissions, reviews, jobs, audit</td>
+</tr>
+<tr>
+<td>Retrieval storage</td>
+<td>PostgreSQL projection tables</td>
+<td>Exact indexes, weighted full text, batched typed adjacency</td>
+</tr>
+<tr>
+<td>Canonical releases</td>
+<td>Canonical JSONL shards with manifest digests</td>
+<td>Portable audit representation independent of query storage</td>
+</tr>
+<tr>
+<td>Blob storage</td>
+<td>Content-addressed filesystem on managed volumes</td>
+<td>Minimal first deployment; S3-compatible storage extension later</td>
+</tr>
+<tr>
+<td>Jobs</td>
+<td>PostgreSQL leases and transactional outbox</td>
+<td>No initial Redis or distributed workflow service</td>
+</tr>
+<tr>
+<td>Identity</td>
+<td>Existing OIDC provider; browser authorization-code login</td>
+<td>SAML via enterprise OIDC broker, not home-grown SAML</td>
+</tr>
+<tr>
+<td>Interfaces</td>
+<td>Versioned HTTP JSON, official MCP TypeScript SDK, CLI</td>
+<td>Common application and authorization paths</td>
+</tr>
+<tr>
+<td>Agent integration</td>
+<td>Versioned workflow guide, authenticated client and local binding helper</td>
+<td>Existing host owns reasoning/reads/edits; verified reviews through minimal Studio</td>
+</tr>
+<tr>
+<td>Telemetry</td>
+<td>OpenTelemetry and structured logs</td>
+<td>Enterprise monitoring integration; sensitive content off by default</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>Vitest, PostgreSQL integration tests, Playwright</td>
+<td>Actual query/security checks and browser journeys</td>
+</tr>
+<tr>
+<td>Packaging</td>
+<td>pnpm workspace, OCI images, Compose</td>
+<td>Small deployable monorepo; Kubernetes packaging later</td>
+</tr>
+</tbody>
+</table>
+<p>Exact versions and image digests are pinned during implementation bootstrap after
+compatibility checks. These are selections for review, not installed or benchmarked
+components. Record supported runtime/database versions in each release; broad
+package ranges are not evidence of compatibility.</p>
+<p>The backend remains TypeScript even though the first corpus includes Java/Spring.
+Use bounded static adapters for both Java/Spring and TypeScript/Hono plus SQL and
+Markdown; no Java service runtime is required merely to parse Java source. Pin grammar
+and parser compatibility in WP1. See <a href="../../technical-design/html/extraction-and-source-binding.html">extraction scope</a>.
+Task/review state uses PostgreSQL; local root bindings use OS-protected client config.</p>
+<h2 id="postgresql-decision">PostgreSQL decision</h2>
+<p>V2's latency evidence implicates scoped query planning, repeated matching, and
+repeated evidence authorization; it does not establish a SQLite limitation.
+PostgreSQL is selected for concurrent enterprise authoring, policy state, durable
+jobs, and transactional activation. Reusing it for projections reduces initial
+operational complexity compared with adding a second query engine.</p>
+<p>PostgreSQL offers full-text search and recursive queries. These are building blocks,
+not proof of v2 ranking parity or performance. Use explicit identifier indexes,
+weighted text fields, and bounded batched adjacency. PostgreSQL text ranking is not
+BM25. Restricted-scope relevance and latency gates precede release commitment.
+<a href="https://www.postgresql.org/docs/current/textsearch.html">Full text</a>,
+<a href="https://www.postgresql.org/docs/17/queries-with.html">recursive queries</a>.</p>
+<p>SQLite FTS5 remains a reference and possible later portable format, not a second
+supported backend in v0.1. Dedicated graph, search, vector, and cache servers are
+deferred until measured workloads justify them.
+<a href="https://www2.sqlite.org/fts5.html">SQLite FTS5</a>.</p>
+<h2 id="semantic-retrieval">Semantic retrieval</h2>
+<p>Start with exact identities, lexical search, and reviewed mappings. Reserve a
+search-lane interface within ContextFoundry for embeddings. A semantic lane must
+improve held-out terminology recall without changing evidence trust or access.
+Evaluate pgvector first if needed; model routing, dimensions, embedding versioning,
+cost, and safe restricted-scope ranking require a separate decision. No semantic
+model is required for the initial build.</p>
+<p>Optional query-time embedding/reranking inference must declare data routing, model
+version, CPU/GPU needs and failure fallback. It is distinct from generative answer
+production. See <a href="../../design/html/hybrid-retrieval.html">hybrid retrieval</a>.</p>
+<p>Do not postpone the semantic-recall experiment until after the business workbench.
+If E2 finds terminology misses, compare a semantic lane on the same corpus early.
+Keep serving independent of any particular model provider. Approximate indexing is
+not the starting correctness oracle: verify against exact authorized-only results
+and test hidden-distractor effects. See <a href="../../research/html/second-pass-assessment.html">second-pass assessment</a>
+and <a href="../../evaluation/html/validation-sequence.html">validation sequence</a>.</p>
+<h2 id="library-evidence-and-constraints">Library evidence and constraints</h2>
+<p>React supports TypeScript; Vite can build the SPA. Fastify supports schema-based
+validation and serialization, but compiled schemas are application code. Pack-uploaded
+schemas must never be installed as executable route schemas.
+<a href="https://react.dev/learn/typescript">React</a>, <a href="https://vite.dev/guide/">Vite</a>,
+<a href="https://fastify.dev/docs/latest/Reference/Validation-and-Serialization/">Fastify</a>.</p>
+<p>Tree-sitter provides syntax parsing, not complete semantic or runtime resolution.
+Framework adapters must preserve unresolved references.
+<a href="https://tree-sitter.github.io/tree-sitter/">Tree-sitter</a>.</p>
+<p>PostgreSQL row security is defense in depth. Runtime identities must not own protected
+tables or possess bypass privileges; migrations use a separate identity.
+<a href="https://www.postgresql.org/docs/17/ddl-rowsecurity.html">Row security</a>.</p>
+<h2 id="alternatives">Alternatives</h2>
+<table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Why deferred</th>
+<th>Revisit trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Next.js</td>
+<td>Private review UI needs no SEO/SSR</td>
+<td>Demonstrated server-rendering requirement</td>
+</tr>
+<tr>
+<td>Python primary backend</td>
+<td>Second main contract/runtime ecosystem</td>
+<td>Specific extraction advantage; isolated Python workers can precede this</td>
+</tr>
+<tr>
+<td>Graph server</td>
+<td>Scoped neighborhoods and typed paths fit adjacency model</td>
+<td>SQL implementation fails representative graph gates after optimization</td>
+</tr>
+<tr>
+<td>Temporal</td>
+<td>Initial preparation stages need bounded retries/checkpoints</td>
+<td>Long-lived multi-system workflows and compensation</td>
+</tr>
+<tr>
+<td>Kubernetes first</td>
+<td>Installation burden</td>
+<td>Enterprise HA and platform requirements</td>
+</tr>
+<tr>
+<td>Full LLM knowledge generation</td>
+<td>Adds interpretation, reproducibility and cost concerns</td>
+<td>Reviewed offline proposals demonstrate measurable value</td>
+</tr>
+</tbody>
+</table>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/architecture/technology-stack.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

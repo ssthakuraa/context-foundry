@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Requirements-to-design traceability · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../traceability.md">Markdown source</a></nav>
+    <article>
+      <h1 id="requirements-to-design-traceability">Requirements-to-design traceability</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#alignment-audit">Alignment audit</a></li><li><a href="#known-limits-after-alignment">Known limits after alignment</a></li></ul></details>
+<p><strong>Status:</strong> CF-0.2 design alignment audit · 2026-09-20</p>
+<p>This maps intended behavior to implementation and observable acceptance. A row is
+not an implementation claim. Requirement authority remains the
+<a href="product-requirements.html">product requirements</a>; work is sequenced by the
+<a href="../../execution/html/validation-work-packages.html">validation packages</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Design / technical owner</th>
+<th>First package</th>
+<th>Acceptance evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CF-R01 Connected domain/product/implementation knowledge</td>
+<td><a href="../../design/html/enterprise-knowledge-model.html">Knowledge model</a>, <a href="../../technical-design/html/extraction-and-source-binding.html">extraction</a></td>
+<td>WP2, WP4</td>
+<td>Business-to-code and cross-product paths retain typed support</td>
+</tr>
+<tr>
+<td>CF-R02 Variants and conventions</td>
+<td>Knowledge model, <a href="../../design/html/preparation-and-business-knowledge.html">preparation</a></td>
+<td>WP2</td>
+<td>Conflicting/applicable/unknown variant fixtures, expert-reviewed mappings</td>
+</tr>
+<tr>
+<td>CF-R03 Intent and original request</td>
+<td><a href="../../technical-design/html/task-and-review-contracts.html">Task contracts</a></td>
+<td>WP1, WP3</td>
+<td>Immutable origin, clarification and read-only intent cases</td>
+</tr>
+<tr>
+<td>CF-R04 Useful map</td>
+<td><a href="../../design/html/retrieval-and-agent-guidance.html">Retrieval</a></td>
+<td>WP4, WP5</td>
+<td>Critical anchors with reasons, current locators and explicit gaps</td>
+</tr>
+<tr>
+<td>CF-R05 Gate 1</td>
+<td><a href="../../design/html/human-reviewed-engineering-workflow.html">Workflow</a>, task contracts</td>
+<td>WP3, WP5</td>
+<td>Human addition changes map version; old receipt no longer authorizes</td>
+</tr>
+<tr>
+<td>CF-R06 Per-question sufficiency</td>
+<td>Workflow, <a href="../../design/html/hybrid-retrieval.html">hybrid retrieval</a></td>
+<td>WP5, WP6</td>
+<td>API use versus enhancement requires different evidence depth</td>
+</tr>
+<tr>
+<td>CF-R07 Direct local navigation</td>
+<td>Extraction/source-binding contracts</td>
+<td>WP2, WP5</td>
+<td>Exact/changed/ambiguous/unbound/path-escape outcomes</td>
+</tr>
+<tr>
+<td>CF-R08 Selective investigation</td>
+<td>Workflow and integration contracts</td>
+<td>WP5, WP6</td>
+<td>Necessary reads, fallback and material-scope escalation receipts</td>
+</tr>
+<tr>
+<td>CF-R09 Evidence-backed proposal</td>
+<td>Task contracts, <a href="../../design/html/target-architecture-workbench.html">architecture workbench</a></td>
+<td>WP5</td>
+<td>Minimal findings/design/steps/validation proposal before rich M5 UI</td>
+</tr>
+<tr>
+<td>CF-R10 Gate 2 and final review</td>
+<td>Task contracts, <a href="../../architecture/html/security-and-authorization.html">security</a></td>
+<td>WP3, WP5</td>
+<td>Forged approval/revocation/drift/resume tests; explicit coding authority</td>
+</tr>
+<tr>
+<td>CF-R11 Agent and SCM independence</td>
+<td>Source binding, <a href="../../technical-design/html/interfaces.html">interfaces</a></td>
+<td>WP1, WP5</td>
+<td>Git and supplied-snapshot fixtures; guided host capability matrix</td>
+</tr>
+<tr>
+<td>CF-R12 Provenance/lifecycle</td>
+<td><a href="../../technical-design/html/data-contracts.html">Data contracts</a>, <a href="../../concepts/html/knowledge-packs.html">packs</a></td>
+<td>WP1–4</td>
+<td>Source/review/validation/freshness distinctions; full/delta and withdrawal</td>
+</tr>
+<tr>
+<td>CF-R13 Enterprise authorization</td>
+<td>Security, <a href="../../design/html/identity-and-policy.html">identity</a></td>
+<td>WP3, WP4</td>
+<td>Independent oracle, direct-route denial, hidden support and access-epoch tests</td>
+</tr>
+<tr>
+<td>CF-R14 Robust terminology</td>
+<td>Hybrid retrieval</td>
+<td>WP4, WP6</td>
+<td>Exact/typo/paraphrase/ambiguous cases scored independently</td>
+</tr>
+<tr>
+<td>CF-R15 Reviewable artifacts</td>
+<td><a href="../../design/html/studio-experience.html">Studio</a>, task contracts</td>
+<td>WP3, WP5</td>
+<td>Same version in host and UI; keyboard/narrow layout; no mandatory graph</td>
+</tr>
+<tr>
+<td>CF-R16 Measured value</td>
+<td><a href="../../evaluation/html/methodology.html">Methodology</a>, <a href="../../evaluation/html/three-repository-benchmark.html">benchmark</a></td>
+<td>WP0, WP6, WP7</td>
+<td>Same-information comparisons, held-outs, critical-impact and maintenance ledger</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alignment-audit">Alignment audit</h2>
+<table>
+<thead>
+<tr>
+<th>Document family</th>
+<th>Reconciliation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vision, overview, concepts</td>
+<td>Company-specific functional/technical knowledge; inquiries and API consumption as well as changes; agent responsibility and both gates</td>
+</tr>
+<tr>
+<td>Architecture, stack, operations</td>
+<td>Modular service plus local helper; optional retrieval models distinct from an answer agent; task artifacts backed up; current access epoch</td>
+</tr>
+<tr>
+<td>Preparation and data contracts</td>
+<td>Java/Spring in first slice; source-control-neutral identity; typed applicability, declared precision and task/knowledge separation</td>
+</tr>
+<tr>
+<td>Retrieval and evaluation</td>
+<td>Retrieval tool order remains flexible within reviewed stages; optional guidance ablations cannot remove required gates</td>
+</tr>
+<tr>
+<td>Workflow, UI, identity, interfaces</td>
+<td>Version-bound authenticated human decisions; agent credentials cannot approve; minimal review UI precedes broad workbenches</td>
+</tr>
+<tr>
+<td>Architecture/test workbenches</td>
+<td>Minimal design and validation obligations in first slice; rich diagrams, migration and parity later; skipped tests are not proof</td>
+</tr>
+<tr>
+<td>Execution</td>
+<td>Private three-repository fixture plus public-safe synthetic cases; WP0–7 before broader feature investment</td>
+</tr>
+<tr>
+<td>Research and decisions</td>
+<td>Historical CF-0.1 reports retained as evidence; CF-0.2 verdict/ADR define current proposed scope</td>
+</tr>
+</tbody>
+</table>
+<h2 id="known-limits-after-alignment">Known limits after alignment</h2>
+<p>Schemas and fixtures are specified, not yet executable. Exact dependency versions
+are pinned in WP1. Benchmark answer keys require owner review; capture and paid runs
+require authority. PostgreSQL performance, agent conformance, quality gains and market
+advantage remain unvalidated. These are tracked gates, not hidden missing design work.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/requirements/traceability.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

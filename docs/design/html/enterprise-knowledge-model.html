@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enterprise product and domain knowledge model · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../enterprise-knowledge-model.md">Markdown source</a></nav>
+    <article>
+      <h1 id="enterprise-product-and-domain-knowledge-model">Enterprise product and domain knowledge model</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#small-initial-vocabulary">Small initial vocabulary</a></li><li><a href="#assertions-rather-than-unqualified-edges">Assertions rather than unqualified edges</a></li><li><a href="#example-approval-knowledge">Example: approval knowledge</a></li><li><a href="#knowledge-views-and-persistence">Knowledge views and persistence</a></li><li><a href="#maintenance-and-first-scope">Maintenance and first scope</a></li></ul></details>
+<p><strong>Status:</strong> Proposed design · CF-0.2 alignment · 2026-09-20</p>
+<p>Implements CF-R01, CF-R02 and CF-R12. The model is a typed, evidence-backed graph
+logically; PostgreSQL tables and portable records can implement it. It is neither
+a bag of text chunks nor a graph inferred wholesale by an LLM.</p>
+<h2 id="small-initial-vocabulary">Small initial vocabulary</h2>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Entities and meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Business scope</td>
+<td>Domain, product family, product, capability</td>
+</tr>
+<tr>
+<td>Behavior</td>
+<td>Business flow, flow step, business rule, variant/applicability condition</td>
+</tr>
+<tr>
+<td>Technical policy</td>
+<td>Standard, framework/library/utility, architectural decision, exception</td>
+</tr>
+<tr>
+<td>Implementation</td>
+<td>Component, service/program/job, workflow definition, API/event, entity/table, symbol/file</td>
+</tr>
+<tr>
+<td>Evidence</td>
+<td>Document passage, declaration, semantic-index receipt, observed run, test and validation obligation</td>
+</tr>
+</tbody>
+</table>
+<p>Typed relationships include product participates_in flow; flow contains step;
+step has_rule; capability implemented_by component; component exposes API;
+rule evidenced_by passage; standard applies_to scope; symbol declared_in file;
+test validates obligation. API calls, imports, storage access and runtime observations
+remain distinct relation types. A business sequence is not a proven runtime call path.</p>
+<p>Domain/product membership is many-to-many. Repository, ownership, pack, deployment,
+and developer checkout are separate identities. A Procurement capability can span
+several products/repositories; a shared framework can serve many domains. Cross-pack
+links preserve independently owned records under the pinned release set.</p>
+<h2 id="assertions-rather-than-unqualified-edges">Assertions rather than unqualified edges</h2>
+<p>Each relationship or rule is an assertion with qualified endpoints, relation kind,
+supporting evidence, source revision, origin, review state, owner, applicability and
+visibility requirements. Keep conflicting assertions rather than silently choosing
+the newest or most similar. Reviewed expert assertions retain that origin.</p>
+<p>Applicability includes named product/release, configuration/feature condition,
+business-unit or jurisdiction when relevant, and business effective dates when
+known. Distinguish business effective time from capture time and code revision.
+Unknown applicability is not universal applicability. Initial conditions use bounded
+declarative fields, not executable code or a new general rule engine.</p>
+<p>An alias is scoped to a concept/domain/product and supported by evidence. Entity
+resolution returns exact, candidate, ambiguous or unresolved outcomes; merging
+different identities requires review. Embedding similarity never merges them by itself.</p>
+<h2 id="example-approval-knowledge">Example: approval knowledge</h2>
+<p>Illustrative only: a purchase-order approval step participates in Procure to Pay.
+An approved document states an approval rule for a particular product/configuration.
+A reviewed association connects the step to a workflow and service component.
+Extracted declarations link that component to an API and source symbol. Test
+receipts support only the observations they actually exercised.</p>
+<p>For API use, retrieve the contract, relevant rule and applicable constraints. For
+enhancement, retrieve those plus implementation/workflow/test pointers and unresolved
+dependencies. The agent still reads current source after scope review. A path through
+these assertions explains relevance; it does not prove the proposed change is safe.</p>
+<h2 id="knowledge-views-and-persistence">Knowledge views and persistence</h2>
+<p>Capability summaries, API-use cards and change-navigation cards are bounded projections
+of the same assertions, not independently maintained competing descriptions. Each
+view includes evidence, coverage and freshness. Generated prose is a derived artifact
+with source dependencies and cannot silently replace exact passages.</p>
+<p>Canonical knowledge is reusable and reviewed. The task workspace holds hypotheses,
+reviewer corrections, local-source findings and decisions for one request. Promotion
+from a task to canonical knowledge is an explicit candidate/review/publication path.
+An approved coding plan never becomes evidence that code was implemented.</p>
+<h2 id="maintenance-and-first-scope">Maintenance and first scope</h2>
+<p>Assign owners to reusable concepts and mappings; report stale dependencies and review
+burden. Validate changed/deleted sources against reverse dependencies. Begin with the
+three-repository maintenance flow and a separate synthetic conformance fixture across
+two products, including a shared utility, conflicting variants and an unknown rule.
+Do not attempt all ERP domains first.
+Operational transaction instances and a universal enterprise ontology are out of scope.</p>
+<p>See <a href="../../research/html/enterprise-modeling-patterns.html">research basis</a>,
+<a href="../../technical-design/html/data-contracts.html">data contracts</a>, and
+<a href="hybrid-retrieval.html">hybrid retrieval</a>.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/design/enterprise-knowledge-model.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

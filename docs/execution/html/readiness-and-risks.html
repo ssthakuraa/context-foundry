@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation readiness and risk register · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../readiness-and-risks.md">Markdown source</a></nav>
+    <article>
+      <h1 id="implementation-readiness-and-risk-register">Implementation readiness and risk register</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#ready-means-bounded">Ready means bounded</a></li><li><a href="#readiness-matrix">Readiness matrix</a></li><li><a href="#risks-and-triggers">Risks and triggers</a></li><li><a href="#quota-conscious-execution-handoff">Quota-conscious execution handoff</a></li><li><a href="#decision-log-template">Decision log template</a></li></ul></details>
+<p><strong>Status:</strong> Design closeout for validation implementation · CF-0.2 · 2026-09-20</p>
+<h2 id="ready-means-bounded">Ready means bounded</h2>
+<p>The requirements, architecture, workflows, extraction scope, task contracts and
+ordered work packages are now a reconciled design baseline for the validation slice.
+This is not an implemented product, completed M0 acceptance, or a proven market claim.
+Owner review, benchmark truth and execution permission remain distinct checkpoints.</p>
+<p>Read <a href="../../research/html/design-closeout.html">research verdict</a>,
+<a href="../../requirements/html/traceability.html">traceability</a>,
+<a href="../../evaluation/html/three-repository-benchmark.html">benchmark dossier</a>, then
+<a href="validation-work-packages.html">work packages</a>. Start WP0 before coding. Approval of
+this documentation does not authorize paid inference, external publication, or edits
+to the three evaluation repositories.</p>
+<h2 id="readiness-matrix">Readiness matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Closeout result</th>
+<th>Remaining gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Product intent and functional journey</td>
+<td>CF-R01–16; task depth and both human gates reconciled</td>
+<td>Owner accepts detailed behavior</td>
+</tr>
+<tr>
+<td>Architecture</td>
+<td>Responsibility boundaries and reversible storage/retrieval choices specified</td>
+<td>Scoped query spike and end-to-end value</td>
+</tr>
+<tr>
+<td>Technical contracts</td>
+<td>Extraction precision, source locators, task state/decisions, errors and access specified</td>
+<td>Executable schemas/conformance fixtures in WP1</td>
+</tr>
+<tr>
+<td>Evaluation corpus</td>
+<td>Three revisions recorded; bounded candidate tasks and holdout policy</td>
+<td>Authorized capture, owner rubric, split freeze</td>
+</tr>
+<tr>
+<td>Implementation scope</td>
+<td>Dependency-ordered work packages with failure tests and receipts</td>
+<td>Explicit start approval and WP0 exit</td>
+</tr>
+<tr>
+<td>Competitive confidence</td>
+<td>Positioning and evidence gaps explicit</td>
+<td>Independent pilots and fair comparisons</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>Canonical Markdown, generated HTML and link/parity checks</td>
+<td>Re-run checks with each change</td>
+</tr>
+</tbody>
+</table>
+<h2 id="risks-and-triggers">Risks and triggers</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Risk</th>
+<th>Mitigation / evidence</th>
+<th>Escalation trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>Useful enterprise knowledge is missing or stale</td>
+<td>Expert obligations, evidence states, reusable reviewed mappings; track preparation labor</td>
+<td>Oracle packet does not improve outcomes or necessary intent cannot be established</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>Rich graph costs more than it helps</td>
+<td>Simple document/pointer baseline, incremental/full parity, per-lane ablations</td>
+<td>No held-out gain after two bounded diagnosed iterations</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>Java/framework resolution overclaims precision</td>
+<td>Narrow supported patterns, ambiguity fixtures, optional approved semantic indexes</td>
+<td>Critical paths require unsupported reflection, dynamic SQL or generated wiring</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>Retrieval evidence leaks through derived facts/ranking</td>
+<td>Support closure, current access epoch, independent authorization oracle</td>
+<td>Any unauthorized payload/pointer/metadata disclosure; stop affected lane</td>
+</tr>
+<tr>
+<td>R5</td>
+<td>Agent skips reviews or treats evidence as instruction</td>
+<td>Verified decisions, guided/enforced labels, injection and resume tests</td>
+<td>Host cannot support required conformance; do not advertise enforced mode</td>
+</tr>
+<tr>
+<td>R6</td>
+<td>Test inventory masquerades as behavior coverage</td>
+<td>Distinguish declarations, skipped tests, assertions and authenticated runs</td>
+<td>Any parity claim based only on filenames or contract skeletons</td>
+</tr>
+<tr>
+<td>R7</td>
+<td>Benchmark knowledge leaks into prepared mappings</td>
+<td>Freeze mappings and rubrics separately; held-out workflow, exposure log</td>
+<td>Exposed task treated as unseen; replace or relabel it</td>
+</tr>
+<tr>
+<td>R8</td>
+<td>PostgreSQL scoped retrieval degrades</td>
+<td>Actual-scope plans, hidden-distractor test, exact authorized oracle</td>
+<td>Workload/quality gates fail after bounded query/index repair</td>
+</tr>
+<tr>
+<td>R9</td>
+<td>Product becomes expensive enterprise consulting</td>
+<td>Setup, expert review, refresh and ACL administration accounting</td>
+<td>Recurring maintenance exceeds measured investigation savings</td>
+</tr>
+<tr>
+<td>R10</td>
+<td>Existing products already solve the practical need</td>
+<td>Same-information comparison and independent design partners</td>
+<td>No repeatable advantage in quality, control, maintenance or deployment</td>
+</tr>
+<tr>
+<td>R11</td>
+<td>Documentation drifts during parallel coding</td>
+<td>Shared contracts first; small work packages; contract-change reviews</td>
+<td>Worker changes interfaces or accepted semantics without review</td>
+</tr>
+<tr>
+<td>R12</td>
+<td>Private material enters open-source outputs</td>
+<td>Separate captures/trajectories; no corpus in product repo; publication review</td>
+<td>Unapproved source, business rule, credential or identifying output in distributable artifacts</td>
+</tr>
+</tbody>
+</table>
+<h2 id="quota-conscious-execution-handoff">Quota-conscious execution handoff</h2>
+<p>The design-closeout boundary is the appropriate point to lower reasoning effort or
+switch to the user's preferred implementation model. Routine implementation should
+receive only its work package, linked contracts, relevant code and acceptance cases,
+not an instruction to redesign the entire product. A model choice is not a quality
+gate; check actual results.</p>
+<p>Use stronger review selectively at WP1 contract/security freeze, WP4 authorization
+and query-plan review, WP5 review-receipt/host boundary, and WP6 experiment verdict.
+Escalate unresolved architectural or security choices; do not repeatedly regenerate
+the whole design. This is an execution recommendation, not an estimate of account
+quota multipliers or a promise of equivalent model performance.</p>
+<h2 id="decision-log-template">Decision log template</h2>
+<p>Documentation verification on 2026-09-20: generated-page parity and local link/anchor
+checks passed for 45 pages; desktop review-guide and narrow work-package views were
+visually spot-checked. All 16 requirement IDs have traceability rows. These checks
+validate documentation artifacts, not application behavior or the proposed architecture.</p>
+<p>Record date, work package, question, evidence, options, decision owner, affected
+contracts/tests and keep/change/stop result. Store failed trials as well as successes.
+Do not convert a proposed target into an achieved result by editing its status alone.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/execution/readiness-and-risks.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

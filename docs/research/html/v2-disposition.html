@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>V2 research and implementation disposition · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../v2-disposition.md">Markdown source</a></nav>
+    <article>
+      <h1 id="v2-research-and-implementation-disposition">V2 research and implementation disposition</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#evidence-boundary">Evidence boundary</a></li><li><a href="#disposition-register">Disposition register</a></li><li><a href="#what-the-failure-does-and-does-not-show">What the failure does and does not show</a></li><li><a href="#external-ideas-to-borrow">External ideas to borrow</a></li><li><a href="#follow-up-source-study">Follow-up source study</a></li></ul></details>
+<p><strong>Status:</strong> Reviewed input; recommendations proposed · CF-0.1</p>
+<p>This historical disposition remains evidence. See <a href="design-closeout.html">CF-0.2 design closeout</a>
+for the current research verdict and implementation boundary.</p>
+<h2 id="evidence-boundary">Evidence boundary</h2>
+<p>The local engineering-knowledge-pack-sdkv2 archive supplied by the owner contains
+research, architecture, implementation, tests, and evaluation reports. It is reference
+material, not ContextFoundry's active worklist. Its instructions to resume or stop
+work govern that historical project, not this new design effort. Several supplied
+reports are labelled 2026-09-20; this review preserves their labels without claiming
+independent verification of their chronology. Runtime measurements were not reproduced.</p>
+<p>Reviewed source areas include discovery-service.js, discovery-runtime-v2.js,
+discovery-response-v2.js, business-map.js, interface-bridge.js, typed-paths.js,
+serving-projection-v2.js, discovery-http-server.js, and targeted preparation/retrieval
+tests. This is selected source inspection, not a full code or security audit.</p>
+<h2 id="disposition-register">Disposition register</h2>
+<table>
+<thead>
+<tr>
+<th>V2 artifact/design</th>
+<th>ContextFoundry disposition</th>
+<th>Verification before reuse</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Repository, owner, pack, checkout identities</td>
+<td>Carry forward concepts</td>
+<td>Duplicate-name/cross-repo fixtures</td>
+</tr>
+<tr>
+<td>Canonical records and source anchors</td>
+<td>Carry forward concepts</td>
+<td>Serialization, evidence and revision checks</td>
+</tr>
+<tr>
+<td>Technology adapter contracts</td>
+<td>Adapt into isolated worker interface</td>
+<td>Supported-format coverage and hostile input fixtures</td>
+</tr>
+<tr>
+<td>Interface provider/consumer resolution</td>
+<td>Carry forward algorithm principles</td>
+<td>Ambiguity, versions, identical routes, hidden supports</td>
+</tr>
+<tr>
+<td>Incremental contributions and reverse invalidation</td>
+<td>Carry forward principles</td>
+<td>Full/delta parity across changed and deleted providers</td>
+</tr>
+<tr>
+<td>Business Map</td>
+<td>Adapt and extend</td>
+<td>Existing code is reviewed phrase-based nomination; full document/reverse lookup needs implementation</td>
+</tr>
+<tr>
+<td>Evidence authorization</td>
+<td>Adapt</td>
+<td>Existing host scope/shared-token boundary is insufficient for per-user enterprise access</td>
+</tr>
+<tr>
+<td>Typed paths and entry-point selection</td>
+<td>Retain as candidate mechanisms</td>
+<td>Useful connectors, irrelevant hubs, paraphrases, actual output quality</td>
+</tr>
+<tr>
+<td>One public discovery tool</td>
+<td>Reopen</td>
+<td>Fixed-corpus compact-handoff vs progressive comparison</td>
+</tr>
+<tr>
+<td>Large evidence/contract payload</td>
+<td>Rework</td>
+<td>Detail-on-demand with no false completeness</td>
+</tr>
+<tr>
+<td>Prompt directives</td>
+<td>Rework</td>
+<td>Independent directive experiment and observed agent behavior</td>
+</tr>
+<tr>
+<td>Session/accounting machinery</td>
+<td>Adopt only needed receipts</td>
+<td>Do not introduce an agent runtime simply to collect metrics</td>
+</tr>
+<tr>
+<td>Evaluation reports/tests</td>
+<td>Preserve lessons and test patterns</td>
+<td>Historical exposed stories cannot become held-out claims</td>
+</tr>
+</tbody>
+</table>
+<p>Conceptual reuse does not authorize copying proprietary source or product data into
+the public repository. Before any literal code reuse, establish provenance and
+redistribution authority; otherwise implement independently from the documented
+design. No reference SDK source has been copied into ContextFoundry in this phase.</p>
+<h2 id="what-the-failure-does-and-does-not-show">What the failure does and does not show</h2>
+<p>The supplied retrospective reports 283,634 bytes of discovery output, 44 components,
+49 connections, 37 files, 60 evidence units, and 41 subsequent shell commands. Reported
+time was 552.5 seconds versus 415.6 seconds historically; total tokens 4,519,618 versus
+2,234,119. Different models were used, so this is not a controlled causal comparison.
+The latency RCA separately reports a repaired actual-scope MCP cache miss around
+31.63 seconds. Neither figure is a ContextFoundry measurement or target.</p>
+<p>The integrated-design report describes relevant corpus components being lost at
+anchor/path selection. This supports prioritizing retrieval/content/guidance tests
+with a fixed corpus. It does not establish universal corpus completeness or prove
+that one-call interaction alone caused failure. More tools and smaller outputs also
+require evidence of value. Useful source verification must not be scored as waste.</p>
+<p>Reference archive files: docs/edkp-failed-design-retrospective-2026-09-20.md,
+docs/edkp-research-backed-decisions-2026-09-17.md,
+docs/edkp-integrated-design-freeze-2026-09-17.md,
+docs/postv2enhancment.md, docs/architecture-v2.md, docs/technical-design-v2.md,
+docs/tests/edkp-v2-email-postfix-evaluation-2026-09-20.md, and
+docs/tests/edkp-v2-discovery-rca-design-2026-09-20.md. These archive-relative identifiers
+are recorded rather than copying restricted reports or adding broken public links.</p>
+<h2 id="external-ideas-to-borrow">External ideas to borrow</h2>
+<table>
+<thead>
+<tr>
+<th>Reference</th>
+<th>Mechanism worth studying</th>
+<th>ContextFoundry boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GitNexus</td>
+<td>Process-grouped search, separate context/impact/trace operations</td>
+<td>Qualified identity and enterprise authorization remain explicit</td>
+</tr>
+<tr>
+<td>Codebase Memory MCP</td>
+<td>Focused structural queries, directional tracing, pagination</td>
+<td>Compact response does not imply complete business impact</td>
+</tr>
+<tr>
+<td>Graphify</td>
+<td>Scoped subgraphs, relationship explanation, mixed code/document evidence</td>
+<td>Inference remains separate from declarations and review</td>
+</tr>
+<tr>
+<td>GraphRAG</td>
+<td>Entity-to-text-unit mappings and local evidence selection</td>
+<td>No hidden query-time answer generator; model-assisted preparation is optional</td>
+</tr>
+</tbody>
+</table>
+<p>Public repository/docs pages were checked during this design session. These are
+mechanism references, not installed providers or reproduced benchmarks. V2 also
+records pinned historical revisions; current project pages may differ.
+<a href="https://github.com/abhigyanpatwari/GitNexus">GitNexus</a>,
+<a href="https://github.com/DeusData/codebase-memory-mcp">Codebase Memory MCP</a>,
+<a href="https://github.com/Graphify-Labs/graphify">Graphify</a>,
+<a href="https://microsoft.github.io/graphrag/query/local_search/">GraphRAG local search</a>.</p>
+<h2 id="follow-up-source-study">Follow-up source study</h2>
+<p>The <a href="second-pass-assessment.html">second pass</a> reopens selected pinned external code
+paths and v2's response validator/latency RCA. It confirms useful mechanisms while
+retaining the distinction between historical reports and reproduced results. Some
+historical line ranges do not match the reopened function locations; use commit,
+path and function names rather than relying on those ranges alone.</p>
+<p>Before implementing each borrowed algorithm, pin a revision and document the selected
+call path, data prerequisites, failure/truncation behavior, and evaluation assumptions.
+Write ContextFoundry conformance fixtures from the desired behavior, not copied
+benchmark answers. Open-source research informs independent implementation; it does
+not justify importing an entire platform as a runtime dependency.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/research/v2-disposition.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>
