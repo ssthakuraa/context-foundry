@@ -9,7 +9,8 @@ validation slice. Start with the [research verdict](research/design-closeout.md)
 [product requirements](requirements/product-requirements.md), and
 [readiness/risk register](execution/readiness-and-risks.md). This means a concrete
 implementation handoff exists, not that the architecture is empirically proven.
-No comparative agent experiments, PostgreSQL spike or product implementation has run.
+No comparative agent experiments, PostgreSQL spike or product runtime has run;
+WP1 executable-contract work is underway.
 
 The package specifies product boundaries, system architecture, a concrete technology
 proposal, preparation/business knowledge, retrieval/directives, UI journeys, security,
@@ -46,8 +47,9 @@ Detailed architecture review follows:
 | 8 | [Evaluation](evaluation/methodology.md) | Will the experiment distinguish real benefit from test success? |
 | 9 | [Execution plan](execution/implementation-plan.md) | Is the first usable slice small enough to prove value early? |
 
-Implementers also read [extraction/source binding](technical-design/extraction-and-source-binding.md)
-and [task/decision contracts](technical-design/task-and-review-contracts.md) before coding.
+Implementers also read [extraction/source binding](technical-design/extraction-and-source-binding.md),
+[task/decision contracts](technical-design/task-and-review-contracts.md) and the
+[open WP1 freeze review](technical-design/contract-freeze-review.md) before dependent coding.
 
 Then review [Studio](design/studio-experience.md), [architecture proposals](design/target-architecture-workbench.md),
 [test impact](design/test-impact-and-validation.md), [data contracts](technical-design/data-contracts.md),
@@ -80,8 +82,9 @@ No language stack guarantees retrieval quality; the selected PostgreSQL implemen
 still needs benchmark evidence. V2's full corpus/model experiments were not rerun.
 The external projects are research references, not validated ContextFoundry dependencies.
 The first corpus is identified, but its private capture and expert rubric still need
-approval. Model/data routing, execution budget, exact dependency versions, public
-license and production SLOs require explicit decisions at their work-package gates.
+approval. Model/data routing, execution budget, remaining dependency versions and
+production SLOs require explicit decisions at their work-package gates. Apache-2.0
+has been approved for the public repository; it does not grant rights to private fixtures.
 The design does not assume paid evaluations or publication authority.
 
 ## Review outcome to record

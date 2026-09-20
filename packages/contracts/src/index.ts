@@ -752,7 +752,7 @@ export type SupportIssueCode =
   | 'INVALID_RECORD' | 'DUPLICATE_RECORD_ID' | 'INVALID_EVIDENCE'
   | 'DUPLICATE_EVIDENCE_ID' | 'MISSING_EVIDENCE' | 'MISSING_DEPENDENCY'
   | 'UNDECLARED_RELATIONSHIP_SUPPORT' | 'DEPENDENCY_CYCLE_OR_BLOCKED'
-  | 'SUPPORT_LIMIT_EXCEEDED';
+  | 'SUPPORT_LIMIT_EXCEEDED' | 'MISSING_TRANSITIVE_SUPPORT';
 
 export type SupportIssue = {
   code: SupportIssueCode;
@@ -831,6 +831,10 @@ export function checkSupportClosure(
     const id = ready[cursor]!;
     processed++;
     const upstream = requirements.get(id)!;
+    if (!upstream.size) {
+      issues.push({ code: 'MISSING_TRANSITIVE_SUPPORT', item: 'record', index: recordsById.get(id)!.index });
+      break;
+    }
     if (upstream.size > MAX_SUPPORT_REFS_PER_RECORD) {
       issues.push({ code: 'SUPPORT_LIMIT_EXCEEDED', item: 'record', index: recordsById.get(id)!.index });
       break;

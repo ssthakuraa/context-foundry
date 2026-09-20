@@ -40,6 +40,9 @@ test('missing and duplicate support fails closed without a partial closure', () 
     .issues.map(issue => issue.code), ['DUPLICATE_RECORD_ID']);
   assert.deepEqual(checkSupportClosure([], [locator('ev:one'), locator('ev:one')])
     .issues.map(issue => issue.code), ['DUPLICATE_EVIDENCE_ID']);
+  const orphan = checkSupportClosure([record('rec:orphan', [])], []);
+  assert.deepEqual(orphan.issues.map(issue => issue.code), ['MISSING_TRANSITIVE_SUPPORT']);
+  assert.equal(orphan.evidenceByRecord, undefined);
 });
 
 test('cycles and records blocked by cycles are diagnosed, never published as closure', () => {

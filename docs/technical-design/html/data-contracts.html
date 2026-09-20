@@ -88,7 +88,8 @@ access. Those require trusted capture and local binding checks.</p>
 <code>checkSupportClosure</code> verifies that record evidence/dependency references resolve,
 that relationship payload support is declared on its envelope, and that IDs are
 unique. It computes a bounded transitive evidence-ID set per record for acyclic
-dependencies. Missing/invalid references, duplicate IDs, cycles or excessive closure
+dependencies. A record with no evidence anywhere in that chain is rejected.
+Missing/invalid references, duplicate IDs, cycles or excessive closure
 return issues and <strong>no</strong> closure; records blocked by a cycle are diagnosed along with
 cycle members. This initial slice rejects cycles rather than publishing a partial
 strongly connected group. Call <code>checkReleaseIntegrity</code> to combine this check with

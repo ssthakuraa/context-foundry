@@ -1,0 +1,24 @@
+# WP1 contract-freeze review
+
+**Status:** Open review · CF-0.2 · 2026-09-20. This is a gap audit, not a freeze or permission to start private evaluation.
+
+## Verified now
+
+- Twenty-one Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. The first registered record kinds are engineering symbols/relationships and business rules/mappings; all five task artifact body kinds have strict shapes.
+- Metadata checks cover capture/file/locator binding, canonical declared-file manifest digests, acyclic source-evidence support with no empty-support record, and exact same-task artifact references. These checks return issues instead of partial authorization decisions.
+- The current thirty-seven package tests, typecheck, build, schema export check, forty-seven generated HTML pages and four valid/three rejected canonical vectors in TypeScript and Python pass. These are bounded fixtures, not a completeness claim.
+
+## Blocking gaps before a shared contract freeze
+
+| Gap | Why it matters | Exit evidence |
+|---|---|---|
+| Kind catalog | Interface operations, test associations, business flows/variants and behavior obligations still lack registered payloads or an explicit optional-extension protocol | Each first-slice producer/consumer kind is either strictly registered or explicitly unsupported with coverage |
+| Portable semantic parity | JSON Schema exports do not encode all TypeScript semantic checks, including path normalization, cross-record support, exact body digest and version-chain rules | A language-neutral semantic rule manifest and negative conformance cases consumed by at least two implementations |
+| Evidence trust | Execution-evidence JSON is shape-only; source capture metadata does not prove bytes, producer authenticity or publication authority | Authenticated importer and digest/revision/policy receipts; forged or stale report denial tests |
+| Task authority | Receipt shape and artifact references cannot establish a human session, current grant, nonrevocation or valid state transition | WP3 transactional authorization/state tests before any implementation approval claim |
+| Release-set closure | Cross-pack identity conflicts, source-manifest provenance, shard digest closure and activation compatibility are not yet checked end to end | Portable synthetic two-pack fixture with valid/invalid release-set and dependency cases |
+| Cross-language boundaries | Four canonical vectors are a start, but not a broad Unicode/number/size/JSONL corpus or independent importer round-trip | Expanded fixed vectors and parity report with supported limits and rejection behavior |
+
+## Decision
+
+Keep `0.2.0` provisional. WP1 may continue with synthetic fixtures and bounded interfaces, but WP2/WP3 must not treat the current schemas as frozen. Schema validity, a claimed approval receipt or a `passed` report cannot substitute for authenticated policy, source-byte verification or human review. Private benchmark capture/runs still require the owner decisions recorded in [WP0](../execution/validation-work-packages.md).

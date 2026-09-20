@@ -53,7 +53,8 @@ Source locators now carry a unique `evidence_id` within the supplied release set
 `checkSupportClosure` verifies that record evidence/dependency references resolve,
 that relationship payload support is declared on its envelope, and that IDs are
 unique. It computes a bounded transitive evidence-ID set per record for acyclic
-dependencies. Missing/invalid references, duplicate IDs, cycles or excessive closure
+dependencies. A record with no evidence anywhere in that chain is rejected.
+Missing/invalid references, duplicate IDs, cycles or excessive closure
 return issues and **no** closure; records blocked by a cycle are diagnosed along with
 cycle members. This initial slice rejects cycles rather than publishing a partial
 strongly connected group. Call `checkReleaseIntegrity` to combine this check with

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WP1 contract-freeze review · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../contract-freeze-review.md">Markdown source</a></nav>
+    <article>
+      <h1 id="wp1-contract-freeze-review">WP1 contract-freeze review</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#verified-now">Verified now</a></li><li><a href="#blocking-gaps-before-a-shared-contract-freeze">Blocking gaps before a shared contract freeze</a></li><li><a href="#decision">Decision</a></li></ul></details>
+<p><strong>Status:</strong> Open review · CF-0.2 · 2026-09-20. This is a gap audit, not a freeze or permission to start private evaluation.</p>
+<h2 id="verified-now">Verified now</h2>
+<ul>
+<li>Twenty-one Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. The first registered record kinds are engineering symbols/relationships and business rules/mappings; all five task artifact body kinds have strict shapes.</li>
+<li>Metadata checks cover capture/file/locator binding, canonical declared-file manifest digests, acyclic source-evidence support with no empty-support record, and exact same-task artifact references. These checks return issues instead of partial authorization decisions.</li>
+<li>The current thirty-seven package tests, typecheck, build, schema export check, forty-seven generated HTML pages and four valid/three rejected canonical vectors in TypeScript and Python pass. These are bounded fixtures, not a completeness claim.</li>
+</ul>
+<h2 id="blocking-gaps-before-a-shared-contract-freeze">Blocking gaps before a shared contract freeze</h2>
+<table>
+<thead>
+<tr>
+<th>Gap</th>
+<th>Why it matters</th>
+<th>Exit evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kind catalog</td>
+<td>Interface operations, test associations, business flows/variants and behavior obligations still lack registered payloads or an explicit optional-extension protocol</td>
+<td>Each first-slice producer/consumer kind is either strictly registered or explicitly unsupported with coverage</td>
+</tr>
+<tr>
+<td>Portable semantic parity</td>
+<td>JSON Schema exports do not encode all TypeScript semantic checks, including path normalization, cross-record support, exact body digest and version-chain rules</td>
+<td>A language-neutral semantic rule manifest and negative conformance cases consumed by at least two implementations</td>
+</tr>
+<tr>
+<td>Evidence trust</td>
+<td>Execution-evidence JSON is shape-only; source capture metadata does not prove bytes, producer authenticity or publication authority</td>
+<td>Authenticated importer and digest/revision/policy receipts; forged or stale report denial tests</td>
+</tr>
+<tr>
+<td>Task authority</td>
+<td>Receipt shape and artifact references cannot establish a human session, current grant, nonrevocation or valid state transition</td>
+<td>WP3 transactional authorization/state tests before any implementation approval claim</td>
+</tr>
+<tr>
+<td>Release-set closure</td>
+<td>Cross-pack identity conflicts, source-manifest provenance, shard digest closure and activation compatibility are not yet checked end to end</td>
+<td>Portable synthetic two-pack fixture with valid/invalid release-set and dependency cases</td>
+</tr>
+<tr>
+<td>Cross-language boundaries</td>
+<td>Four canonical vectors are a start, but not a broad Unicode/number/size/JSONL corpus or independent importer round-trip</td>
+<td>Expanded fixed vectors and parity report with supported limits and rejection behavior</td>
+</tr>
+</tbody>
+</table>
+<h2 id="decision">Decision</h2>
+<p>Keep <code>0.2.0</code> provisional. WP1 may continue with synthetic fixtures and bounded interfaces, but WP2/WP3 must not treat the current schemas as frozen. Schema validity, a claimed approval receipt or a <code>passed</code> report cannot substitute for authenticated policy, source-byte verification or human review. Private benchmark capture/runs still require the owner decisions recorded in <a href="../../execution/html/validation-work-packages.html">WP0</a>.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/technical-design/contract-freeze-review.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>
