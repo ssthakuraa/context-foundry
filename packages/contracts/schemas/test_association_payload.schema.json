@@ -1,0 +1,54 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:test-association-payload",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "association_basis": {
+      "anyOf": [
+        {
+          "const": "static_reference",
+          "type": "string"
+        },
+        {
+          "const": "reviewed_relevance",
+          "type": "string"
+        }
+      ]
+    },
+    "expected_scope": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_entity_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "target_kind": {
+      "anyOf": [
+        {
+          "const": "engineering_entity",
+          "type": "string"
+        },
+        {
+          "const": "behavior_obligation",
+          "type": "string"
+        }
+      ]
+    },
+    "test_entity_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "test_entity_id",
+    "target_entity_id",
+    "target_kind",
+    "association_basis",
+    "expected_scope"
+  ],
+  "type": "object"
+}

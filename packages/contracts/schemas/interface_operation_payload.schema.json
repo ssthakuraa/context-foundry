@@ -1,0 +1,102 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:interface-operation-payload",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "auth_descriptor": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    },
+    "error_descriptors": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "http_method": {
+      "anyOf": [
+        {
+          "const": "GET",
+          "type": "string"
+        },
+        {
+          "const": "POST",
+          "type": "string"
+        },
+        {
+          "const": "PUT",
+          "type": "string"
+        },
+        {
+          "const": "PATCH",
+          "type": "string"
+        },
+        {
+          "const": "DELETE",
+          "type": "string"
+        }
+      ]
+    },
+    "implementation_entity_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "interface_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "operation_key": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "protocol": {
+      "anyOf": [
+        {
+          "const": "http",
+          "type": "string"
+        },
+        {
+          "const": "event",
+          "type": "string"
+        },
+        {
+          "const": "internal",
+          "type": "string"
+        }
+      ]
+    },
+    "request_contract_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "response_contract_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "route_template": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    },
+    "side_effect_descriptor": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "interface_id",
+    "operation_key",
+    "protocol"
+  ],
+  "type": "object"
+}

@@ -82,6 +82,12 @@ p, li, td, a { overflow-wrap: anywhere; }
 <td>Parity checked: business rule examples only</td>
 </tr>
 <tr>
+<td>CF-S11</td>
+<td>Interface operation</td>
+<td>HTTP requires method and route; other protocols cannot claim HTTP fields</td>
+<td>Parity checked: HTTP/event examples</td>
+</tr>
+<tr>
 <td>CF-S06</td>
 <td>Release set</td>
 <td>Pack IDs unique within the set</td>
@@ -131,7 +137,7 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 </tbody>
 </table>
-<p><code>CF-S01</code>–<code>CF-S05</code> are a bounded cross-language start, not a second complete validator. Every case is intended to satisfy the exported JSON Schema so its acceptance difference isolates a semantic rule. The Python script trusts that precondition; the TypeScript test checks full shape plus semantics. Before contract freeze, add a portable schema validator or schema prevalidation for the second implementation, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>
+<p><code>CF-S01</code>–<code>CF-S05</code> and <code>CF-S11</code> are a bounded cross-language start, not a second complete validator. Every case is intended to satisfy the exported JSON Schema so its acceptance difference isolates a semantic rule. The Python script trusts that precondition; the TypeScript test checks full shape plus semantics. Before contract freeze, add a portable schema validator or schema prevalidation for the second implementation, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>
 <p>Run from the repository root: <code>pnpm test</code> and <code>python3 scripts/check-semantic-python.py</code>.</p>
 
     </article>

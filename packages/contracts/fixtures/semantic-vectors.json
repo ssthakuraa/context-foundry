@@ -14,6 +14,10 @@
     {"name":"callable-with-signature","schema":"engineering_symbol_payload","valid":true,"value":{"name":"run","artifact_kind":"method","language":"java","signature":"run()"}},
     {"name":"bounded-without-scope","schema":"business_rule_payload","valid":false,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"bounded"}}},
     {"name":"unknown-with-scope","schema":"business_rule_payload","valid":false,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"unknown","product_ids":["product:1"]}}},
-    {"name":"unknown-without-scope","schema":"business_rule_payload","valid":true,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"unknown"}}}
+    {"name":"unknown-without-scope","schema":"business_rule_payload","valid":true,"value":{"name":"Approval","statement":"Review required","applicability":{"status":"unknown"}}},
+    {"name":"http-operation-complete","schema":"interface_operation_payload","valid":true,"value":{"interface_id":"api:1","operation_key":"submit","protocol":"http","http_method":"POST","route_template":"/submit"}},
+    {"name":"http-operation-missing-route","schema":"interface_operation_payload","valid":false,"value":{"interface_id":"api:1","operation_key":"submit","protocol":"http","http_method":"POST"}},
+    {"name":"event-operation-no-route","schema":"interface_operation_payload","valid":true,"value":{"interface_id":"topic:1","operation_key":"submitted","protocol":"event"}},
+    {"name":"event-operation-with-method","schema":"interface_operation_payload","valid":false,"value":{"interface_id":"topic:1","operation_key":"submitted","protocol":"event","http_method":"POST"}}
   ]
 }

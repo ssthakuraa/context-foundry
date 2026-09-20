@@ -264,6 +264,33 @@ export const BusinessMappingPayloadSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:business-mapping-payload', additionalProperties: false });
 export type BusinessMappingPayload = Static<typeof BusinessMappingPayloadSchema>;
 
+export const InterfaceOperationPayloadSchema = Type.Object({
+  interface_id: id(),
+  operation_key: id(),
+  protocol: Type.Union([Type.Literal('http'), Type.Literal('event'), Type.Literal('internal')]),
+  http_method: Type.Optional(Type.Union([
+    Type.Literal('GET'), Type.Literal('POST'), Type.Literal('PUT'),
+    Type.Literal('PATCH'), Type.Literal('DELETE'),
+  ])),
+  route_template: Type.Optional(Type.String({ minLength: 1, maxLength: 2048 })),
+  request_contract_ref: Type.Optional(id()),
+  response_contract_ref: Type.Optional(id()),
+  auth_descriptor: Type.Optional(Type.String({ minLength: 1, maxLength: 2048 })),
+  error_descriptors: Type.Optional(Type.Array(id(), { uniqueItems: true })),
+  side_effect_descriptor: Type.Optional(Type.String({ minLength: 1, maxLength: 2048 })),
+  implementation_entity_ref: Type.Optional(id()),
+}, { $id: 'urn:context-foundry:schema:0.2.0:interface-operation-payload', additionalProperties: false });
+export type InterfaceOperationPayload = Static<typeof InterfaceOperationPayloadSchema>;
+
+export const TestAssociationPayloadSchema = Type.Object({
+  test_entity_id: id(),
+  target_entity_id: id(),
+  target_kind: Type.Union([Type.Literal('engineering_entity'), Type.Literal('behavior_obligation')]),
+  association_basis: Type.Union([Type.Literal('static_reference'), Type.Literal('reviewed_relevance')]),
+  expected_scope: Type.String({ minLength: 1, maxLength: 2048 }),
+}, { $id: 'urn:context-foundry:schema:0.2.0:test-association-payload', additionalProperties: false });
+export type TestAssociationPayload = Static<typeof TestAssociationPayloadSchema>;
+
 export const RelationshipPayloadSchema = Type.Object({
   subject_id: id(),
   object_id: id(),
@@ -460,6 +487,8 @@ export const Schemas = {
   engineering_symbol_payload: EngineeringSymbolPayloadSchema,
   business_rule_payload: BusinessRulePayloadSchema,
   business_mapping_payload: BusinessMappingPayloadSchema,
+  interface_operation_payload: InterfaceOperationPayloadSchema,
+  test_association_payload: TestAssociationPayloadSchema,
   relationship_payload: RelationshipPayloadSchema,
   scope_map_body: ScopeMapBodySchema,
   sufficiency_body: SufficiencyBodySchema,
@@ -545,6 +574,16 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
   }
   if (name === 'business_mapping_payload') {
     return applicabilityErrors((value as BusinessMappingPayload).applicability);
+  }
+  if (name === 'interface_operation_payload') {
+    const operation = value as InterfaceOperationPayload;
+    if (operation.protocol === 'http' && (!operation.http_method || !operation.route_template)) {
+      return ['/http_method and /route_template are required for HTTP operations'];
+    }
+    if (operation.protocol !== 'http' && (operation.http_method || operation.route_template)) {
+      return ['/http_method and /route_template are only valid for HTTP operations'];
+    }
+    return [];
   }
   if (name === 'scope_map_body') {
     const body = value as ScopeMapBody;
@@ -656,6 +695,26 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
       if (mapping.mapping_basis === 'reviewed_association' &&
         !['human_asserted', 'model_proposed'].includes(record.origin)) {
         return ['/origin must be human_asserted or model_proposed for reviewed_association'];
+      }
+      return [];
+    }
+    if (record.kind === 'interface.operation') {
+      if (!validateDetailed('interface_operation_payload', record.payload).valid) {
+        return ['/payload must conform to interface_operation_payload'];
+      }
+      return record.origin === 'source_declared'
+        ? [] : ['/origin must be source_declared for interface.operation'];
+    }
+    if (record.kind === 'test.association') {
+      if (!validateDetailed('test_association_payload', record.payload).valid) {
+        return ['/payload must conform to test_association_payload'];
+      }
+      const association = record.payload as TestAssociationPayload;
+      if (association.association_basis === 'static_reference' && record.origin !== 'static_resolution') {
+        return ['/origin must be static_resolution for static_reference'];
+      }
+      if (association.association_basis === 'reviewed_relevance' && record.origin !== 'human_asserted') {
+        return ['/origin must be human_asserted for reviewed_relevance'];
       }
       return [];
     }

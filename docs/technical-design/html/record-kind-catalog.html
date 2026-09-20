@@ -76,15 +76,15 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 <tr>
 <td><code>interface.operation</code></td>
-<td>Stable interface ID, operation key, protocol, request/response contract pointers and known error/auth/side-effect descriptors</td>
+<td>Stable interface ID, operation key, protocol, optional request/response contract pointers and known error/auth/side-effect descriptors; HTTP requires method and route</td>
 <td>Source-declared contract only; descriptors absent or unknown remain unknown, not invented. Implementation pointer is distinct from contract claim</td>
-<td>Pending strict payload and adapter</td>
+<td>Strict payload registered; adapter pending</td>
 </tr>
 <tr>
 <td><code>test.association</code></td>
 <td>Test identity, target entity/obligation, association basis and expected scope</td>
-<td>Static reference or reviewed association; association is not evidence a test ran, passed or covers all behavior</td>
-<td>Pending strict payload and adapter</td>
+<td>Static reference or human-asserted association; association is not evidence a test ran, passed or covers all behavior</td>
+<td>Strict payload registered; adapter pending</td>
 </tr>
 <tr>
 <td><code>business.flow</code></td>

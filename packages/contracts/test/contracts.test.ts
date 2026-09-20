@@ -8,7 +8,53 @@ import {
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 21);
+  assert.equal(Object.keys(Schemas).length, 23);
+});
+
+test('interface operations describe source-declared contracts without claiming runtime behavior', () => {
+  const payload = {
+    interface_id: 'api:approval', operation_key: 'approval:submit', protocol: 'http',
+    http_method: 'POST', route_template: '/approvals', request_contract_ref: 'schema:approval-request',
+    response_contract_ref: 'schema:approval-response', implementation_entity_ref: 'repo:A:ApprovalService',
+  };
+  const record = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:operation', entity_id: 'api:approval:submit',
+    kind: 'interface.operation', owner_id: 'team:A', origin: 'source_declared',
+    review: { state: 'not_required' }, payload, evidence_refs: ['ev:route'],
+    dependency_refs: [], classification: 'internal',
+  };
+  assert.equal(validate('record_envelope', record), true);
+  assert.equal(validate('record_envelope', { ...record, origin: 'model_proposed' }), false);
+  assert.equal(validate('interface_operation_payload', { ...payload, route_template: undefined }), false);
+  assert.equal(validate('interface_operation_payload', { ...payload, protocol: 'event' }), false);
+  assert.equal(validate('interface_operation_payload', { ...payload, behavior_verified: true }), false);
+  assert.equal(validate('interface_operation_payload', {
+    interface_id: 'topic:approval', operation_key: 'approval:changed', protocol: 'event',
+  }), true);
+});
+
+test('test associations are distinct from execution outcomes or blanket coverage', () => {
+  const payload = {
+    test_entity_id: 'repo:A:ApprovalTest.submit', target_entity_id: 'repo:A:ApprovalService.submit',
+    target_kind: 'engineering_entity', association_basis: 'static_reference',
+    expected_scope: 'submit path for a configured threshold',
+  };
+  const record = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:test-association', entity_id: 'repo:A:ApprovalTest.submit',
+    kind: 'test.association', owner_id: 'team:A', origin: 'static_resolution',
+    review: { state: 'not_required' }, payload, evidence_refs: ['ev:test'],
+    dependency_refs: [], classification: 'internal',
+  };
+  assert.equal(validate('record_envelope', record), true);
+  assert.equal(validate('record_envelope', { ...record, origin: 'model_proposed' }), false);
+  assert.equal(validate('test_association_payload', { ...payload, outcome: 'passed' }), false);
+  assert.equal(validate('test_association_payload', { ...payload, expected_scope: '' }), false);
+  assert.equal(validate('record_envelope', { ...record, payload: {
+    ...payload, association_basis: 'reviewed_relevance',
+  } }), false);
+  assert.equal(validate('record_envelope', {
+    ...record, origin: 'human_asserted', payload: { ...payload, association_basis: 'reviewed_relevance' },
+  }), true);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {

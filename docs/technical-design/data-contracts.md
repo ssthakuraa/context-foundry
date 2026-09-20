@@ -2,10 +2,11 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains twenty-one
+**Implementation note (2026-09-20):** `packages/contracts` now contains twenty-three
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
-engineering symbol payload, business rule and mapping payloads, all five task artifact bodies,
+engineering symbol payload, business rule and mapping payloads, interface operation
+and test association payloads, all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
