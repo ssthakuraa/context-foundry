@@ -240,6 +240,14 @@ interface_consumer, test_association, visibility_requirement.
 
 Primary keys include generation_id for projected rows. Artifact identity is unique
 within a generation; overlapping releases with conflicting facts block activation.
+The initial conservative composition rule is **one owning pack per entity ID** in a
+release set. `checkCrossPackEntityOwnership` rejects the same entity asserted by
+different pack groups even if the payload looks identical; multiple assertions
+inside its owning pack remain allowed. Cross-product bridges reference that owner
+instead of reasserting the identity in another pack. This avoids an implicit merge
+of conflicting provenance but needs an explicit migration/reownership procedure.
+The check trusts caller-supplied pack grouping and does not authenticate a pack,
+bind records to a shard digest, or activate a generation.
 Index relationships by (generation, subject, relation) and reverse object ordering;
 index exact artifact keys separately from weighted text fields. Search descriptors
 retain evidence references so hidden text cannot contribute match reasons or rank.

@@ -341,6 +341,45 @@ export function checkReleaseSetByteClosure(
   return issues;
 }
 
+export type CrossPackIssueCode =
+  | 'INVALID_PACK_GROUP' | 'INVALID_PACK_RECORD' | 'DUPLICATE_PACK_GROUP'
+  | 'CROSS_PACK_ENTITY_OWNER_CONFLICT';
+export type CrossPackIssue = { code: CrossPackIssueCode; pack_index: number; record_index?: number };
+
+/** Conservative single-owner entity rule for grouped pack records.
+ * Bridge associations reference an owner; they do not duplicate its entity identity. */
+export function checkCrossPackEntityOwnership(
+  groups: readonly { pack_id: string; records: readonly RecordEnvelope[] }[],
+): readonly CrossPackIssue[] {
+  const issues: CrossPackIssue[] = [];
+  const packIds = new Set<string>();
+  const ownerByEntity = new Map<string, string>();
+  groups.forEach((group, packIndex) => {
+    if (typeof group.pack_id !== 'string' || !group.pack_id || group.pack_id.length > 512 ||
+      !Array.isArray(group.records)) {
+      issues.push({ code: 'INVALID_PACK_GROUP', pack_index: packIndex });
+      return;
+    }
+    if (packIds.has(group.pack_id)) {
+      issues.push({ code: 'DUPLICATE_PACK_GROUP', pack_index: packIndex });
+      return;
+    }
+    packIds.add(group.pack_id);
+    group.records.forEach((record, recordIndex) => {
+      if (!validate('record_envelope', record)) {
+        issues.push({ code: 'INVALID_PACK_RECORD', pack_index: packIndex, record_index: recordIndex });
+        return;
+      }
+      const owner = ownerByEntity.get(record.entity_id);
+      if (owner && owner !== group.pack_id) {
+        issues.push({ code: 'CROSS_PACK_ENTITY_OWNER_CONFLICT',
+          pack_index: packIndex, record_index: recordIndex });
+      } else ownerByEntity.set(record.entity_id, group.pack_id);
+    });
+  });
+  return issues;
+}
+
 export const EngineeringSymbolPayloadSchema = Type.Object({
   name: id(),
   artifact_kind: Type.Union([
