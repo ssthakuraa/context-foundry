@@ -47,7 +47,7 @@ p, li, td, a { overflow-wrap: anywhere; }
 
 
 def rewrite_markdown_links(rendered: str, source: Path, output: Path) -> str:
-    """Make relative Markdown links point to their generated HTML pages."""
+    """Rebase local links for the sibling HTML layout; redirect Markdown to HTML."""
 
     pattern = re.compile(r'(href|src)="([^"]+)"')
 
@@ -57,14 +57,11 @@ def rewrite_markdown_links(rendered: str, source: Path, output: Path) -> str:
             return match.group(0)
 
         target_text, fragment = (unescape(href).split("#", 1) + [""])[:2]
-        if not target_text.endswith(".md"):
-            return match.group(0)
-
         target = (source.parent / target_text).resolve()
-        if not target.exists() or target.suffix != ".md":
+        if not target.is_file() or not target.is_relative_to(ROOT):
             return match.group(0)
 
-        target_output = target.parent / "html" / f"{target.stem}.html"
+        target_output = target.parent / "html" / f"{target.stem}.html" if target.suffix == ".md" else target
         relative = Path(os.path.relpath(target_output, output.parent))
         rewritten = str(relative)
         if fragment:

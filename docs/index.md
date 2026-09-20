@@ -10,7 +10,8 @@ inside the enterprise boundary.
 [research verdict](research/design-closeout.md) and
 [implementation readiness](execution/readiness-and-risks.md).
 All architecture/technical choices remain proposed unless an ADR states otherwise.
-No product implementation or benchmark validation is claimed.
+WP1 executable contracts are underway; no product runtime or benchmark validation
+is claimed.
 
 1. [Vision](vision.md)
 2. [Engineering context](concepts/engineering-context.md)
@@ -48,6 +49,7 @@ No product implementation or benchmark validation is claimed.
 - [Storage decision](decisions/0003-postgresql-and-portable-releases.md)
 - [Retrieval experiment decision](decisions/0004-retrieval-and-guidance-experiment.md)
 - [Validation-slice baseline decision](decisions/0005-validation-slice-baseline.md)
+- [Open-source license decision](decisions/0006-apache-2-license.md)
 
 ## Technical design and execution
 

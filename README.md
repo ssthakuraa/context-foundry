@@ -37,7 +37,9 @@ validation slice. Research synthesis and the design handoff are ready for review
 prototype effectiveness, performance and market competitiveness remain unvalidated.
 Product runtime implementation has not started; WP0 evaluation setup and WP1
 executable contract work are underway.
-The [public GitHub repository](https://github.com/ssthakuraa/context-foundry) is live. License selection is pending.
+The [public GitHub repository](https://github.com/ssthakuraa/context-foundry) is live
+under the [Apache-2.0 license](LICENSE). Private evaluation fixtures are not part
+of this repository or license grant.
 
 ## Contract development
 

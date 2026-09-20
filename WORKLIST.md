@@ -8,9 +8,10 @@ Legend: `[ ]` pending, `[-]` in progress, `[x]` complete, `[!]` needs a product 
 ## Design and handoff
 
 - [x] CF-0.2 product requirements, architecture, research verdict, technical designs, traceability and execution plan written. Evidence: [review guide](docs/review-guide.md), [requirements traceability](docs/requirements/traceability.md).
-- [x] Generated HTML pages validated and visually spot checked. Evidence: 45 pages passed `python3 scripts/build-docs.py --check` on 2026-09-20.
+- [x] Generated HTML pages validated and visually spot checked. Evidence: 46 pages passed `python3 scripts/build-docs.py --check` on 2026-09-20.
 - [x] Create this durable worklist, [restart context](restartcontext.md) and [restart prompt](restartprompt.md).
-- [x] Create the public [GitHub repository](https://github.com/ssthakuraa/context-foundry) and configure `origin`. The private `.local/` directory is Git-ignored; license selection remains open.
+- [x] Create the public [GitHub repository](https://github.com/ssthakuraa/context-foundry) and configure `origin`. The private `.local/` directory is Git-ignored.
+- [x] Adopt [Apache-2.0](LICENSE) with owner approval and record [ADR 0006](docs/decisions/0006-apache-2-license.md); private fixture material remains outside the public license grant.
 
 ## WP0 — Evaluation setup
 
