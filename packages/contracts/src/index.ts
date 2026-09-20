@@ -248,8 +248,15 @@ export const FindingsBodySchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:findings-body', additionalProperties: false });
 export type FindingsBody = Static<typeof FindingsBodySchema>;
 
+const ArtifactRef = Type.Object({
+  artifact_id: id(),
+  version: Type.Integer({ minimum: 1 }),
+  body_digest: digest(),
+}, { additionalProperties: false });
+type ArtifactReference = Static<typeof ArtifactRef>;
+
 export const ImplementationProposalBodySchema = Type.Object({
-  findings_artifact_id: id(),
+  findings_ref: ArtifactRef,
   design_summary: boundedText(),
   affected_entity_ids: refs(),
   ordered_steps: Type.Array(boundedText(), { minItems: 1 }),
@@ -263,8 +270,8 @@ export const ImplementationProposalBodySchema = Type.Object({
 export type ImplementationProposalBody = Static<typeof ImplementationProposalBodySchema>;
 
 export const CompletionBodySchema = Type.Object({
-  findings_artifact_id: id(),
-  approved_proposal_artifact_id: Type.Optional(id()),
+  findings_ref: ArtifactRef,
+  approved_proposal_ref: Type.Optional(ArtifactRef),
   actual_changes: Type.Array(boundedText()),
   check_refs: refs(),
   skipped_checks: Type.Array(boundedText()),
@@ -460,6 +467,11 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
       return ['/claims business_asserted requires evidence'];
     }
     return [];
+  }
+  if (name === 'completion_body') {
+    const body = value as CompletionBody;
+    return body.actual_changes.length && !body.approved_proposal_ref
+      ? ['/approved_proposal_ref required when actual_changes is nonempty'] : [];
   }
   if (name === 'task_artifact') {
     const artifact = value as TaskArtifact;
@@ -788,4 +800,63 @@ export function checkReleaseIntegrity(
     supportIssues: support.issues,
     ...(bindingIssues.length || support.issues.length ? {} : { evidenceByRecord: support.evidenceByRecord }),
   };
+}
+
+export type ArtifactChainIssueCode =
+  | 'INVALID_ARTIFACT' | 'DUPLICATE_KIND_VERSION' | 'DUPLICATE_ARTIFACT_VERSION'
+  | 'ARTIFACT_ID_KIND_CONFLICT' | 'MISSING_PREVIOUS_VERSION'
+  | 'MISSING_ARTIFACT_REFERENCE' | 'WRONG_REFERENCE_KIND' | 'REFERENCE_DIGEST_MISMATCH';
+export type ArtifactChainIssue = { code: ArtifactChainIssueCode; index: number };
+
+/** Exact same-task artifact references; approval, task intent and grants are not checked here. */
+export function checkTaskArtifactReferences(artifacts: readonly TaskArtifact[]): readonly ArtifactChainIssue[] {
+  const issues: ArtifactChainIssue[] = [];
+  const byIdVersion = new Map<string, TaskArtifact>();
+  const byKindVersion = new Set<string>();
+  const seriesKind = new Map<string, TaskArtifact['kind']>();
+  const idVersionKey = (taskId: string, artifactId: string, version: number) =>
+    JSON.stringify([taskId, artifactId, version]);
+
+  artifacts.forEach((artifact, index) => {
+    if (!validate('task_artifact', artifact)) {
+      issues.push({ code: 'INVALID_ARTIFACT', index });
+      return;
+    }
+    const kindKey = JSON.stringify([artifact.task_id, artifact.kind, artifact.version]);
+    if (byKindVersion.has(kindKey)) issues.push({ code: 'DUPLICATE_KIND_VERSION', index });
+    else byKindVersion.add(kindKey);
+    const seriesKey = JSON.stringify([artifact.task_id, artifact.artifact_id]);
+    if (seriesKind.has(seriesKey) && seriesKind.get(seriesKey) !== artifact.kind) {
+      issues.push({ code: 'ARTIFACT_ID_KIND_CONFLICT', index });
+    } else seriesKind.set(seriesKey, artifact.kind);
+    const key = idVersionKey(artifact.task_id, artifact.artifact_id, artifact.version);
+    if (byIdVersion.has(key)) issues.push({ code: 'DUPLICATE_ARTIFACT_VERSION', index });
+    else byIdVersion.set(key, artifact);
+  });
+  if (issues.length) return issues;
+
+  const checkRef = (artifact: TaskArtifact, index: number, ref: ArtifactReference,
+    expectedKind: TaskArtifact['kind']): void => {
+    const target = byIdVersion.get(idVersionKey(artifact.task_id, ref.artifact_id, ref.version));
+    if (!target) issues.push({ code: 'MISSING_ARTIFACT_REFERENCE', index });
+    else if (target.kind !== expectedKind) issues.push({ code: 'WRONG_REFERENCE_KIND', index });
+    else if (target.body_digest !== ref.body_digest) issues.push({ code: 'REFERENCE_DIGEST_MISMATCH', index });
+  };
+  artifacts.forEach((artifact, index) => {
+    if (artifact.version > 1 && !byIdVersion.has(
+      idVersionKey(artifact.task_id, artifact.artifact_id, artifact.version - 1))) {
+      issues.push({ code: 'MISSING_PREVIOUS_VERSION', index });
+    }
+    if (artifact.kind === 'implementation_proposal') {
+      checkRef(artifact, index, (artifact.body as ImplementationProposalBody).findings_ref, 'findings');
+    }
+    if (artifact.kind === 'completion') {
+      const body = artifact.body as CompletionBody;
+      checkRef(artifact, index, body.findings_ref, 'findings');
+      if (body.approved_proposal_ref) {
+        checkRef(artifact, index, body.approved_proposal_ref, 'implementation_proposal');
+      }
+    }
+  });
+  return issues;
 }

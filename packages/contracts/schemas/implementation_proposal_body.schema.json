@@ -25,10 +25,29 @@
       },
       "type": "array"
     },
-    "findings_artifact_id": {
-      "maxLength": 512,
-      "minLength": 1,
-      "type": "string"
+    "findings_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "body_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "version",
+        "body_digest"
+      ],
+      "type": "object"
     },
     "ordered_steps": {
       "items": {
@@ -80,7 +99,7 @@
     }
   },
   "required": [
-    "findings_artifact_id",
+    "findings_ref",
     "design_summary",
     "affected_entity_ids",
     "ordered_steps",

@@ -11,10 +11,29 @@
       },
       "type": "array"
     },
-    "approved_proposal_artifact_id": {
-      "maxLength": 512,
-      "minLength": 1,
-      "type": "string"
+    "approved_proposal_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "body_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "version",
+        "body_digest"
+      ],
+      "type": "object"
     },
     "check_refs": {
       "items": {
@@ -33,10 +52,29 @@
       },
       "type": "array"
     },
-    "findings_artifact_id": {
-      "maxLength": 512,
-      "minLength": 1,
-      "type": "string"
+    "findings_ref": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "body_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "version",
+        "body_digest"
+      ],
+      "type": "object"
     },
     "requested_final_review": {
       "type": "boolean"
@@ -59,7 +97,7 @@
     }
   },
   "required": [
-    "findings_artifact_id",
+    "findings_ref",
     "actual_changes",
     "check_refs",
     "skipped_checks",

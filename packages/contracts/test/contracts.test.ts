@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canonicalSha256, CONTRACT_VERSION, Schemas, validate, validateDetailed } from '../src/index.js';
+import {
+  canonicalSha256, checkTaskArtifactReferences, CONTRACT_VERSION, Schemas,
+  validate, validateDetailed, type TaskArtifact,
+} from '../src/index.js';
 
 const hash = 'a'.repeat(64);
 
@@ -169,7 +172,8 @@ test('sufficiency body requires a plan for selective source inspection', () => {
 });
 
 test('findings, proposal and completion bodies stay typed through review gates', () => {
-  const artifact = (kind: string, body: object, evidenceRefs: string[] = []) => ({
+  const artifact = (kind: TaskArtifact['kind'], body: Record<string, unknown>,
+    evidenceRefs: string[] = []): TaskArtifact => ({
     schema_version: CONTRACT_VERSION, artifact_id: `artifact:${kind}`, task_id: 'task:1',
     kind, version: 1, body_digest: canonicalSha256(body), created_by: 'agent:1',
     origin: 'agent', created_at: '2026-09-20T00:00:00Z', release_set_id: 'release-set:1',
@@ -181,31 +185,61 @@ test('findings, proposal and completion bodies stay typed through review gates',
     contradictions: [], impacts: ['Approval flow'], unresolved_obligations: ['Check override behavior'],
     source_fingerprints: [hash],
   };
-  assert.equal(validate('task_artifact', artifact('findings', findings, ['ev:1'])), true);
+  const findingsArtifact = artifact('findings', findings, ['ev:1']);
+  assert.equal(validate('task_artifact', findingsArtifact), true);
   const noReceipt = { ...findings, claims: [{ ...findings.claims[0], read_receipt_refs: [] }] };
   assert.equal(validate('findings_body', noReceipt), false);
   assert.equal(validate('task_artifact', artifact('findings', noReceipt, ['ev:1'])), false);
   assert.equal(validate('task_artifact', artifact('findings', findings, [])), false);
 
   const proposal = {
-    findings_artifact_id: 'artifact:findings', design_summary: 'Add a bounded threshold override',
+    findings_ref: { artifact_id: findingsArtifact.artifact_id, version: 1,
+      body_digest: findingsArtifact.body_digest },
+    design_summary: 'Add a bounded threshold override',
     affected_entity_ids: ['repo:A:ApprovalService'], ordered_steps: ['Update service', 'Add tests'],
     permitted_actions_requested: ['modify_source'], exclusions: [],
     validation_obligations: ['Verify old and new approval paths'], risks: ['Wrong override precedence'],
     rollback_approach: 'Revert the service change', source_fingerprints: [hash],
   };
-  assert.equal(validate('task_artifact', artifact('implementation_proposal', proposal)), true);
+  const proposalArtifact = artifact('implementation_proposal', proposal);
+  assert.equal(validate('task_artifact', proposalArtifact), true);
   assert.equal(validate('task_artifact', artifact('implementation_proposal', {
     ...proposal, ordered_steps: [],
   })), false);
 
   const completion = {
-    findings_artifact_id: 'artifact:findings', approved_proposal_artifact_id: 'artifact:implementation_proposal',
+    findings_ref: proposal.findings_ref,
+    approved_proposal_ref: { artifact_id: proposalArtifact.artifact_id, version: 1,
+      body_digest: proposalArtifact.body_digest },
     actual_changes: ['Updated service'], check_refs: ['run:1'], skipped_checks: [],
     deviations: [], residual_risks: [], requested_final_review: true,
   };
-  assert.equal(validate('task_artifact', artifact('completion', completion)), true);
+  const completionArtifact = artifact('completion', completion);
+  assert.equal(validate('task_artifact', completionArtifact), true);
   assert.equal(validate('task_artifact', artifact('completion', { ...completion, checked: true })), false);
+  const { approved_proposal_ref: _omitted, ...withoutProposal } = completion;
+  assert.equal(validate('task_artifact', artifact('completion', withoutProposal)), false);
+  assert.deepEqual(checkTaskArtifactReferences([findingsArtifact, proposalArtifact, completionArtifact]), []);
+  const wrongDigest = artifact('implementation_proposal', {
+    ...proposal, findings_ref: { ...proposal.findings_ref, body_digest: hash },
+  });
+  assert.deepEqual(checkTaskArtifactReferences([findingsArtifact, wrongDigest])
+    .map(issue => issue.code), ['REFERENCE_DIGEST_MISMATCH']);
+  assert.deepEqual(checkTaskArtifactReferences([proposalArtifact])
+    .map(issue => issue.code), ['MISSING_ARTIFACT_REFERENCE']);
+  const wrongKind = artifact('completion', {
+    ...completion, findings_ref: { artifact_id: proposalArtifact.artifact_id, version: 1,
+      body_digest: proposalArtifact.body_digest },
+  });
+  assert.deepEqual(checkTaskArtifactReferences([findingsArtifact, proposalArtifact, wrongKind])
+    .map(issue => issue.code), ['WRONG_REFERENCE_KIND']);
+  assert.deepEqual(checkTaskArtifactReferences([findingsArtifact, {
+    ...proposalArtifact, task_id: 'task:other',
+  }]).map(issue => issue.code), ['MISSING_ARTIFACT_REFERENCE']);
+  assert.deepEqual(checkTaskArtifactReferences([findingsArtifact, findingsArtifact])
+    .map(issue => issue.code), ['DUPLICATE_KIND_VERSION', 'DUPLICATE_ARTIFACT_VERSION']);
+  assert.deepEqual(checkTaskArtifactReferences([{ ...findingsArtifact, version: 2, previous_version: 1 }])
+    .map(issue => issue.code), ['MISSING_PREVIOUS_VERSION']);
 });
 
 test('human decision receipt is server-shaped but not proof of authority', () => {

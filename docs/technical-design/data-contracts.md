@@ -28,9 +28,12 @@ business assertion cites evidence. Proposal bodies carry findings identity, orde
 steps, requested actions, validation obligations, risks and rollback. Completion
 bodies record actual changes, check references, skips, deviations and residual risks.
 These checks neither prove evidence or check receipts are authentic nor authorize
-any action; cross-artifact references, task state and human review remain server
-responsibilities. In particular, implementation completion's approved proposal
-binding depends on task intent and current review state, not JSON shape alone.
+any action. Proposal/completion bodies now bind to exact referenced artifact ID,
+version and body digest; `checkTaskArtifactReferences` verifies those references
+within one task and catches duplicate/broken version series. Current task state,
+approval receipts and human authority remain server responsibilities. In particular,
+an implementation completion's approved-proposal reference is not proof that the
+proposal was actually approved or remains valid.
 
 The capture/locator/coverage envelopes were reconciled with the more precise
 [extraction and binding contract](extraction-and-source-binding.md) before freeze.

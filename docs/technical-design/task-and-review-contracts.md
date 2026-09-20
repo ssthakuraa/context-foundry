@@ -14,8 +14,13 @@ basis, and `inspect_source` assessments identify planned evidence-linked reads.
 Findings distinguish claim types and require read-receipt references for
 source-observed claims; proposals and completions retain plans, checks and risks.
 Body evidence references must also be declared on the artifact envelope.
-Cross-artifact identity/digest checks, task-state authority, read-receipt authenticity,
-validation-run authenticity and human review decisions remain unimplemented.
+The proposal and completion bodies use exact `{artifact_id, version, body_digest}`
+references. `checkTaskArtifactReferences` rejects duplicate kind/version pairs,
+broken version chains, wrong-kind/missing/cross-task references and digest drift.
+An artifact ID is stable across versions of one kind within a task. This check
+does not establish that a proposal was approved; authenticated task-state authority,
+read-receipt authenticity, validation-run authenticity and human review decisions
+remain unimplemented.
 
 ## Task aggregate
 
@@ -30,6 +35,10 @@ Artifact envelope: artifact_id, task_id, kind, version, body_digest, previous_ve
 created_by, origin, created_at, schema_version, release_set_id, evidence_refs,
 visibility_requirements and body. Versions are immutable. Human supplements are
 task-local assertions; only a separate release review can publish reusable knowledge.
+The initial contract uses one artifact ID per task/kind series, monotonically
+versioned. A proposal binds to an exact findings version and a completion binds to
+an exact findings version plus an exact approved-proposal version when it reports
+source changes. The task service must still verify that proposal's approval receipt.
 
 ## Artifact bodies
 
