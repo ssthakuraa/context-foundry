@@ -24,6 +24,16 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
+  packages/extractor-spike:
+    dependencies:
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.9.1
+        version: 24.9.1
+
 packages:
 
   '@sinclair/typebox@0.34.52':
