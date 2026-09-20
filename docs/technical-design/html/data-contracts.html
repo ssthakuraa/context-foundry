@@ -126,8 +126,12 @@ each JSONL row with LF. The implementation limits depth to 128 and serialized/in
 size to 16 MiB. <a href="../../../packages/contracts/fixtures/canonical-vectors.json">Portable canonical vectors</a>
 pin valid input, expected canonical UTF-8 text and SHA-256 digests, plus rejected
 variants. The pinned digests were calculated from expected bytes separately from
-the TypeScript canonicalizer. The vectors pass TypeScript; an independent
-non-TypeScript implementation must still consume them before freeze.
+the TypeScript canonicalizer. The vectors pass TypeScript and the independent
+<a href="../../../scripts/check-canonical-python.py">Python conformance check</a> using the
+Apache-2.0 <code>rfc8785==0.1.4</code> implementation pinned in
+<code>scripts/requirements-canonical-python.txt</code>. This verifies the current four valid
+and three rejected vectors, not all possible cross-language edge cases or a frozen
+portable importer. Expand the fixture set and compatibility report before freeze.
 Build timestamps live in provenance/run metadata and are not invented to force
 semantic equality between independently captured evidence.</p>
 <h2 id="record-envelope">Record envelope</h2>

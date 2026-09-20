@@ -50,6 +50,9 @@ to verify the twenty-one exported Draft 7 JSON schemas match the TypeScript sour
 These are a WP1 subset; they are not a complete or frozen product API.
 Canonical JSON/digest helpers and strict raw-JSON parsing are included, with their
 normalization and limits specified in [data contracts](docs/technical-design/data-contracts.md).
+An optional independent Python conformance check uses the dependency pinned in
+`scripts/requirements-canonical-python.txt`: run
+`python3 scripts/check-canonical-python.py` after making that package available.
 
 ## Build the review pages
 
