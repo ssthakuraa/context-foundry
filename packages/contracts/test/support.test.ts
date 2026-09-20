@@ -106,6 +106,7 @@ test('combined integrity gate withholds closure when capture metadata is inconsi
   assert.deepEqual(good.supportIssues, []);
   assert.deepEqual(good.flowIssues, []);
   assert.deepEqual(good.obligationIssues, []);
+  assert.deepEqual(good.engineeringTargetIssues, []);
   assert.deepEqual(good.evidenceByRecord?.get('rec:one'), ['ev:one']);
 
   const altered = checkReleaseIntegrity([capture], [{ ...file, bytes: 11 }],
@@ -137,6 +138,20 @@ test('combined integrity gate withholds closure when capture metadata is inconsi
   assert.deepEqual(dangling.supportIssues, []);
   assert.deepEqual(dangling.obligationIssues.map(issue => issue.code), ['MISSING_TEST_TARGET_OBLIGATION']);
   assert.equal(dangling.evidenceByRecord, undefined);
+
+  const missingImplementation: RecordEnvelope = {
+    ...record('rec:operation', ['ev:one']), entity_id: 'api:submit',
+    kind: 'interface.operation', origin: 'source_declared',
+    payload: { interface_id: 'api:approval', operation_key: 'submit', protocol: 'http',
+      http_method: 'POST', route_template: '/approval',
+      implementation_entity_ref: 'repo:demo:ApprovalService.submit' },
+  };
+  const unresolved = checkReleaseIntegrity([capture], [file], [locator('ev:one')],
+    [missingImplementation]);
+  assert.deepEqual(unresolved.supportIssues, []);
+  assert.deepEqual(unresolved.engineeringTargetIssues.map(issue => issue.code),
+    ['MISSING_IMPLEMENTATION_ENTITY']);
+  assert.equal(unresolved.evidenceByRecord, undefined);
 });
 
 test('oversized transitive support fails closed', () => {

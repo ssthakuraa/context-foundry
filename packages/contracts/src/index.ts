@@ -552,6 +552,47 @@ export function checkObligationLinks(records: readonly RecordEnvelope[]): readon
   return issues;
 }
 
+export type EngineeringTargetIssueCode =
+  | 'DUPLICATE_ENGINEERING_ENTITY' | 'MISSING_IMPLEMENTATION_ENTITY'
+  | 'MISSING_TEST_TARGET_ENTITY' | 'AMBIGUOUS_IMPLEMENTATION_ENTITY'
+  | 'AMBIGUOUS_TEST_TARGET_ENTITY';
+export type EngineeringTargetIssue = { code: EngineeringTargetIssueCode; index: number };
+
+/** Resolve only explicitly typed engineering pointers against valid symbols in this record set.
+ * This does not infer code dependencies, test coverage, or cross-pack ownership. */
+export function checkEngineeringTargetLinks(records: readonly RecordEnvelope[]): readonly EngineeringTargetIssue[] {
+  const issues: EngineeringTargetIssue[] = [];
+  const symbols = new Map<string, number>();
+  records.forEach((record, index) => {
+    if (record.kind !== 'engineering.symbol' || !validate('record_envelope', record)) return;
+    const count = symbols.get(record.entity_id) ?? 0;
+    if (count) issues.push({ code: 'DUPLICATE_ENGINEERING_ENTITY', index });
+    symbols.set(record.entity_id, count + 1);
+  });
+  records.forEach((record, index) => {
+    if (!validate('record_envelope', record)) return;
+    let target: string | undefined;
+    let missing: EngineeringTargetIssueCode;
+    let ambiguous: EngineeringTargetIssueCode;
+    if (record.kind === 'interface.operation') {
+      target = (record.payload as InterfaceOperationPayload).implementation_entity_ref;
+      missing = 'MISSING_IMPLEMENTATION_ENTITY';
+      ambiguous = 'AMBIGUOUS_IMPLEMENTATION_ENTITY';
+    } else if (record.kind === 'test.association') {
+      const association = record.payload as TestAssociationPayload;
+      if (association.target_kind !== 'engineering_entity') return;
+      target = association.target_entity_id;
+      missing = 'MISSING_TEST_TARGET_ENTITY';
+      ambiguous = 'AMBIGUOUS_TEST_TARGET_ENTITY';
+    } else return;
+    if (!target) return;
+    const count = symbols.get(target) ?? 0;
+    if (count === 0) issues.push({ code: missing, index });
+    else if (count > 1) issues.push({ code: ambiguous, index });
+  });
+  return issues;
+}
+
 export const RelationshipPayloadSchema = Type.Object({
   subject_id: id(),
   object_id: id(),
@@ -1330,17 +1371,21 @@ export function checkReleaseIntegrity(
   records: readonly RecordEnvelope[],
 ): { bindingIssues: readonly BindingIssue[]; supportIssues: readonly SupportIssue[];
   flowIssues: readonly FlowLinkIssue[]; obligationIssues: readonly ObligationLinkIssue[];
+  engineeringTargetIssues: readonly EngineeringTargetIssue[];
   evidenceByRecord?: ReadonlyMap<string, readonly string[]> } {
   const bindingIssues = checkCaptureBindings(captures, files, locators);
   const support = checkSupportClosure(records, locators);
   const flowIssues = checkBusinessFlowLinks(records);
   const obligationIssues = checkObligationLinks(records);
+  const engineeringTargetIssues = checkEngineeringTargetLinks(records);
   return {
     bindingIssues,
     supportIssues: support.issues,
     flowIssues,
     obligationIssues,
-    ...(bindingIssues.length || support.issues.length || flowIssues.length || obligationIssues.length ? {} :
+    engineeringTargetIssues,
+    ...(bindingIssues.length || support.issues.length || flowIssues.length || obligationIssues.length ||
+      engineeringTargetIssues.length ? {} :
       { evidenceByRecord: support.evidenceByRecord }),
   };
 }

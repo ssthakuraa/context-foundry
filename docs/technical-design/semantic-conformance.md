@@ -11,19 +11,20 @@ The language-neutral [semantic vectors](../../packages/contracts/fixtures/semant
 | CF-S02 | File-range and byte-span locator | Start is at most end for lines, strictly less for byte offsets | Parity checked |
 | CF-S03 | Coverage | Processed + failed + excluded does not exceed eligible | Parity checked |
 | CF-S04 | Engineering symbol | Callable method, constructor or function has a nonempty signature | Parity checked: method example |
-| CF-S05 | Business rule/mapping applicability | Bounded has a nonempty product or condition scope; unknown claims none | Parity checked: business rule examples only |
+| CF-S05 | Business rule/mapping applicability | Bounded has a nonempty product or condition scope; unknown claims none | Parity checked: business rule and mapping examples |
 | CF-S11 | Interface operation | HTTP requires method and route; other protocols cannot claim HTTP fields | Parity checked: HTTP/event examples |
-| CF-S12 | Consumer capabilities | Required kinds are a subset of accepted kinds | TypeScript only |
-| CF-S06 | Release set | Pack IDs unique within the set | TypeScript only |
+| CF-S12 | Consumer capabilities | Required kinds are a subset of accepted kinds | Parity checked: required/accepted examples |
+| CF-S06 | Release set | Pack IDs unique within the set | Parity checked: duplicate/distinct pack examples |
 | CF-S07 | Task bodies | IDs unique where required; source-observed, business-asserted and evidence-based claims have their required support; source inspection has planned reads | TypeScript only |
 | CF-S08 | Task artifact | Canonical body digest matches; previous version is immediate; body schema matches kind; body support is included in envelope support | Partial parity: six scope-map variants; other body kinds TypeScript only |
 | CF-S09 | Record envelope | Kind is registered; payload schema and mapping origin/basis are consistent; relationship support is declared | TypeScript only |
-| CF-S10 | Execution evidence shape | A passed run has completion time; skipped run has no observed obligations | TypeScript only; never evidence authentication |
+| CF-S10 | Execution evidence shape | A passed run has completion time; skipped run has no observed obligations | Parity checked: passed/skipped examples; never evidence authentication |
 | CF-X01 | Capture, files and locators | Exact source/snapshot/revision and digest binding, declared manifest closure | TypeScript only, metadata only |
 | CF-X02 | Record support graph | References exist, graph is acyclic, every record has nonempty transitive source support | TypeScript only |
 | CF-X03 | Task artifacts in a task | Exact same-task referenced version/kind exists and cross-artifact links are consistent | TypeScript only; not approval |
 | CF-X04 | Flow/step/obligation records | Flow membership and explicitly typed obligation references resolve uniquely | TypeScript only; not business truth or test execution |
+| CF-X05 | Engineering symbol targets | Interface implementation pointers and explicitly typed engineering test targets resolve to one valid local symbol | TypeScript only; not a call graph, coverage or cross-pack claim |
 
-`CF-S01`–`CF-S05`, `CF-S11`, `CF-S13`, and the scope-map subset of `CF-S08` are a bounded cross-language start, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages check shape; Python does not implement the other four task body kinds or cross-object checks. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.
+`CF-S01`–`CF-S06`, `CF-S10`–`CF-S13`, and the scope-map subset of `CF-S08` have bounded cross-language examples, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages check shape; Python does not implement the other four task body kinds or cross-object checks. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.
 
 Run from the repository root: `pnpm test` and, in a Python 3.12 environment with [pinned semantic-check dependencies](../../scripts/requirements-semantic-python.txt), `python3 scripts/check-semantic-python.py`. The public fixture checker has no access to private evaluation sources.

@@ -47,10 +47,23 @@ def valid_semantics(schema, value):
         has_scope = bool(applicability.get("product_ids") or applicability.get("conditions"))
         return ((applicability["status"] != "bounded" or has_scope)
                 and (applicability["status"] != "unknown" or not has_scope))
+    if schema == "business_mapping_payload":
+        applicability = value["applicability"]
+        has_scope = bool(applicability.get("product_ids") or applicability.get("conditions"))
+        return ((applicability["status"] != "bounded" or has_scope)
+                and (applicability["status"] != "unknown" or not has_scope))
     if schema == "interface_operation_payload":
         has_http_fields = bool(value.get("http_method") and value.get("route_template"))
         return (has_http_fields if value["protocol"] == "http"
                 else "http_method" not in value and "route_template" not in value)
+    if schema == "consumer_capabilities":
+        return set(value["required_kinds"]).issubset(value["accepted_kinds"])
+    if schema == "release_set":
+        pack_ids = [pack["pack_id"] for pack in value["packs"]]
+        return len(pack_ids) == len(set(pack_ids))
+    if schema == "execution_evidence":
+        return ((value["outcome"] != "skipped" or not value["observed_obligation_ids"])
+                and (value["outcome"] != "passed" or bool(value.get("completed_at"))))
     raise ValueError(f"unsupported semantic vector schema: {schema}")
 
 
