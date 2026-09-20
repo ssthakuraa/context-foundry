@@ -24,11 +24,44 @@
       "input": "[]",
       "canonical": "[]",
       "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "name": "unicode-normalization-is-preserved",
+      "input": "{\"é\":\"NFC\",\"e\\u0301\":\"NFD\"}",
+      "canonical": "{\"é\":\"NFD\",\"é\":\"NFC\"}",
+      "sha256": "897b10cef0f117a16e395bf3b5d553fc6fdddbffb887ed8dc71bfb07b653959d"
+    },
+    {
+      "name": "string-escapes",
+      "input": "{\"text\":\"line\\nquote\\\"slash/\"}",
+      "canonical": "{\"text\":\"line\\nquote\\\"slash/\"}",
+      "sha256": "00f2cfa02e5b0738510adbda7fa0ef6380e8e949d12606218d0d853ea45af72d"
+    },
+    {
+      "name": "numeric-notation-boundaries",
+      "input": "{\"edge\":[1e-6,1e-7,1e20,1e21,-0.0]}",
+      "canonical": "{\"edge\":[0.000001,1e-7,100000000000000000000,1e+21,0]}",
+      "sha256": "5c51e0de7a635afe0bab3206e076ae0c67f061e77e6ccd8b926f463a275ef32a"
+    },
+    {
+      "name": "nested-order-and-array-order",
+      "input": "{\"outer\":{\"z\":0,\"a\":[{\"b\":2,\"a\":1}]}}",
+      "canonical": "{\"outer\":{\"a\":[{\"a\":1,\"b\":2}],\"z\":0}}",
+      "sha256": "f53a81a82297c1740688411e984e07f75856dc1862b2570260cde05a6ea26156"
+    },
+    {
+      "name": "max-safe-integer",
+      "input": "{\"max\":9007199254740991}",
+      "canonical": "{\"max\":9007199254740991}",
+      "sha256": "5274eb3771d44c0dc4c8145127c27d94a9a8128420eb69f1ea038d267ac28b06"
     }
   ],
   "invalid": [
     { "name": "decoded-duplicate-key", "input": "{\"x\":1,\"\\u0078\":2}" },
     { "name": "unsafe-bare-integer", "input": "{\"x\":9007199254740993}" },
-    { "name": "unpaired-surrogate", "input": "{\"x\":\"\\ud800\"}" }
+    { "name": "unpaired-surrogate", "input": "{\"x\":\"\\ud800\"}" },
+    { "name": "unpaired-low-surrogate", "input": "{\"x\":\"\\udc00\"}" },
+    { "name": "nonfinite-exponent", "input": "{\"x\":1e400}" },
+    { "name": "decoded-duplicate-escaped-key", "input": "{\"\\u0061\":1,\"a\":2}" }
   ]
 }
