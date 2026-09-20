@@ -8,8 +8,8 @@ coverage, release manifest, task artifact, human decision receipt, task error an
 evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
 tests exist. This is only a WP1 subset: registered payload-kind validation, body
-subschemas, support closure, semantic cross-record checks and canonical serialization
-are not implemented or frozen. A decision receipt's JSON shape does not establish
+subschemas, support closure, semantic cross-record checks and cross-language
+canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
 
@@ -24,7 +24,17 @@ Do not use a content hash as the only long-lived entity identity.
 Use opaque UUIDs for operational identities, qualified strings for entity keys, and
 SHA-256 digests for canonical content. Canonical serialization uses UTF-8, LF, sorted
 object keys, stable record ordering, and rejects non-finite numbers/duplicate keys.
-Specify Unicode and number normalization in serializer fixtures before implementation.
+The initial TypeScript serializer follows an
+[RFC 8785-style](https://www.rfc-editor.org/rfc/rfc8785) I-JSON subset: preserve
+Unicode scalar values without NFC/NFD conversion; reject unpaired surrogates; sort
+object keys by UTF-16 code units; use ECMAScript JSON number formatting, including
+`-0` as `0`; reject NaN and infinities. Raw JSON must enter through
+`parseJsonStrict` before hashing so duplicate decoded object keys (including escaped
+aliases) cannot disappear under ordinary `JSON.parse`. The strict parser rejects
+bare integer tokens outside the safe-integer range; exponent-form binary64 numbers
+remain supported. `canonicalRecordLines` sorts by unique `record_id` and terminates
+each JSONL row with LF. The implementation limits depth to 128 and serialized/input
+size to 16 MiB. Cross-language fixtures are still required before contract freeze.
 Build timestamps live in provenance/run metadata and are not invented to force
 semantic equality between independently captured evidence.
 

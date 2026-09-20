@@ -1,5 +1,6 @@
 import { Ajv, type ValidateFunction } from 'ajv';
 import { Type, type Static } from '@sinclair/typebox';
+export { canonicalJson, canonicalRecordLines, canonicalSha256, parseJsonStrict } from './canonical.js';
 
 export const CONTRACT_VERSION = '0.2.0' as const;
 const id = () => Type.String({ minLength: 1, maxLength: 512 });

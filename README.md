@@ -46,6 +46,8 @@ pnpm 11, run `pnpm install --frozen-lockfile`, then `pnpm test`, `pnpm typecheck
 and `pnpm build`. Run `pnpm --filter @context-foundry/contracts schema:check`
 to verify the nine exported Draft 7 JSON schemas match the TypeScript source.
 These are a WP1 subset; they are not a complete or frozen product API.
+Canonical JSON/digest helpers and strict raw-JSON parsing are included, with their
+normalization and limits specified in [data contracts](docs/technical-design/data-contracts.md).
 
 ## Build the review pages
 
