@@ -1,6 +1,22 @@
 {
   "format": "context-foundry-semantic-vectors-1",
   "schema_version": "0.2.0",
+  "artifact_base": {
+    "schema_version":"0.2.0","artifact_id":"artifact:1","task_id":"task:1",
+    "kind":"scope_map","version":1,
+    "body_digest":"d0a81944d83866b60a4b3fc1878201c198bcf05a038ca729908f9afae16d22fa",
+    "created_by":"agent:1","origin":"agent","created_at":"2026-09-20T00:00:00Z",
+    "release_set_id":"set:1","evidence_refs":["ev:1"],"visibility_requirements":["ev:1"],
+    "body":{"intent":"inquiry","questions":[{"question_id":"q1","text":"How does approval work?"}],"candidates":[{"entity_id":"service:approval","relevance_reason":"Entry point","basis":"evidence","evidence_refs":["ev:1"]}],"assumptions":[],"unknowns":[],"material_scope_boundaries":[]}
+  },
+  "artifact_variants": [
+    {"name":"artifact-v1-valid","changes":{},"valid":true},
+    {"name":"artifact-wrong-body-digest","changes":{"body_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"valid":false},
+    {"name":"artifact-v1-has-previous","changes":{"previous_version":1},"valid":false},
+    {"name":"artifact-v2-linked","changes":{"version":2,"previous_version":1},"valid":true},
+    {"name":"artifact-v2-unlinked","changes":{"version":2},"valid":false},
+    {"name":"artifact-undeclared-support","changes":{"evidence_refs":[]},"valid":false}
+  ],
   "shape_invalid": [
     {"name":"captured-file-missing-digest","schema":"captured_file","value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src/A.java","bytes":12,"media_kind":"text/plain","classification":"internal"}},
     {"name":"symbol-unknown-language","schema":"engineering_symbol_payload","value":{"name":"run","artifact_kind":"method","language":"unknown","signature":"run()"}},

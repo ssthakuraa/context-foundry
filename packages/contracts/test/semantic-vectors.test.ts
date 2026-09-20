@@ -7,6 +7,8 @@ import { CONTRACT_VERSION, Schemas, validate, type SchemaName } from '../src/ind
 type VectorFile = {
   format: string;
   schema_version: string;
+  artifact_base: Record<string, unknown>;
+  artifact_variants: { name: string; changes: Record<string, unknown>; valid: boolean }[];
   shape_invalid: { name: string; schema: SchemaName; value: unknown }[];
   cases: { name: string; schema: SchemaName; valid: boolean; value: unknown }[];
 };
@@ -31,5 +33,13 @@ test('portable semantic vectors match TypeScript validation', () => {
     assert.equal(ajv.validate(Schemas[vector.schema], vector.value), false,
       `${vector.name} must be rejected by the exported JSON Schema`);
     assert.equal(validate(vector.schema, vector.value), false, vector.name);
+  }
+  for (const vector of vectors.artifact_variants) {
+    assert.equal(names.has(vector.name), false, `duplicate case ${vector.name}`);
+    names.add(vector.name);
+    const artifact = { ...vectors.artifact_base, ...vector.changes };
+    assert.equal(ajv.validate(Schemas.task_artifact, artifact), true,
+      `${vector.name} must be JSON Schema valid: ${ajv.errorsText()}`);
+    assert.equal(validate('task_artifact', artifact), vector.valid, vector.name);
   }
 });

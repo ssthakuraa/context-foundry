@@ -5,10 +5,12 @@ This intentionally does not implement JSON Schema or cross-record authority chec
 """
 
 import json
+import hashlib
 import re
 from pathlib import Path
 
 from jsonschema import Draft7Validator
+import rfc8785
 
 ROOT = Path(__file__).resolve().parents[1]
 VECTORS = ROOT / "packages/contracts/fixtures/semantic-vectors.json"
@@ -49,13 +51,37 @@ def valid_semantics(schema, value):
     raise ValueError(f"unsupported semantic vector schema: {schema}")
 
 
+def valid_artifact(artifact, body_validator):
+    body = artifact["body"]
+    if hashlib.sha256(rfc8785.dumps(body)).hexdigest() != artifact["body_digest"]:
+        return False
+    version = artifact["version"]
+    if version == 1 and "previous_version" in artifact:
+        return False
+    if version > 1 and artifact.get("previous_version") != version - 1:
+        return False
+    if artifact["kind"] != "scope_map" or not body_validator.is_valid(body):
+        return False  # Bounded checker only implements the scope-map body.
+    questions = [question["question_id"] for question in body["questions"]]
+    if len(set(questions)) != len(questions):
+        return False
+    for candidate in body["candidates"]:
+        if candidate["basis"] == "evidence" and not candidate["evidence_refs"]:
+            return False
+        if not set(candidate["evidence_refs"]).issubset(artifact["evidence_refs"]):
+            return False
+    return True
+
+
 def main():
     vectors = json.loads(VECTORS.read_text(encoding="utf-8"))
     assert vectors["format"] == "context-foundry-semantic-vectors-1"
     assert vectors["schema_version"] == "0.2.0"
     names = set()
     validators = {}
-    for schema_name in {vector["schema"] for vector in vectors["cases"] + vectors["shape_invalid"]}:
+    needed = {vector["schema"] for vector in vectors["cases"] + vectors["shape_invalid"]}
+    needed.update(("task_artifact", "scope_map_body"))
+    for schema_name in needed:
         schema = json.loads((SCHEMAS / f"{schema_name}.schema.json").read_text(encoding="utf-8"))
         Draft7Validator.check_schema(schema)
         validators[schema_name] = Draft7Validator(schema)
@@ -68,8 +94,15 @@ def main():
         assert vector["name"] not in names, vector["name"]
         names.add(vector["name"])
         assert not validators[vector["schema"]].is_valid(vector["value"]), vector["name"]
+    for vector in vectors["artifact_variants"]:
+        assert vector["name"] not in names, vector["name"]
+        names.add(vector["name"])
+        artifact = {**vectors["artifact_base"], **vector["changes"]}
+        assert validators["task_artifact"].is_valid(artifact), vector["name"]
+        assert valid_artifact(artifact, validators["scope_map_body"]) is vector["valid"], vector["name"]
     print(f"Verified {len(vectors['cases'])} semantic and "
-          f"{len(vectors['shape_invalid'])} shape-invalid Python vectors")
+          f"{len(vectors['shape_invalid'])} shape-invalid Python vectors, "
+          f"plus {len(vectors['artifact_variants'])} artifact variants")
 
 
 if __name__ == "__main__":
