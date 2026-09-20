@@ -2,13 +2,14 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains twelve
+**Implementation note (2026-09-20):** `packages/contracts` now contains fourteen
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, coverage, release manifest/set, relationship payload, task artifact,
-human decision receipt, task error and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
+engineering symbol payload, business rule payload, human decision receipt, task error
+and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
-tests exist. This is only a WP1 subset: registered payload-kind validation, body
-subschemas, broader semantic cross-record checks and cross-language
+tests exist. This is only a WP1 subset: remaining registered payload kinds, task body
+subschemas, broader semantic cross-record checks and independent cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
@@ -61,7 +62,11 @@ aliases) cannot disappear under ordinary `JSON.parse`. The strict parser rejects
 bare integer tokens outside the safe-integer range; exponent-form binary64 numbers
 remain supported. `canonicalRecordLines` sorts by unique `record_id` and terminates
 each JSONL row with LF. The implementation limits depth to 128 and serialized/input
-size to 16 MiB. Cross-language fixtures are still required before contract freeze.
+size to 16 MiB. [Portable canonical vectors](../../packages/contracts/fixtures/canonical-vectors.json)
+pin valid input, expected canonical UTF-8 text and SHA-256 digests, plus rejected
+variants. The pinned digests were calculated from expected bytes separately from
+the TypeScript canonicalizer. The vectors pass TypeScript; an independent
+non-TypeScript implementation must still consume them before freeze.
 Build timestamps live in provenance/run metadata and are not invented to force
 semantic equality between independently captured evidence.
 
@@ -79,7 +84,7 @@ initial first-party validation dialect; generated TypeScript types must stay in 
   "owner_id": "team:billing",
   "origin": "source_declared",
   "review": {"state": "not_required"},
-  "payload": {"name": "start", "artifact_kind": "method"},
+  "payload": {"name": "start", "artifact_kind": "method", "language": "java", "signature": "start()"},
   "evidence_refs": ["ev:cycle-start"],
   "dependency_refs": [],
   "classification": "internal"
@@ -88,9 +93,17 @@ initial first-party validation dialect; generated TypeScript types must stay in 
 
 The owning release supplies pack/revision bindings. A relationship includes qualified
 subject/object, relation type, direction, evidence, and supporting record references.
-Registered extension kinds use namespaced payload schemas and immutable schema digests.
-Unknown required kinds fail validation; optional unknown kinds are preserved but
-excluded from unsupported operations with explicit coverage status.
+The initial registered record kinds are `engineering.symbol`,
+`engineering.relationship` and `business.rule`. Symbol payloads require Java or
+TypeScript language and a declared artifact kind; methods, constructors and
+functions require a signature so overloaded callables are not silently conflated.
+Business rules require a name, statement and explicit applicability state. A bounded
+rule names at least a product or condition; unknown applicability cannot carry a
+claimed scope and is never treated as universal. These checks constrain shape, not
+the truth of the rule, review authority or effective-time semantics.
+Registered extension kinds will use namespaced payload schemas and immutable schema
+digests. Unknown required kinds currently fail validation. Preserving optional
+unknown kinds with explicit coverage status is not implemented yet.
 
 ## Evidence dimensions
 

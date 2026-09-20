@@ -5,7 +5,7 @@ import { CONTRACT_VERSION, Schemas, validate, validateDetailed } from '../src/in
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 12);
+  assert.equal(Object.keys(Schemas).length, 14);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -53,12 +53,51 @@ test('record envelope retains origin and review as separate dimensions', () => {
   const record = {
     schema_version: CONTRACT_VERSION, record_id: 'rec:1', entity_id: 'repo:demo:symbol:A.m',
     kind: 'engineering.symbol', owner_id: 'team:demo', origin: 'source_declared',
-    review: { state: 'not_required' }, payload: { name: 'm' }, evidence_refs: ['ev:1'],
+    review: { state: 'not_required' },
+    payload: { name: 'm', artifact_kind: 'method', language: 'java', signature: 'm(int)' },
+    evidence_refs: ['ev:1'],
     dependency_refs: [], classification: 'internal',
   };
   assert.equal(validate('record_envelope', record), true);
   assert.equal(validate('record_envelope', { ...record, review: { state: 'approved', reviewer: 'agent' } }), false);
   assert.equal(validate('record_envelope', { ...record, origin: 'unknown' }), false);
+  assert.equal(validate('record_envelope', { ...record, kind: 'engineering.unknown' }), false);
+  assert.equal(validate('record_envelope', { ...record, payload: { name: 'm' } }), false);
+});
+
+test('symbol and business rule payloads retain explicit kind and applicability', () => {
+  const symbol = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:symbol', entity_id: 'repo:A:java:A.m(int)',
+    kind: 'engineering.symbol', owner_id: 'team:A', origin: 'source_declared',
+    review: { state: 'not_required' }, evidence_refs: ['ev:A'], dependency_refs: [],
+    classification: 'internal',
+    payload: { name: 'm', artifact_kind: 'method', language: 'java', signature: 'm(int)' },
+  };
+  assert.equal(validate('record_envelope', symbol), true);
+  assert.equal(validate('engineering_symbol_payload', symbol.payload), true);
+  assert.equal(validate('record_envelope', { ...symbol, payload: { ...symbol.payload, signature: undefined } }), false);
+  assert.equal(validate('engineering_symbol_payload', { ...symbol.payload, signature: undefined }), false);
+  assert.equal(validate('record_envelope', { ...symbol, payload: { ...symbol.payload, runtime_behavior: 'proven' } }), false);
+
+  const rule = {
+    ...symbol, record_id: 'rec:rule', entity_id: 'business:approval-rule',
+    kind: 'business.rule', origin: 'human_asserted', review: { state: 'approved' },
+    payload: {
+      name: 'Approval threshold', statement: 'Approval is required above the configured threshold.',
+      applicability: { status: 'bounded', product_ids: ['product:A'] },
+    },
+  };
+  assert.equal(validate('record_envelope', rule), true);
+  assert.equal(validate('business_rule_payload', rule.payload), true);
+  assert.equal(validate('record_envelope', { ...rule, payload: {
+    ...rule.payload, applicability: { status: 'bounded' },
+  } }), false);
+  assert.equal(validate('record_envelope', { ...rule, payload: {
+    ...rule.payload, applicability: { status: 'unknown', product_ids: ['product:A'] },
+  } }), false);
+  assert.equal(validate('record_envelope', { ...rule, payload: {
+    ...rule.payload, applicability: { status: 'unknown' },
+  } }), true);
 });
 
 test('coverage and release manifest reject unsupported values', () => {

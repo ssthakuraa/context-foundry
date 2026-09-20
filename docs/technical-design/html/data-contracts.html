@@ -40,13 +40,14 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
-<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twelve
+<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains fourteen
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, coverage, release manifest/set, relationship payload, task artifact,
-human decision receipt, task error and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
+engineering symbol payload, business rule payload, human decision receipt, task error
+and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
-tests exist. This is only a WP1 subset: registered payload-kind validation, body
-subschemas, broader semantic cross-record checks and cross-language
+tests exist. This is only a WP1 subset: remaining registered payload kinds, task body
+subschemas, broader semantic cross-record checks and independent cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.</p>
@@ -94,7 +95,11 @@ aliases) cannot disappear under ordinary <code>JSON.parse</code>. The strict par
 bare integer tokens outside the safe-integer range; exponent-form binary64 numbers
 remain supported. <code>canonicalRecordLines</code> sorts by unique <code>record_id</code> and terminates
 each JSONL row with LF. The implementation limits depth to 128 and serialized/input
-size to 16 MiB. Cross-language fixtures are still required before contract freeze.
+size to 16 MiB. <a href="../../../packages/contracts/fixtures/canonical-vectors.json">Portable canonical vectors</a>
+pin valid input, expected canonical UTF-8 text and SHA-256 digests, plus rejected
+variants. The pinned digests were calculated from expected bytes separately from
+the TypeScript canonicalizer. The vectors pass TypeScript; an independent
+non-TypeScript implementation must still consume them before freeze.
 Build timestamps live in provenance/run metadata and are not invented to force
 semantic equality between independently captured evidence.</p>
 <h2 id="record-envelope">Record envelope</h2>
@@ -108,7 +113,7 @@ initial first-party validation dialect; generated TypeScript types must stay in 
   &quot;owner_id&quot;: &quot;team:billing&quot;,
   &quot;origin&quot;: &quot;source_declared&quot;,
   &quot;review&quot;: {&quot;state&quot;: &quot;not_required&quot;},
-  &quot;payload&quot;: {&quot;name&quot;: &quot;start&quot;, &quot;artifact_kind&quot;: &quot;method&quot;},
+  &quot;payload&quot;: {&quot;name&quot;: &quot;start&quot;, &quot;artifact_kind&quot;: &quot;method&quot;, &quot;language&quot;: &quot;java&quot;, &quot;signature&quot;: &quot;start()&quot;},
   &quot;evidence_refs&quot;: [&quot;ev:cycle-start&quot;],
   &quot;dependency_refs&quot;: [],
   &quot;classification&quot;: &quot;internal&quot;
@@ -116,9 +121,17 @@ initial first-party validation dialect; generated TypeScript types must stay in 
 </code></pre>
 <p>The owning release supplies pack/revision bindings. A relationship includes qualified
 subject/object, relation type, direction, evidence, and supporting record references.
-Registered extension kinds use namespaced payload schemas and immutable schema digests.
-Unknown required kinds fail validation; optional unknown kinds are preserved but
-excluded from unsupported operations with explicit coverage status.</p>
+The initial registered record kinds are <code>engineering.symbol</code>,
+<code>engineering.relationship</code> and <code>business.rule</code>. Symbol payloads require Java or
+TypeScript language and a declared artifact kind; methods, constructors and
+functions require a signature so overloaded callables are not silently conflated.
+Business rules require a name, statement and explicit applicability state. A bounded
+rule names at least a product or condition; unknown applicability cannot carry a
+claimed scope and is never treated as universal. These checks constrain shape, not
+the truth of the rule, review authority or effective-time semantics.
+Registered extension kinds will use namespaced payload schemas and immutable schema
+digests. Unknown required kinds currently fail validation. Preserving optional
+unknown kinds with explicit coverage status is not implemented yet.</p>
 <h2 id="evidence-dimensions">Evidence dimensions</h2>
 <table>
 <thead>

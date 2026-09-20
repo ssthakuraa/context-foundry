@@ -1,0 +1,34 @@
+{
+  "format": "context-foundry-canonical-vectors-1",
+  "valid": [
+    {
+      "name": "object-key-order",
+      "input": "{\"z\":2,\"a\":1}",
+      "canonical": "{\"a\":1,\"z\":2}",
+      "sha256": "99168216144c7fed5d4c54916cf98d9c66096280c04a499822a99b6658bd177a"
+    },
+    {
+      "name": "utf16-key-order-and-unicode",
+      "input": "{\"ﬀ\":1,\"😀\":2}",
+      "canonical": "{\"😀\":2,\"ﬀ\":1}",
+      "sha256": "5a1b11cfe155ee29a4e76aa0532fca054397b40c68a1705b37fc6e5220fbd998"
+    },
+    {
+      "name": "ecmascript-number-format",
+      "input": "{\"tiny\":1e-7,\"neg\":-0,\"n\":1e+30}",
+      "canonical": "{\"n\":1e+30,\"neg\":0,\"tiny\":1e-7}",
+      "sha256": "7042bf224d4c4028ecfe5fe74be2c5d9a96b9f2dde07bae44123534d7aa9f7a8"
+    },
+    {
+      "name": "empty-array",
+      "input": "[]",
+      "canonical": "[]",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "invalid": [
+    { "name": "decoded-duplicate-key", "input": "{\"x\":1,\"\\u0078\":2}" },
+    { "name": "unsafe-bare-integer", "input": "{\"x\":9007199254740993}" },
+    { "name": "unpaired-surrogate", "input": "{\"x\":\"\\ud800\"}" }
+  ]
+}

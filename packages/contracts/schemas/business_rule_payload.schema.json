@@ -1,0 +1,62 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:business-rule-payload",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "conditions": {
+          "items": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "product_ids": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "status": {
+          "anyOf": [
+            {
+              "const": "bounded",
+              "type": "string"
+            },
+            {
+              "const": "unknown",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "type": "object"
+    },
+    "name": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "statement": {
+      "maxLength": 8192,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "statement",
+    "applicability"
+  ],
+  "type": "object"
+}

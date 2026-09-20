@@ -151,6 +151,31 @@ export const ReleaseSetSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:release-set', additionalProperties: false });
 export type ReleaseSet = Static<typeof ReleaseSetSchema>;
 
+export const EngineeringSymbolPayloadSchema = Type.Object({
+  name: id(),
+  artifact_kind: Type.Union([
+    Type.Literal('package'), Type.Literal('type'), Type.Literal('method'),
+    Type.Literal('constructor'), Type.Literal('field'), Type.Literal('function'),
+    Type.Literal('variable'), Type.Literal('module'),
+  ]),
+  language: Type.Union([Type.Literal('java'), Type.Literal('typescript')]),
+  signature: Type.Optional(Type.String({ minLength: 1, maxLength: 2048 })),
+}, { $id: 'urn:context-foundry:schema:0.2.0:engineering-symbol-payload', additionalProperties: false });
+export type EngineeringSymbolPayload = Static<typeof EngineeringSymbolPayloadSchema>;
+
+const RuleApplicability = Type.Object({
+  status: Type.Union([Type.Literal('bounded'), Type.Literal('unknown')]),
+  product_ids: Type.Optional(refs()),
+  conditions: Type.Optional(Type.Array(Type.String({ minLength: 1, maxLength: 1024 }), { uniqueItems: true })),
+}, { additionalProperties: false });
+
+export const BusinessRulePayloadSchema = Type.Object({
+  name: id(),
+  statement: Type.String({ minLength: 1, maxLength: 8192 }),
+  applicability: RuleApplicability,
+}, { $id: 'urn:context-foundry:schema:0.2.0:business-rule-payload', additionalProperties: false });
+export type BusinessRulePayload = Static<typeof BusinessRulePayloadSchema>;
+
 export const RelationshipPayloadSchema = Type.Object({
   subject_id: id(),
   object_id: id(),
@@ -252,6 +277,8 @@ export const Schemas = {
   coverage: CoverageSchema,
   release_manifest: ReleaseManifestSchema,
   release_set: ReleaseSetSchema,
+  engineering_symbol_payload: EngineeringSymbolPayloadSchema,
+  business_rule_payload: BusinessRulePayloadSchema,
   relationship_payload: RelationshipPayloadSchema,
   task_artifact: TaskArtifactSchema,
   human_decision_receipt: HumanDecisionReceiptSchema,
@@ -301,6 +328,22 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
     return new Set(packs.map(pack => pack.pack_id)).size === packs.length
       ? [] : ['/packs must contain each pack_id at most once'];
   }
+  if (name === 'engineering_symbol_payload') {
+    const symbol = value as EngineeringSymbolPayload;
+    return ['method', 'constructor', 'function'].includes(symbol.artifact_kind) && !symbol.signature
+      ? ['/signature is required for callable symbols'] : [];
+  }
+  if (name === 'business_rule_payload') {
+    const applicability = (value as BusinessRulePayload).applicability;
+    const hasScope = !!applicability.product_ids?.length || !!applicability.conditions?.length;
+    if (applicability.status === 'bounded' && !hasScope) {
+      return ['/applicability bounded rules require product IDs or conditions'];
+    }
+    if (applicability.status === 'unknown' && hasScope) {
+      return ['/applicability unknown cannot carry a claimed scope'];
+    }
+    return [];
+  }
   if (name === 'record_envelope') {
     const record = value as RecordEnvelope;
     if (record.kind === 'engineering.relationship') {
@@ -309,6 +352,15 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
       return relationship.evidence_refs.every(ref => record.evidence_refs.includes(ref))
         ? [] : ['/evidence_refs must include relationship payload support'];
     }
+    if (record.kind === 'engineering.symbol') {
+      return validateDetailed('engineering_symbol_payload', record.payload).valid
+        ? [] : ['/payload must conform to engineering_symbol_payload'];
+    }
+    if (record.kind === 'business.rule') {
+      return validateDetailed('business_rule_payload', record.payload).valid
+        ? [] : ['/payload must conform to business_rule_payload'];
+    }
+    return ['/kind is not registered as a required record kind'];
   }
   return [];
 }

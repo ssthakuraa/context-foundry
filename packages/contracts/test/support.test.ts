@@ -13,7 +13,8 @@ const locator = (evidenceId: string): EvidenceLocator => ({
 const record = (recordId: string, evidenceRefs: string[], dependencyRefs: string[] = []): RecordEnvelope => ({
   schema_version: CONTRACT_VERSION, record_id: recordId, entity_id: `entity:${recordId}`,
   kind: 'engineering.symbol', owner_id: 'team:demo', origin: 'source_declared',
-  review: { state: 'not_required' }, payload: { name: recordId },
+  review: { state: 'not_required' },
+  payload: { name: recordId, artifact_kind: 'type', language: 'typescript' },
   evidence_refs: evidenceRefs, dependency_refs: dependencyRefs, classification: 'internal',
 });
 
