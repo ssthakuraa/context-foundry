@@ -8,7 +8,7 @@ captured file, coverage, release manifest/set, relationship payload, task artifa
 human decision receipt, task error and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
 tests exist. This is only a WP1 subset: registered payload-kind validation, body
-subschemas, support closure, broader semantic cross-record checks and cross-language
+subschemas, broader semantic cross-record checks and cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
@@ -26,6 +26,19 @@ are separate failures and cannot establish manifest closure. This detects a chan
 or omitted declared file record; it does **not** prove the actual file bytes match
 their claimed digests, prove that no source file was omitted before capture, or grant
 access. Those require trusted capture and local binding checks.
+
+Source locators now carry a unique `evidence_id` within the supplied release set.
+`checkSupportClosure` verifies that record evidence/dependency references resolve,
+that relationship payload support is declared on its envelope, and that IDs are
+unique. It computes a bounded transitive evidence-ID set per record for acyclic
+dependencies. Missing/invalid references, duplicate IDs, cycles or excessive closure
+return issues and **no** closure; records blocked by a cycle are diagnosed along with
+cycle members. This initial slice rejects cycles rather than publishing a partial
+strongly connected group. Call `checkReleaseIntegrity` to combine this check with
+capture/file/locator binding; it withholds closure if either side fails. These are
+metadata checks, not checks of current source bytes, evidence truth, approval,
+publication permission or a user's current grants. Non-source evidence kinds and
+cross-pack composition need explicit contracts before the freeze.
 
 ## Identity and versioning
 
@@ -99,7 +112,7 @@ nor approval. Relevance scores live on query results, not canonical evidence tru
 | Family | Required fields |
 |---|---|
 | Source/document capture | Logical authority, URI/path, revision/edition, digest, capture policy |
-| Evidence locator | Capture ID, line/range or document section/span, content digest |
+| Evidence locator | Evidence ID, source/snapshot, line/range or document section/span, file digest |
 | Engineering artifact | Qualified ID, kind, owner, declarations and contract references |
 | Engineering relationship | Endpoints, typed direction, support records, resolution method |
 | Interface contract | Protocol/service/version/operation, fields/types, completeness by facet |

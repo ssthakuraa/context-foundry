@@ -26,10 +26,11 @@ test('capture accepts a bounded source identity and rejects unknown fields', () 
 
 test('locators discriminate file lines from document sections', () => {
   const base = {
-    source_id: 'repo:demo', snapshot_id: 'snapshot:1', revision_kind: 'git',
+    evidence_id: 'ev:service', source_id: 'repo:demo', snapshot_id: 'snapshot:1', revision_kind: 'git',
     revision_value: '0123456', path: 'src/Service.java', file_digest: hash,
   };
   assert.equal(validate('evidence_locator', { kind: 'file', ...base }), true);
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base, evidence_id: undefined }), false);
   assert.equal(validate('evidence_locator', {
     kind: 'file_range', ...base, start_line: 3, end_line: 9,
   }), true);

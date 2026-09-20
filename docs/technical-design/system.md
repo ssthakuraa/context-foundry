@@ -83,9 +83,10 @@ source verification. Degraded coverage is represented per affected operation.
 ## Authorization cost without weakening authorization
 
 Precompute each derived record's transitive visibility requirements at projection
-build time, rejecting missing support and diagnosing cycles. A dependency cycle can
-be represented as a strongly connected group for visibility; it is not proof of a
-semantic causal cycle. Requirement sets preserve source/domain identities, not
+build time, rejecting missing support and diagnosing cycles. The initial executable
+contract fails closed on cycles and records blocked by them; a future implementation
+may represent a strongly connected group for visibility after explicit conformance
+tests. Such a group would not prove a semantic causal cycle. Requirement sets preserve source/domain identities, not
 snapshotted user grants. Evaluate against current grants at query time.
 
 Dense dependency sets may be costly; benchmark normalized joins versus materialized

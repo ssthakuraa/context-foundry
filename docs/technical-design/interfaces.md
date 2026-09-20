@@ -65,7 +65,7 @@ to the agent conversation or proposal request, not retrieval requirement text.
     "entity_id": "repo:billing:symbol:Cycle.start",
     "reason": "Declared cycle creation entry point",
     "evidence_refs": ["ev:12"],
-    "locator": {"source_id": "billing", "snapshot_id": "capture:17", "revision_kind": "supplied_snapshot", "revision_value": "r17", "path": "src/cycle.ts", "file_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "start_line": 42, "end_line": 78},
+    "locator": {"kind": "file_range", "evidence_id": "ev:12", "source_id": "billing", "snapshot_id": "capture:17", "revision_kind": "supplied_snapshot", "revision_value": "r17", "path": "src/cycle.ts", "file_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "start_line": 42, "end_line": 78},
     "origin": "source_declared"
   }],
   "gaps": [{"code": "COVERAGE_PARTIAL", "question_id": "q1"}],

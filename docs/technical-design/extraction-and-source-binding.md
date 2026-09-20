@@ -12,6 +12,8 @@ envelope and metadata-only binding check now distinguish missing files, revision
 drift and locator/file digest disagreement across separate source identities.
 The check recomputes the capture's file-manifest digest from canonical, path-sorted
 declared file metadata; this is metadata closure, not a read of actual source bytes.
+Each locator has an `evidence_id` for support resolution, distinct from the file path
+or content digest. Release-wide duplicate evidence IDs fail support validation.
 Symlink/case-collision checks, live local-byte comparison and authorization remain
 for WP2. The contract version is not frozen.
 
@@ -99,7 +101,7 @@ of the bounded slice when incremental correctness cannot be established.
 
 ## Locator and local resolution
 
-Server locator fields: source_id, snapshot_id, revision_kind/value when known, path,
+Server locator fields: evidence_id, source_id, snapshot_id, revision_kind/value when known, path,
 file_digest, optional symbol_id, optional start_line/end_line and section_id. Lines
 are one-based inclusive for text display; an optional byte span uses zero-based
 half-open UTF-8 offsets. The schema requires paired bounds and validates ordering.

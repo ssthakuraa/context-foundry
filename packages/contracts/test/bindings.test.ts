@@ -21,7 +21,7 @@ const captureA: SourceCapture = {
   classification: 'internal',
 };
 const locatorA: EvidenceLocator = {
-  kind: 'file_range', source_id: 'repo:A', snapshot_id: 'snap:1', revision_kind: 'git',
+  kind: 'file_range', evidence_id: 'ev:A', source_id: 'repo:A', snapshot_id: 'snap:1', revision_kind: 'git',
   revision_value: 'rev1', path: 'src/Service.java', file_digest: hashA,
   start_line: 1, end_line: 3,
 };
@@ -32,7 +32,7 @@ test('same relative path in distinct sources remains distinct', () => {
     ...captureA, capture_id: 'cap:B', source_id: 'repo:B',
     file_manifest_digest: fileManifestDigest([fileB]),
   };
-  const locatorB: EvidenceLocator = { ...locatorA, source_id: 'repo:B', file_digest: hashB };
+  const locatorB: EvidenceLocator = { ...locatorA, evidence_id: 'ev:B', source_id: 'repo:B', file_digest: hashB };
   assert.deepEqual(checkCaptureBindings([captureA, captureB], [fileA, fileB], [locatorA, locatorB]), []);
 });
 

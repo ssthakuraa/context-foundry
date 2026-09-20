@@ -23,6 +23,11 @@
           ],
           "type": "object"
         },
+        "evidence_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
         "file_digest": {
           "pattern": "^[a-f0-9]{64}$",
           "type": "string"
@@ -75,6 +80,7 @@
       },
       "required": [
         "kind",
+        "evidence_id",
         "source_id",
         "snapshot_id",
         "revision_kind",
@@ -107,6 +113,11 @@
         "end_line": {
           "minimum": 1,
           "type": "integer"
+        },
+        "evidence_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
         },
         "file_digest": {
           "pattern": "^[a-f0-9]{64}$",
@@ -164,6 +175,7 @@
       },
       "required": [
         "kind",
+        "evidence_id",
         "source_id",
         "snapshot_id",
         "revision_kind",
@@ -194,6 +206,11 @@
             "end"
           ],
           "type": "object"
+        },
+        "evidence_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
         },
         "file_digest": {
           "pattern": "^[a-f0-9]{64}$",
@@ -252,6 +269,7 @@
       },
       "required": [
         "kind",
+        "evidence_id",
         "source_id",
         "snapshot_id",
         "revision_kind",

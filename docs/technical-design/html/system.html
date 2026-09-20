@@ -108,9 +108,10 @@ provide useful navigation, but current implementation behavior requires appropri
 source verification. Degraded coverage is represented per affected operation.</p>
 <h2 id="authorization-cost-without-weakening-authorization">Authorization cost without weakening authorization</h2>
 <p>Precompute each derived record's transitive visibility requirements at projection
-build time, rejecting missing support and diagnosing cycles. A dependency cycle can
-be represented as a strongly connected group for visibility; it is not proof of a
-semantic causal cycle. Requirement sets preserve source/domain identities, not
+build time, rejecting missing support and diagnosing cycles. The initial executable
+contract fails closed on cycles and records blocked by them; a future implementation
+may represent a strongly connected group for visibility after explicit conformance
+tests. Such a group would not prove a semantic causal cycle. Requirement sets preserve source/domain identities, not
 snapshotted user grants. Evaluate against current grants at query time.</p>
 <p>Dense dependency sets may be costly; benchmark normalized joins versus materialized
 sets. Exceeding supported proof size yields an explicit unsupported/limited outcome,

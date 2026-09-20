@@ -41,6 +41,7 @@ export const CapturedFileSchema = Type.Object({
 export type CapturedFile = Static<typeof CapturedFileSchema>;
 
 const LocatorBase = {
+  evidence_id: id(),
   source_id: id(),
   snapshot_id: id(),
   revision_kind: Type.Union([
@@ -442,4 +443,131 @@ export function checkCaptureBindings(
     }
   });
   return issues;
+}
+
+export type SupportIssueCode =
+  | 'INVALID_RECORD' | 'DUPLICATE_RECORD_ID' | 'INVALID_EVIDENCE'
+  | 'DUPLICATE_EVIDENCE_ID' | 'MISSING_EVIDENCE' | 'MISSING_DEPENDENCY'
+  | 'UNDECLARED_RELATIONSHIP_SUPPORT' | 'DEPENDENCY_CYCLE_OR_BLOCKED'
+  | 'SUPPORT_LIMIT_EXCEEDED';
+
+export type SupportIssue = {
+  code: SupportIssueCode;
+  item: 'record' | 'evidence';
+  index: number;
+};
+
+export type SupportClosure = {
+  issues: readonly SupportIssue[];
+  /** Present only when every record and reference is valid. Not an access decision. */
+  evidenceByRecord?: ReadonlyMap<string, readonly string[]>;
+};
+
+const MAX_SUPPORT_REFS_PER_RECORD = 10_000;
+
+/** Validate declared support and compute transitive evidence IDs for an acyclic release. */
+export function checkSupportClosure(
+  records: readonly RecordEnvelope[],
+  evidence: readonly EvidenceLocator[],
+): SupportClosure {
+  const issues: SupportIssue[] = [];
+  const evidenceIds = new Set<string>();
+  const recordsById = new Map<string, { record: RecordEnvelope; index: number }>();
+
+  evidence.forEach((locator, index) => {
+    if (!validate('evidence_locator', locator)) {
+      issues.push({ code: 'INVALID_EVIDENCE', item: 'evidence', index });
+    } else if (evidenceIds.has(locator.evidence_id)) {
+      issues.push({ code: 'DUPLICATE_EVIDENCE_ID', item: 'evidence', index });
+    } else evidenceIds.add(locator.evidence_id);
+  });
+  records.forEach((record, index) => {
+    if (!validate('record_envelope', record)) {
+      issues.push({ code: 'INVALID_RECORD', item: 'record', index });
+    } else if (recordsById.has(record.record_id)) {
+      issues.push({ code: 'DUPLICATE_RECORD_ID', item: 'record', index });
+    } else recordsById.set(record.record_id, { record, index });
+  });
+  if (issues.length) return { issues };
+
+  for (const { record, index } of recordsById.values()) {
+    for (const ref of record.evidence_refs) {
+      if (!evidenceIds.has(ref)) issues.push({ code: 'MISSING_EVIDENCE', item: 'record', index });
+    }
+    for (const ref of record.dependency_refs) {
+      if (!recordsById.has(ref)) issues.push({ code: 'MISSING_DEPENDENCY', item: 'record', index });
+    }
+    if (record.kind === 'engineering.relationship') {
+      const payload = record.payload as RelationshipPayload;
+      for (const ref of payload.supporting_record_refs) {
+        if (!record.dependency_refs.includes(ref)) {
+          issues.push({ code: 'UNDECLARED_RELATIONSHIP_SUPPORT', item: 'record', index });
+        }
+      }
+    }
+  }
+  if (issues.length) return { issues };
+
+  const requirements = new Map<string, Set<string>>();
+  const remaining = new Map<string, number>();
+  const dependents = new Map<string, string[]>();
+  const ready: string[] = [];
+  for (const [recordId, { record }] of recordsById) {
+    requirements.set(recordId, new Set(record.evidence_refs));
+    remaining.set(recordId, record.dependency_refs.length);
+    if (!record.dependency_refs.length) ready.push(recordId);
+    for (const dependencyId of record.dependency_refs) {
+      const list = dependents.get(dependencyId) ?? [];
+      list.push(recordId);
+      dependents.set(dependencyId, list);
+    }
+  }
+
+  let processed = 0;
+  for (let cursor = 0; cursor < ready.length; cursor++) {
+    const id = ready[cursor]!;
+    processed++;
+    const upstream = requirements.get(id)!;
+    if (upstream.size > MAX_SUPPORT_REFS_PER_RECORD) {
+      issues.push({ code: 'SUPPORT_LIMIT_EXCEEDED', item: 'record', index: recordsById.get(id)!.index });
+      break;
+    }
+    for (const dependentId of dependents.get(id) ?? []) {
+      const downstream = requirements.get(dependentId)!;
+      for (const evidenceId of upstream) downstream.add(evidenceId);
+      const count = remaining.get(dependentId)! - 1;
+      remaining.set(dependentId, count);
+      if (count === 0) ready.push(dependentId);
+    }
+  }
+  if (issues.length) return { issues };
+  if (processed !== recordsById.size) {
+    for (const [recordId, count] of remaining) {
+      if (count > 0) {
+        issues.push({ code: 'DEPENDENCY_CYCLE_OR_BLOCKED', item: 'record', index: recordsById.get(recordId)!.index });
+      }
+    }
+    return { issues };
+  }
+  return {
+    issues,
+    evidenceByRecord: new Map([...requirements].map(([id, ids]) => [id, [...ids].sort()])),
+  };
+}
+
+/** Combined metadata gate: never expose support closure if capture binding failed. */
+export function checkReleaseIntegrity(
+  captures: readonly SourceCapture[],
+  files: readonly CapturedFile[],
+  locators: readonly EvidenceLocator[],
+  records: readonly RecordEnvelope[],
+): { bindingIssues: readonly BindingIssue[]; supportIssues: readonly SupportIssue[];
+  evidenceByRecord?: ReadonlyMap<string, readonly string[]> } {
+  const bindingIssues = checkCaptureBindings(captures, files, locators);
+  const support = checkSupportClosure(records, locators);
+  return {
+    bindingIssues,
+    supportIssues: support.issues,
+    ...(bindingIssues.length || support.issues.length ? {} : { evidenceByRecord: support.evidenceByRecord }),
+  };
 }
