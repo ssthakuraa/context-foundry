@@ -38,7 +38,7 @@ p, li, td, a { overflow-wrap: anywhere; }
   <main>
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../docs/html/index.html">Documentation</a><a href="../docs/html/review-guide.html">Review guide</a><a href="../README.md">Markdown source</a></nav>
     <article>
-      <h1 id="contextfoundry">ContextFoundry</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#documentation">Documentation</a></li><li><a href="#project-status">Project status</a></li><li><a href="#build-the-review-pages">Build the review pages</a></li></ul></details>
+      <h1 id="contextfoundry">ContextFoundry</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#documentation">Documentation</a></li><li><a href="#project-status">Project status</a></li><li><a href="#contract-development">Contract development</a></li><li><a href="#build-the-review-pages">Build the review pages</a></li></ul></details>
 <p>Trusted engineering context for AI agents.</p>
 <p>ContextFoundry is being designed as an open-source, self-hosted platform for building and
 serving governed knowledge about enterprise software systems. It connects
@@ -69,8 +69,14 @@ does not replace their code-generation or agent capabilities.</p>
 technical designs with the two-gate human workflow and a Java/Spring plus TypeScript
 validation slice. Research synthesis and the design handoff are ready for review;
 prototype effectiveness, performance and market competitiveness remain unvalidated.
-Product implementation has not started.
-Open-source publication and license selection are pending.</p>
+Product runtime implementation has not started; WP0 evaluation setup and WP1
+executable contract work are underway.
+The <a href="https://github.com/ssthakuraa/context-foundry">public GitHub repository</a> is live. License selection is pending.</p>
+<h2 id="contract-development">Contract development</h2>
+<p>The initial contract package is under <code>packages/contracts</code>. With Node.js 22+ and
+pnpm 11, run <code>pnpm install --frozen-lockfile</code>, then <code>pnpm test</code>, <code>pnpm typecheck</code>
+and <code>pnpm build</code>. The five current schemas are a WP1 subset; they are not a
+complete or frozen product API.</p>
 <h2 id="build-the-review-pages">Build the review pages</h2>
 <p>Use Python 3.10+ with <code>markdown-it-py==3.0.0</code> (the tested documentation dependency):</p>
 <pre><code class="language-bash">python3 scripts/build-docs.py

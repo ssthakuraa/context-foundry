@@ -35,8 +35,16 @@ The project is in the design phase. CF-0.2 reconciles architecture, functional a
 technical designs with the two-gate human workflow and a Java/Spring plus TypeScript
 validation slice. Research synthesis and the design handoff are ready for review;
 prototype effectiveness, performance and market competitiveness remain unvalidated.
-Product runtime implementation has not started; evaluation setup is underway.
+Product runtime implementation has not started; WP0 evaluation setup and WP1
+executable contract work are underway.
 The [public GitHub repository](https://github.com/ssthakuraa/context-foundry) is live. License selection is pending.
+
+## Contract development
+
+The initial contract package is under `packages/contracts`. With Node.js 22+ and
+pnpm 11, run `pnpm install --frozen-lockfile`, then `pnpm test`, `pnpm typecheck`
+and `pnpm build`. The five current schemas are a WP1 subset; they are not a
+complete or frozen product API.
 
 ## Build the review pages
 

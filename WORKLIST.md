@@ -21,8 +21,8 @@ Legend: `[ ]` pending, `[-]` in progress, `[x]` complete, `[!]` needs a product 
 
 ## WP1 — Executable contracts
 
-- [ ] Bootstrap the minimal TypeScript workspace and pin required runtime, validator and test dependencies after a compatibility check.
-- [ ] Implement strict schemas and generated/static types for source captures, locators, assertions, coverage, releases, task artifacts, human decisions, errors and evaluation manifests.
+- [x] Bootstrap the minimal TypeScript workspace and pin required runtime, validator and test dependencies after a compatibility/license check. Evidence: `pnpm-lock.yaml`, Node 24 local build, TypeScript 5.9.3, TypeBox 0.34.52, Ajv 8.20.0; `pnpm test`, `pnpm typecheck` and `pnpm build` passed on 2026-09-20.
+- [-] Implement strict schemas and generated/static types for source captures, locators, assertions, coverage, releases, task artifacts, human decisions, errors and evaluation manifests. Five base schemas and static types exist; task/review/error/run families and semantic cross-record checks remain.
 - [ ] Implement canonical serialization and digests; verify Unicode, number, duplicate key, ordering and round trip cases.
 - [ ] Freeze the contract version and record compatibility/validation receipts before WP2/WP3 dependent work.
 

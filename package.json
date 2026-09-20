@@ -1,0 +1,12 @@
+{
+  "name": "context-foundry",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {"node": ">=22"},
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

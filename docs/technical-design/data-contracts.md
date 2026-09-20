@@ -2,6 +2,15 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
+**Implementation note (2026-09-20):** `packages/contracts` now contains five
+Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
+coverage and release manifest), static TypeScript types and strict Ajv runtime
+validators. A pinned workspace lockfile and positive/negative tests exist. This is
+only the first WP1 slice: registered payload-kind validation, support closure,
+task/decision/error/run schemas, canonical serialization and portable schema export
+are not implemented or frozen. Do not treat an envelope passing schema validation
+as a reviewed or fully supported assertion.
+
 ## Identity and versioning
 
 An entity ID combines logical repository or document namespace with adapter-owned

@@ -15,7 +15,7 @@ Proceed on the next work packages at Medium effort. Keep design and other docume
 - Repo: `/home/ssthakur/projects/context-foundry` (Git branch `main`), with public `origin` at `https://github.com/ssthakuraa/context-foundry`. Preserve user changes and inspect `git status`, recent commits and remote before edits. Keep ignored `.local/` private.
 - Design: CF-0.2 docs completed. Start at [review guide](docs/review-guide.md), [research verdict](docs/research/design-closeout.md), [technical contracts](docs/technical-design/task-and-review-contracts.md), [extraction contracts](docs/technical-design/extraction-and-source-binding.md), [work packages](docs/execution/validation-work-packages.md), and [benchmark dossier](docs/evaluation/three-repository-benchmark.md).
 - Docs are canonical Markdown; generated sibling HTML uses `python3 scripts/build-docs.py` and `python3 scripts/build-docs.py --check`. The last design closeout verified 45 HTML pages and desktop/mobile samples.
-- The durable [worklist](WORKLIST.md) is the progress source. WP0 has a verified private 154-file digest manifest and nine provisional development stories/rubric in ignored `.local/evaluation/`. Owner adjudication and holdout reservation remain pending; WP1–WP4 are pending. Recheck the worklist and files for newer progress.
+- The durable [worklist](WORKLIST.md) is the progress source. WP0 has a verified private 154-file digest manifest, nine provisional development stories/rubric and an unsealed leasing holdout exposure ledger in ignored `.local/evaluation/`. Owner adjudication and exact independent holdout sealing remain pending. WP1 workspace/bootstrap and five base schemas are implemented; WP1 contract completion and WP2–WP4 remain pending. Recheck the worklist and files for newer progress.
 - Evaluation repositories: `/home/ssthakur/projects/rentalapp`, `/home/ssthakur/projects/platform`, `/home/ssthakur/projects/agentic-platform`. Prior inspected commits respectively `9b57b0e871555e815417c6654d193e0554bd6964`, `3781720a74937e5a4ab67b98b441ca31f4ec0c64`, `0159c29896ece2405a67d5a0db211f3622ccdfd8`. Recheck revisions and status. They are read only fixture inputs for this project.
 
 ## Decisions and limits
@@ -24,7 +24,7 @@ Proceed on the next work packages at Medium effort. Keep design and other docume
 - Keep source origin, review, validation, freshness, coverage and task local assertions separate. Retrieval similarity nominates candidates; it does not prove a company rule or dependency.
 - Task stage guidance cannot enforce arbitrary host shell tools. Initial claim is guided integration plus verified review receipts.
 - A private three repo fixture and synthetic public safe conformance cases are separate. Do not copy private fixture source/derived content into publicly distributable project artifacts without authority. The owner must review intended business truth and benchmark criteria before outcome claims or paid runs.
-- Existing project instructions, if any, and user requests outrank this note. No product runtime code, private benchmark runs or paid evaluation had started at this update; inspect fresh state to update that statement.
+- Existing project instructions, if any, and user requests outrank this note. The `packages/contracts` code is an initial contract slice only; no private benchmark run or paid evaluation had started at this update. Inspect fresh state to update that statement.
 
 ## Resume procedure
 
@@ -35,4 +35,4 @@ Proceed on the next work packages at Medium effort. Keep design and other docume
 
 ## Current next action
 
-Reserve the held-out leasing stories and exposure record without tuning against them, then implement WP1 executable contracts after checking available runtime tooling. Owner review of business truth, scoring thresholds, data routing and paid budget is still required before private evaluation runs; progress independent synthetic contracts meanwhile. Review publication contents and make periodic GitHub checkpoint commits without including `.local/`.
+Continue WP1 with task/review/error/run schemas, schema portability, cross-record conformance and canonical digest fixtures. The local bundled Node 24 and pnpm 11 work when Node's bin directory is on `PATH`; use `pnpm test`, `pnpm typecheck`, `pnpm build` from the repo root. Owner review of business truth, scoring thresholds, data routing and paid budget is still required before private evaluation runs; exact leasing holdouts must be independently sealed. Review publication contents and make periodic GitHub checkpoint commits without including `.local/`.
