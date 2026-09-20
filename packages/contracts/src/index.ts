@@ -180,6 +180,65 @@ export const ReleaseSetSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:release-set', additionalProperties: false });
 export type ReleaseSet = Static<typeof ReleaseSetSchema>;
 
+export const RegisteredRecordKindSchema = Type.Union([
+  Type.Literal('engineering.symbol'), Type.Literal('engineering.relationship'),
+  Type.Literal('business.rule'), Type.Literal('business.mapping'),
+  Type.Literal('interface.operation'), Type.Literal('test.association'),
+  Type.Literal('business.flow'), Type.Literal('business.flow_step'),
+  Type.Literal('behavior.obligation'),
+]);
+export type RegisteredRecordKind = Static<typeof RegisteredRecordKindSchema>;
+
+export const ProducerCapabilitiesSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  producer_id: id(),
+  adapter_digest: digest(),
+  record_kinds: Type.Array(RegisteredRecordKindSchema, { uniqueItems: true }),
+  declared_unsupported: refs(),
+}, { $id: 'urn:context-foundry:schema:0.2.0:producer-capabilities', additionalProperties: false });
+export type ProducerCapabilities = Static<typeof ProducerCapabilitiesSchema>;
+
+export const ConsumerCapabilitiesSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  consumer_id: id(),
+  required_kinds: Type.Array(RegisteredRecordKindSchema, { uniqueItems: true }),
+  accepted_kinds: Type.Array(RegisteredRecordKindSchema, { uniqueItems: true }),
+}, { $id: 'urn:context-foundry:schema:0.2.0:consumer-capabilities', additionalProperties: false });
+export type ConsumerCapabilities = Static<typeof ConsumerCapabilitiesSchema>;
+
+export type KindHandshakeIssueCode =
+  | 'INVALID_PRODUCER' | 'INVALID_CONSUMER' | 'MISSING_REQUIRED_KIND'
+  | 'UNACCEPTED_PRODUCED_KIND' | 'UNDECLARED_RECORD_KIND' | 'INVALID_PRODUCED_RECORD';
+export type KindHandshakeIssue = { code: KindHandshakeIssueCode; index: number };
+
+/** Declared compatibility only; does not prove producer authenticity or extraction coverage. */
+export function checkKindHandshake(
+  producer: ProducerCapabilities,
+  consumer: ConsumerCapabilities,
+  records: readonly RecordEnvelope[] = [],
+): readonly KindHandshakeIssue[] {
+  const issues: KindHandshakeIssue[] = [];
+  if (!validate('producer_capabilities', producer)) issues.push({ code: 'INVALID_PRODUCER', index: 0 });
+  if (!validate('consumer_capabilities', consumer)) issues.push({ code: 'INVALID_CONSUMER', index: 0 });
+  if (issues.length) return issues;
+  const produced = new Set(producer.record_kinds);
+  const accepted = new Set(consumer.accepted_kinds);
+  consumer.required_kinds.forEach((kind, index) => {
+    if (!produced.has(kind)) issues.push({ code: 'MISSING_REQUIRED_KIND', index });
+  });
+  producer.record_kinds.forEach((kind, index) => {
+    if (!accepted.has(kind)) issues.push({ code: 'UNACCEPTED_PRODUCED_KIND', index });
+  });
+  records.forEach((record, index) => {
+    if (!validate('record_envelope', record)) {
+      issues.push({ code: 'INVALID_PRODUCED_RECORD', index });
+    } else if (!produced.has(record.kind as RegisteredRecordKind)) {
+      issues.push({ code: 'UNDECLARED_RECORD_KIND', index });
+    }
+  });
+  return issues;
+}
+
 export type ReleaseSetIssueCode =
   | 'INVALID_RELEASE_SET' | 'INVALID_RELEASE_MANIFEST' | 'DUPLICATE_RELEASE_MANIFEST'
   | 'MISSING_RELEASE_MANIFEST' | 'MANIFEST_DIGEST_MISMATCH' | 'UNLISTED_RELEASE_MANIFEST';
@@ -593,6 +652,8 @@ export const Schemas = {
   coverage: CoverageSchema,
   release_manifest: ReleaseManifestSchema,
   release_set: ReleaseSetSchema,
+  producer_capabilities: ProducerCapabilitiesSchema,
+  consumer_capabilities: ConsumerCapabilitiesSchema,
   engineering_symbol_payload: EngineeringSymbolPayloadSchema,
   business_rule_payload: BusinessRulePayloadSchema,
   business_mapping_payload: BusinessMappingPayloadSchema,
@@ -675,6 +736,11 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
     const packs = (value as ReleaseSet).packs;
     return new Set(packs.map(pack => pack.pack_id)).size === packs.length
       ? [] : ['/packs must contain each pack_id at most once'];
+  }
+  if (name === 'consumer_capabilities') {
+    const consumer = value as ConsumerCapabilities;
+    return consumer.required_kinds.every(kind => consumer.accepted_kinds.includes(kind))
+      ? [] : ['/required_kinds must be included in accepted_kinds'];
   }
   if (name === 'engineering_symbol_payload') {
     const symbol = value as EngineeringSymbolPayload;

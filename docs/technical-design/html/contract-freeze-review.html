@@ -42,9 +42,9 @@ p, li, td, a { overflow-wrap: anywhere; }
 <p><strong>Status:</strong> Open review · CF-0.2 · 2026-09-20. This is a gap audit, not a freeze or permission to start private evaluation.</p>
 <h2 id="verified-now">Verified now</h2>
 <ul>
-<li>Twenty-six Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes.</li>
+<li>Twenty-eight Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes. Producer/consumer capability manifests can check declared kind compatibility.</li>
 <li>Metadata checks cover capture/file/locator binding, canonical declared-file manifest digests, acyclic source-evidence support with no empty-support record, and exact same-task artifact references. These checks return issues instead of partial authorization decisions.</li>
-<li>The current fifty-five contract tests plus two isolated extractor-spike tests, typecheck, build, schema export check, fifty generated HTML pages, seventeen bounded semantic, three shape-invalid and six scope-map artifact variants in TypeScript/Python, nine valid/six rejected canonical JSON and three valid/three rejected JSONL vectors in TypeScript/Python pass. Generated 16 MiB size-boundary cases also pass in both languages. These are bounded fixtures, not a completeness claim.</li>
+<li>The current fifty-seven contract tests plus two isolated extractor-spike tests, typecheck, build, schema export check, fifty generated HTML pages, seventeen bounded semantic, three shape-invalid and six scope-map artifact variants in TypeScript/Python, nine valid/six rejected canonical JSON and three valid/three rejected JSONL vectors in TypeScript/Python pass. Generated 16 MiB size-boundary cases also pass in both languages. These are bounded fixtures, not a completeness claim.</li>
 </ul>
 <h2 id="blocking-gaps-before-a-shared-contract-freeze">Blocking gaps before a shared contract freeze</h2>
 <table>
@@ -58,8 +58,8 @@ p, li, td, a { overflow-wrap: anywhere; }
 <tbody>
 <tr>
 <td>Kind catalog</td>
-<td>The nine <a href="record-kind-catalog.html">proposed first-slice kinds</a> have strict payloads, flow/step membership and typed obligation-reference checks, but producer/consumer handshakes, engineering targets and other references, declaration adapters and explicit unsupported coverage remain</td>
-<td>Each first-slice producer/consumer kind is either strictly handled or explicitly unsupported with coverage and reference closure</td>
+<td>The nine <a href="record-kind-catalog.html">proposed first-slice kinds</a> have strict payloads and declared producer/consumer kind compatibility, but manifest authenticity, engineering targets and other references, declaration adapters and actual unsupported coverage remain</td>
+<td>Each first-slice producer/consumer kind is strictly handled or explicitly unsupported with coverage and reference closure</td>
 </tr>
 <tr>
 <td>Portable semantic parity</td>

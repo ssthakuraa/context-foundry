@@ -1,0 +1,81 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:producer-capabilities",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "declared_unsupported": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "producer_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_kinds": {
+      "items": {
+        "anyOf": [
+          {
+            "const": "engineering.symbol",
+            "type": "string"
+          },
+          {
+            "const": "engineering.relationship",
+            "type": "string"
+          },
+          {
+            "const": "business.rule",
+            "type": "string"
+          },
+          {
+            "const": "business.mapping",
+            "type": "string"
+          },
+          {
+            "const": "interface.operation",
+            "type": "string"
+          },
+          {
+            "const": "test.association",
+            "type": "string"
+          },
+          {
+            "const": "business.flow",
+            "type": "string"
+          },
+          {
+            "const": "business.flow_step",
+            "type": "string"
+          },
+          {
+            "const": "behavior.obligation",
+            "type": "string"
+          }
+        ]
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "producer_id",
+    "adapter_digest",
+    "record_kinds",
+    "declared_unsupported"
+  ],
+  "type": "object"
+}

@@ -8,7 +8,7 @@ import {
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 26);
+  assert.equal(Object.keys(Schemas).length, 28);
 });
 
 test('business flow and step carry bounded scope without pretending to be call edges', () => {

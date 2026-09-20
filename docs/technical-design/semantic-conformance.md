@@ -12,6 +12,7 @@ The language-neutral [semantic vectors](../../packages/contracts/fixtures/semant
 | CF-S04 | Engineering symbol | Callable method, constructor or function has a nonempty signature | Parity checked: method example |
 | CF-S05 | Business rule/mapping applicability | Bounded has a nonempty product or condition scope; unknown claims none | Parity checked: business rule examples only |
 | CF-S11 | Interface operation | HTTP requires method and route; other protocols cannot claim HTTP fields | Parity checked: HTTP/event examples |
+| CF-S12 | Consumer capabilities | Required kinds are a subset of accepted kinds | TypeScript only |
 | CF-S06 | Release set | Pack IDs unique within the set | TypeScript only |
 | CF-S07 | Task bodies | IDs unique where required; source-observed, business-asserted and evidence-based claims have their required support; source inspection has planned reads | TypeScript only |
 | CF-S08 | Task artifact | Canonical body digest matches; previous version is immediate; body schema matches kind; body support is included in envelope support | Partial parity: six scope-map variants; other body kinds TypeScript only |
