@@ -23,6 +23,11 @@ prove the bytes came from the declared source/revision, establish a complete cap
 or authorize their use. A trusted capture producer/local helper must supply bytes
 through an approved, path-safe handle; a changed result cannot be silently rebound
 to the old locator. No local-root or symlink safety claim follows from this function.
+`checkCaptureByteClosure` composes that comparison with the declared-file manifest:
+all declared paths need exactly one supplied byte payload, with no extras, duplicate
+paths or changed bytes. It returns verified file digests only if every check passes.
+The caller still supplies both bytes and metadata; this is not authenticated capture
+or proof that no source file was omitted before declaration.
 
 Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
 supported patterns; it does not promise a complete program-analysis engine.

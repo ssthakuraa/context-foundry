@@ -55,6 +55,10 @@ access. Those require trusted capture and local binding checks.
 The pure `verifyCapturedFileBytes` helper now checks raw caller-supplied bytes and
 length against an individual valid file record. It does not open paths or prove
 producer identity, capture completeness, revision or publication authority.
+`checkCaptureByteClosure` withholds its digest list unless every declared file has
+one matching supplied byte payload, no extra path, and a valid metadata manifest.
+It still cannot attest where those bytes came from or whether the declaration
+included every file in the underlying source.
 
 Source locators now carry a unique `evidence_id` within the supplied release set.
 `checkSupportClosure` verifies that record evidence/dependency references resolve,

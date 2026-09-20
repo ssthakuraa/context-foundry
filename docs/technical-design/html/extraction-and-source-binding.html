@@ -59,7 +59,12 @@ captured-file entry's SHA-256 digest <strong>and</strong> byte length. It does n
 prove the bytes came from the declared source/revision, establish a complete capture,
 or authorize their use. A trusted capture producer/local helper must supply bytes
 through an approved, path-safe handle; a changed result cannot be silently rebound
-to the old locator. No local-root or symlink safety claim follows from this function.</p>
+to the old locator. No local-root or symlink safety claim follows from this function.
+<code>checkCaptureByteClosure</code> composes that comparison with the declared-file manifest:
+all declared paths need exactly one supplied byte payload, with no extras, duplicate
+paths or changed bytes. It returns verified file digests only if every check passes.
+The caller still supplies both bytes and metadata; this is not authenticated capture
+or proof that no source file was omitted before declaration.</p>
 <p>Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
 supported patterns; it does not promise a complete program-analysis engine.</p>
 <h2 id="source-capture-manifest">Source capture manifest</h2>

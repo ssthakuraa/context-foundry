@@ -90,7 +90,11 @@ their claimed digests, prove that no source file was omitted before capture, or 
 access. Those require trusted capture and local binding checks.
 The pure <code>verifyCapturedFileBytes</code> helper now checks raw caller-supplied bytes and
 length against an individual valid file record. It does not open paths or prove
-producer identity, capture completeness, revision or publication authority.</p>
+producer identity, capture completeness, revision or publication authority.
+<code>checkCaptureByteClosure</code> withholds its digest list unless every declared file has
+one matching supplied byte payload, no extra path, and a valid metadata manifest.
+It still cannot attest where those bytes came from or whether the declaration
+included every file in the underlying source.</p>
 <p>Source locators now carry a unique <code>evidence_id</code> within the supplied release set.
 <code>checkSupportClosure</code> verifies that record evidence/dependency references resolve,
 that relationship payload support is declared on its envelope, and that IDs are

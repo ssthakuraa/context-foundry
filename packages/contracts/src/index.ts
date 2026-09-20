@@ -885,6 +885,44 @@ export function verifyCapturedFileBytes(file: CapturedFile, bytes: Uint8Array): 
   };
 }
 
+export type CaptureByteIssueCode =
+  | 'CAPTURE_METADATA_INVALID' | 'DUPLICATE_SUPPLIED_PATH' | 'UNDECLARED_SUPPLIED_PATH'
+  | 'MISSING_SUPPLIED_BYTES' | 'INVALID_SUPPLIED_BYTES' | 'FILE_BYTES_CHANGED';
+export type CaptureByteIssue = { code: CaptureByteIssueCode; index: number };
+
+/** All-or-nothing comparison of a declared capture to caller-supplied bytes.
+ * Does not authenticate the caller, source, revision or publication policy. */
+export function checkCaptureByteClosure(
+  capture: SourceCapture,
+  files: readonly CapturedFile[],
+  supplied: readonly { path: string; bytes: Uint8Array }[],
+): { issues: readonly CaptureByteIssue[]; verified_file_digests?: readonly string[] } {
+  if (checkCaptureBindings([capture], files, []).length) {
+    return { issues: [{ code: 'CAPTURE_METADATA_INVALID', index: 0 }] };
+  }
+  const issues: CaptureByteIssue[] = [];
+  const suppliedByPath = new Map<string, { bytes: Uint8Array; index: number }>();
+  const declared = new Set(files.map(file => file.path));
+  supplied.forEach((item, index) => {
+    if (suppliedByPath.has(item.path)) {
+      issues.push({ code: 'DUPLICATE_SUPPLIED_PATH', index });
+    } else if (!declared.has(item.path)) {
+      issues.push({ code: 'UNDECLARED_SUPPLIED_PATH', index });
+    } else suppliedByPath.set(item.path, { bytes: item.bytes, index });
+  });
+  files.forEach((file, index) => {
+    const item = suppliedByPath.get(file.path);
+    if (!item) issues.push({ code: 'MISSING_SUPPLIED_BYTES', index });
+    else if (!(item.bytes instanceof Uint8Array)) {
+      issues.push({ code: 'INVALID_SUPPLIED_BYTES', index: item.index });
+    } else if (verifyCapturedFileBytes(file, item.bytes).status !== 'exact') {
+      issues.push({ code: 'FILE_BYTES_CHANGED', index });
+    }
+  });
+  return issues.length ? { issues } :
+    { issues, verified_file_digests: files.map(file => file.file_digest) };
+}
+
 export type BindingIssueCode =
   | 'INVALID_CAPTURE' | 'DUPLICATE_CAPTURE' | 'INVALID_FILE' | 'UNBOUND_FILE'
   | 'DUPLICATE_PATH' | 'INVALID_LOCATOR' | 'UNBOUND_LOCATOR_SOURCE'
