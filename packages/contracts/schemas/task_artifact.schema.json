@@ -1,0 +1,127 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:task-artifact",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "body": {
+      "patternProperties": {
+        "^(.*)$": {}
+      },
+      "type": "object"
+    },
+    "body_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "created_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "created_by": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "kind": {
+      "anyOf": [
+        {
+          "const": "scope_map",
+          "type": "string"
+        },
+        {
+          "const": "sufficiency",
+          "type": "string"
+        },
+        {
+          "const": "findings",
+          "type": "string"
+        },
+        {
+          "const": "implementation_proposal",
+          "type": "string"
+        },
+        {
+          "const": "completion",
+          "type": "string"
+        }
+      ]
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "const": "human",
+          "type": "string"
+        },
+        {
+          "const": "agent",
+          "type": "string"
+        },
+        {
+          "const": "imported",
+          "type": "string"
+        }
+      ]
+    },
+    "previous_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "release_set_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "task_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "visibility_requirements": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "task_id",
+    "kind",
+    "version",
+    "body_digest",
+    "created_by",
+    "origin",
+    "created_at",
+    "release_set_id",
+    "evidence_refs",
+    "visibility_requirements",
+    "body"
+  ],
+  "type": "object"
+}

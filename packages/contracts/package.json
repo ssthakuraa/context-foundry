@@ -6,9 +6,10 @@
   "engines": {"node": ">=22"},
   "exports": {".": "./dist/index.js"},
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
+  "files": ["dist", "schemas"],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/export-schemas.mjs",
+    "schema:check": "node scripts/export-schemas.mjs --check",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
   },

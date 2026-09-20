@@ -1,0 +1,126 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:human-decision-receipt",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "artifact_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "artifact_version": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "authority_kind": {
+      "const": "verified_human_session",
+      "type": "string"
+    },
+    "decision_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "expected_task_version": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "expires_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "gate": {
+      "anyOf": [
+        {
+          "const": "scope",
+          "type": "string"
+        },
+        {
+          "const": "implementation",
+          "type": "string"
+        },
+        {
+          "const": "completion",
+          "type": "string"
+        }
+      ]
+    },
+    "issued_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "outcome": {
+      "anyOf": [
+        {
+          "const": "accept",
+          "type": "string"
+        },
+        {
+          "const": "request_changes",
+          "type": "string"
+        },
+        {
+          "const": "reject",
+          "type": "string"
+        },
+        {
+          "const": "design_only",
+          "type": "string"
+        }
+      ]
+    },
+    "permitted_actions": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "permitted_scope": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "reviewer_subject": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "task_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "decision_id",
+    "task_id",
+    "gate",
+    "artifact_id",
+    "artifact_version",
+    "artifact_digest",
+    "outcome",
+    "reviewer_subject",
+    "authority_kind",
+    "permitted_actions",
+    "permitted_scope",
+    "expected_task_version",
+    "issued_at"
+  ],
+  "type": "object"
+}

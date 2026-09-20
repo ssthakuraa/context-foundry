@@ -1,0 +1,56 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:task-error",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "anyOf": [
+        {
+          "const": "NOT_FOUND_OR_NOT_VISIBLE",
+          "type": "string"
+        },
+        {
+          "const": "TASK_STATE_CONFLICT",
+          "type": "string"
+        },
+        {
+          "const": "REVIEW_REQUIRED",
+          "type": "string"
+        },
+        {
+          "const": "APPROVAL_STALE",
+          "type": "string"
+        },
+        {
+          "const": "UNSUPPORTED_KIND",
+          "type": "string"
+        },
+        {
+          "const": "SOURCE_STALE",
+          "type": "string"
+        }
+      ]
+    },
+    "correlation_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "message": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "code",
+    "message",
+    "correlation_id"
+  ],
+  "type": "object"
+}

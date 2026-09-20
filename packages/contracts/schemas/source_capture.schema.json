@@ -1,0 +1,97 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:source-capture",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "capture_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "capture_policy": {
+      "anyOf": [
+        {
+          "const": "metadata_only",
+          "type": "string"
+        },
+        {
+          "const": "approved_content",
+          "type": "string"
+        }
+      ]
+    },
+    "classification": {
+      "anyOf": [
+        {
+          "const": "public",
+          "type": "string"
+        },
+        {
+          "const": "internal",
+          "type": "string"
+        },
+        {
+          "const": "restricted",
+          "type": "string"
+        }
+      ]
+    },
+    "content_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "logical_authority": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "revision": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "revision_kind": {
+      "anyOf": [
+        {
+          "const": "git",
+          "type": "string"
+        },
+        {
+          "const": "edition",
+          "type": "string"
+        },
+        {
+          "const": "snapshot",
+          "type": "string"
+        }
+      ]
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "uri": {
+      "maxLength": 4096,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "capture_id",
+    "source_id",
+    "logical_authority",
+    "uri",
+    "revision_kind",
+    "revision",
+    "content_sha256",
+    "capture_policy",
+    "classification"
+  ],
+  "type": "object"
+}

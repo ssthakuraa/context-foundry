@@ -1,0 +1,65 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:coverage",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "facet": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    },
+    "revision": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "source_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "anyOf": [
+        {
+          "const": "complete_for_declared_scope",
+          "type": "string"
+        },
+        {
+          "const": "partial",
+          "type": "string"
+        },
+        {
+          "const": "unsupported",
+          "type": "string"
+        },
+        {
+          "const": "unavailable",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_id",
+    "revision",
+    "adapter_id",
+    "facet",
+    "status"
+  ],
+  "type": "object"
+}

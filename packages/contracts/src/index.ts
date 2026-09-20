@@ -95,12 +95,95 @@ export const ReleaseManifestSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:release-manifest', additionalProperties: false });
 export type ReleaseManifest = Static<typeof ReleaseManifestSchema>;
 
+export const TaskArtifactSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  artifact_id: id(),
+  task_id: id(),
+  kind: Type.Union([
+    Type.Literal('scope_map'), Type.Literal('sufficiency'), Type.Literal('findings'),
+    Type.Literal('implementation_proposal'), Type.Literal('completion'),
+  ]),
+  version: Type.Integer({ minimum: 1 }),
+  body_digest: digest(),
+  previous_version: Type.Optional(Type.Integer({ minimum: 1 })),
+  created_by: id(),
+  origin: Type.Union([Type.Literal('human'), Type.Literal('agent'), Type.Literal('imported')]),
+  created_at: Type.String({ minLength: 1 }),
+  release_set_id: id(),
+  evidence_refs: refs(),
+  visibility_requirements: refs(),
+  body: Type.Record(Type.String(), Type.Unknown()),
+}, { $id: 'urn:context-foundry:schema:0.2.0:task-artifact', additionalProperties: false });
+export type TaskArtifact = Static<typeof TaskArtifactSchema>;
+
+// Server-issued receipt only. A valid JSON shape never establishes review authority.
+export const HumanDecisionReceiptSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  decision_id: id(),
+  task_id: id(),
+  gate: Type.Union([Type.Literal('scope'), Type.Literal('implementation'), Type.Literal('completion')]),
+  artifact_id: id(),
+  artifact_version: Type.Integer({ minimum: 1 }),
+  artifact_digest: digest(),
+  outcome: Type.Union([
+    Type.Literal('accept'), Type.Literal('request_changes'), Type.Literal('reject'),
+    Type.Literal('design_only'),
+  ]),
+  reviewer_subject: id(),
+  authority_kind: Type.Literal('verified_human_session'),
+  permitted_actions: refs(),
+  permitted_scope: refs(),
+  expected_task_version: Type.Integer({ minimum: 0 }),
+  issued_at: Type.String({ minLength: 1 }),
+  expires_at: Type.Optional(Type.String({ minLength: 1 })),
+}, { $id: 'urn:context-foundry:schema:0.2.0:human-decision-receipt', additionalProperties: false });
+export type HumanDecisionReceipt = Static<typeof HumanDecisionReceiptSchema>;
+
+export const TaskErrorSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  code: Type.Union([
+    Type.Literal('NOT_FOUND_OR_NOT_VISIBLE'), Type.Literal('TASK_STATE_CONFLICT'),
+    Type.Literal('REVIEW_REQUIRED'), Type.Literal('APPROVAL_STALE'),
+    Type.Literal('UNSUPPORTED_KIND'), Type.Literal('SOURCE_STALE'),
+  ]),
+  message: Type.String({ minLength: 1, maxLength: 512 }),
+  correlation_id: id(),
+}, { $id: 'urn:context-foundry:schema:0.2.0:task-error', additionalProperties: false });
+export type TaskError = Static<typeof TaskErrorSchema>;
+
+export const EvaluationRunManifestSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  run_id: id(),
+  task_id: id(),
+  arm: Type.Union([Type.Literal('A'), Type.Literal('B'), Type.Literal('C'), Type.Literal('O')]),
+  attempt: Type.Integer({ minimum: 1 }),
+  corpus_manifest_digest: digest(),
+  task_input_digest: digest(),
+  instruction_digest: digest(),
+  model_id: id(),
+  model_effort: Type.Union([
+    Type.Literal('low'), Type.Literal('medium'), Type.Literal('high'),
+    Type.Literal('xhigh'), Type.Literal('unknown'),
+  ]),
+  host_id: id(),
+  policy_generation: id(),
+  cache_state: Type.Union([Type.Literal('cold'), Type.Literal('warm'), Type.Literal('unknown')]),
+  status: Type.Union([Type.Literal('planned'), Type.Literal('completed'), Type.Literal('failed'), Type.Literal('skipped')]),
+  started_at: Type.String({ minLength: 1 }),
+  usage_receipt_ref: Type.Optional(id()),
+}, { $id: 'urn:context-foundry:schema:0.2.0:evaluation-run-manifest', additionalProperties: false });
+export type EvaluationRunManifest = Static<typeof EvaluationRunManifestSchema>;
+
 export const Schemas = {
   source_capture: SourceCaptureSchema,
   evidence_locator: EvidenceLocatorSchema,
   record_envelope: RecordEnvelopeSchema,
   coverage: CoverageSchema,
   release_manifest: ReleaseManifestSchema,
+  task_artifact: TaskArtifactSchema,
+  human_decision_receipt: HumanDecisionReceiptSchema,
+  task_error: TaskErrorSchema,
+  evaluation_run_manifest: EvaluationRunManifestSchema,
 } as const;
 export type SchemaName = keyof typeof Schemas;
 

@@ -1,0 +1,159 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:evaluation-run-manifest",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "arm": {
+      "anyOf": [
+        {
+          "const": "A",
+          "type": "string"
+        },
+        {
+          "const": "B",
+          "type": "string"
+        },
+        {
+          "const": "C",
+          "type": "string"
+        },
+        {
+          "const": "O",
+          "type": "string"
+        }
+      ]
+    },
+    "attempt": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "cache_state": {
+      "anyOf": [
+        {
+          "const": "cold",
+          "type": "string"
+        },
+        {
+          "const": "warm",
+          "type": "string"
+        },
+        {
+          "const": "unknown",
+          "type": "string"
+        }
+      ]
+    },
+    "corpus_manifest_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "host_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "instruction_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "model_effort": {
+      "anyOf": [
+        {
+          "const": "low",
+          "type": "string"
+        },
+        {
+          "const": "medium",
+          "type": "string"
+        },
+        {
+          "const": "high",
+          "type": "string"
+        },
+        {
+          "const": "xhigh",
+          "type": "string"
+        },
+        {
+          "const": "unknown",
+          "type": "string"
+        }
+      ]
+    },
+    "model_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_generation": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "run_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "started_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "status": {
+      "anyOf": [
+        {
+          "const": "planned",
+          "type": "string"
+        },
+        {
+          "const": "completed",
+          "type": "string"
+        },
+        {
+          "const": "failed",
+          "type": "string"
+        },
+        {
+          "const": "skipped",
+          "type": "string"
+        }
+      ]
+    },
+    "task_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "task_input_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "usage_receipt_ref": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "task_id",
+    "arm",
+    "attempt",
+    "corpus_manifest_digest",
+    "task_input_digest",
+    "instruction_digest",
+    "model_id",
+    "model_effort",
+    "host_id",
+    "policy_generation",
+    "cache_state",
+    "status",
+    "started_at"
+  ],
+  "type": "object"
+}

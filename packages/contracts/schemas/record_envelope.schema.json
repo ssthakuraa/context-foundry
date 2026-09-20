@@ -1,0 +1,141 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:record-envelope",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "anyOf": [
+        {
+          "const": "public",
+          "type": "string"
+        },
+        {
+          "const": "internal",
+          "type": "string"
+        },
+        {
+          "const": "restricted",
+          "type": "string"
+        }
+      ]
+    },
+    "dependency_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "entity_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "kind": {
+      "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+      "type": "string"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "const": "source_declared",
+          "type": "string"
+        },
+        {
+          "const": "static_resolution",
+          "type": "string"
+        },
+        {
+          "const": "human_asserted",
+          "type": "string"
+        },
+        {
+          "const": "model_proposed",
+          "type": "string"
+        }
+      ]
+    },
+    "owner_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "patternProperties": {
+        "^(.*)$": {}
+      },
+      "type": "object"
+    },
+    "record_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "const": "pending",
+              "type": "string"
+            },
+            {
+              "const": "approved",
+              "type": "string"
+            },
+            {
+              "const": "rejected",
+              "type": "string"
+            },
+            {
+              "const": "not_required",
+              "type": "string"
+            },
+            {
+              "const": "stale",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "record_id",
+    "entity_id",
+    "kind",
+    "owner_id",
+    "origin",
+    "review",
+    "payload",
+    "evidence_refs",
+    "dependency_refs",
+    "classification"
+  ],
+  "type": "object"
+}

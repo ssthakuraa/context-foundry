@@ -2,14 +2,16 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains five
+**Implementation note (2026-09-20):** `packages/contracts` now contains nine
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
-coverage and release manifest), static TypeScript types and strict Ajv runtime
-validators. A pinned workspace lockfile and positive/negative tests exist. This is
-only the first WP1 slice: registered payload-kind validation, support closure,
-task/decision/error/run schemas, canonical serialization and portable schema export
-are not implemented or frozen. Do not treat an envelope passing schema validation
-as a reviewed or fully supported assertion.
+coverage, release manifest, task artifact, human decision receipt, task error and
+evaluation run manifest), static TypeScript types, strict Ajv runtime validators
+and generated portable JSON files. A pinned workspace lockfile and positive/negative
+tests exist. This is only a WP1 subset: registered payload-kind validation, body
+subschemas, support closure, semantic cross-record checks and canonical serialization
+are not implemented or frozen. A decision receipt's JSON shape does not establish
+human identity or authorization; the server must issue and verify it. Do not treat
+an envelope passing schema validation as a reviewed or fully supported assertion.
 
 ## Identity and versioning
 

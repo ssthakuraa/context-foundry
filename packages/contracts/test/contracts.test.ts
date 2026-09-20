@@ -5,7 +5,7 @@ import { CONTRACT_VERSION, Schemas, validate, validationErrors } from '../src/in
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 5);
+  assert.equal(Object.keys(Schemas).length, 9);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -62,4 +62,53 @@ test('coverage and release manifest reject unsupported values', () => {
   };
   assert.equal(validate('release_manifest', release), true);
   assert.equal(validate('release_manifest', { ...release, source_manifest_digests: [] }), false);
+});
+
+test('task artifact requires an immutable envelope and rejects unknown kinds', () => {
+  const artifact = {
+    schema_version: CONTRACT_VERSION, artifact_id: 'artifact:1', task_id: 'task:1',
+    kind: 'scope_map', version: 1, body_digest: hash, created_by: 'agent:1',
+    origin: 'agent', created_at: '2026-09-20T00:00:00Z', release_set_id: 'release-set:1',
+    evidence_refs: ['ev:1'], visibility_requirements: ['ev:1'], body: { questions: ['q1'] },
+  };
+  assert.equal(validate('task_artifact', artifact), true);
+  assert.equal(validate('task_artifact', { ...artifact, kind: 'agent_approval' }), false);
+  assert.equal(validate('task_artifact', { ...artifact, body_digest: 'not-a-digest' }), false);
+  assert.equal(validate('task_artifact', { ...artifact, approved: true }), false);
+});
+
+test('human decision receipt is server-shaped but not proof of authority', () => {
+  const receipt = {
+    schema_version: CONTRACT_VERSION, decision_id: 'decision:1', task_id: 'task:1',
+    gate: 'scope', artifact_id: 'artifact:1', artifact_version: 1, artifact_digest: hash,
+    outcome: 'accept', reviewer_subject: 'human:1', authority_kind: 'verified_human_session',
+    permitted_actions: [], permitted_scope: [], expected_task_version: 1,
+    issued_at: '2026-09-20T00:00:00Z',
+  };
+  assert.equal(validate('human_decision_receipt', receipt), true);
+  assert.equal(validate('human_decision_receipt', { ...receipt, authority_kind: 'agent_token' }), false);
+  assert.equal(validate('human_decision_receipt', { ...receipt, task_id: undefined }), false);
+});
+
+test('task errors use bounded codes without leaking arbitrary details', () => {
+  const error = {
+    schema_version: CONTRACT_VERSION, code: 'NOT_FOUND_OR_NOT_VISIBLE',
+    message: 'Not found or not visible', correlation_id: 'trace:1',
+  };
+  assert.equal(validate('task_error', error), true);
+  assert.equal(validate('task_error', { ...error, code: 'HIDDEN_SOURCE_EXISTS' }), false);
+  assert.equal(validate('task_error', { ...error, hidden_source: 'repo:secret' }), false);
+});
+
+test('evaluation manifest records comparable arm and unknown cache state', () => {
+  const manifest = {
+    schema_version: CONTRACT_VERSION, run_id: 'run:1', task_id: 'task:1', arm: 'A', attempt: 1,
+    corpus_manifest_digest: hash, task_input_digest: hash, instruction_digest: hash,
+    model_id: 'model:1', model_effort: 'medium', host_id: 'host:1',
+    policy_generation: 'policy:1', cache_state: 'unknown', status: 'planned',
+    started_at: '2026-09-20T00:00:00Z',
+  };
+  assert.equal(validate('evaluation_run_manifest', manifest), true);
+  assert.equal(validate('evaluation_run_manifest', { ...manifest, arm: 'uncontrolled' }), false);
+  assert.equal(validate('evaluation_run_manifest', { ...manifest, attempt: 0 }), false);
 });

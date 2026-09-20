@@ -1,0 +1,82 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:release-manifest",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "config_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "coverage_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "created_by": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "ordered_shard_digests": {
+      "items": {
+        "pattern": "^[a-f0-9]{64}$",
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "pack_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "release_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "source_manifest_digests": {
+      "items": {
+        "pattern": "^[a-f0-9]{64}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "validation_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "pack_id",
+    "release_id",
+    "source_manifest_digests",
+    "adapter_digest",
+    "config_digest",
+    "ordered_shard_digests",
+    "coverage_refs",
+    "validation_refs",
+    "created_by"
+  ],
+  "type": "object"
+}
