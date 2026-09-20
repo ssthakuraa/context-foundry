@@ -40,10 +40,10 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
-<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains nineteen
+<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twenty
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, coverage, release manifest/set, relationship payload, task artifact,
-engineering symbol payload, business rule payload, all five task artifact bodies,
+engineering symbol payload, business rule and mapping payloads, all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
@@ -142,13 +142,17 @@ initial first-party validation dialect; generated TypeScript types must stay in 
 <p>The owning release supplies pack/revision bindings. A relationship includes qualified
 subject/object, relation type, direction, evidence, and supporting record references.
 The initial registered record kinds are <code>engineering.symbol</code>,
-<code>engineering.relationship</code> and <code>business.rule</code>. Symbol payloads require Java or
+<code>engineering.relationship</code>, <code>business.rule</code> and <code>business.mapping</code>. Symbol payloads require Java or
 TypeScript language and a declared artifact kind; methods, constructors and
 functions require a signature so overloaded callables are not silently conflated.
 Business rules require a name, statement and explicit applicability state. A bounded
 rule names at least a product or condition; unknown applicability cannot carry a
-claimed scope and is never treated as universal. These checks constrain shape, not
-the truth of the rule, review authority or effective-time semantics.
+claimed scope and is never treated as universal. Business mappings explicitly bind
+business and engineering entity IDs, a relation, applicability and either an
+<code>explicit_reference</code> or <code>reviewed_association</code> basis. The basis constrains the
+permitted origin; a reviewed association never becomes a source-declared runtime
+call merely by approval. These checks constrain shape, not the truth of a rule or
+mapping, review authority or effective-time semantics.
 Registered extension kinds will use namespaced payload schemas and immutable schema
 digests. Unknown required kinds currently fail validation. Preserving optional
 unknown kinds with explicit coverage status is not implemented yet.</p>

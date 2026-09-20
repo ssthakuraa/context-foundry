@@ -8,7 +8,7 @@ import {
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 19);
+  assert.equal(Object.keys(Schemas).length, 20);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -101,6 +101,30 @@ test('symbol and business rule payloads retain explicit kind and applicability',
   assert.equal(validate('record_envelope', { ...rule, payload: {
     ...rule.payload, applicability: { status: 'unknown' },
   } }), true);
+});
+
+test('business mappings keep basis and origin separate from runtime relationships', () => {
+  const payload = {
+    business_entity_id: 'business:approval', engineering_entity_id: 'repo:A:ApprovalService',
+    mapping_relation: 'implemented_by', mapping_basis: 'reviewed_association',
+    applicability: { status: 'bounded', product_ids: ['product:A'] },
+  };
+  const mapping = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:mapping', entity_id: 'business:approval',
+    kind: 'business.mapping', owner_id: 'team:A', origin: 'human_asserted',
+    review: { state: 'approved', evidence_fingerprint: hash }, payload,
+    evidence_refs: ['ev:1'], dependency_refs: [], classification: 'internal',
+  };
+  assert.equal(validate('record_envelope', mapping), true);
+  assert.equal(validate('record_envelope', { ...mapping, origin: 'static_resolution' }), false);
+  assert.equal(validate('record_envelope', { ...mapping, payload: {
+    ...payload, mapping_basis: 'explicit_reference',
+  } }), false);
+  assert.equal(validate('record_envelope', {
+    ...mapping, origin: 'source_declared', payload: { ...payload, mapping_basis: 'explicit_reference' },
+  }), true);
+  assert.equal(validate('business_mapping_payload', { ...payload, applicability: { status: 'bounded' } }), false);
+  assert.equal(validate('business_mapping_payload', { ...payload, mapping_relation: 'calls' }), false);
 });
 
 test('coverage and release manifest reject unsupported values', () => {

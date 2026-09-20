@@ -40,6 +40,12 @@ known. Distinguish business effective time from capture time and code revision.
 Unknown applicability is not universal applicability. Initial conditions use bounded
 declarative fields, not executable code or a new general rule engine.
 
+The first executable `business.mapping` payload distinguishes an explicit source
+reference from a reviewed association and requires a named business endpoint,
+engineering endpoint, relation and bounded-or-unknown applicability. This does not
+establish a runtime call; origin and review remain separate envelope dimensions.
+Publication/approval checks are later service work.
+
 An alias is scoped to a concept/domain/product and supported by evidence. Entity
 resolution returns exact, candidate, ambiguous or unresolved outcomes; merging
 different identities requires review. Embedding similarity never merges them by itself.

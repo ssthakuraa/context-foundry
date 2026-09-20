@@ -1,0 +1,96 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:business-mapping-payload",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "conditions": {
+          "items": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "product_ids": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "status": {
+          "anyOf": [
+            {
+              "const": "bounded",
+              "type": "string"
+            },
+            {
+              "const": "unknown",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "type": "object"
+    },
+    "business_entity_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "engineering_entity_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "mapping_basis": {
+      "anyOf": [
+        {
+          "const": "explicit_reference",
+          "type": "string"
+        },
+        {
+          "const": "reviewed_association",
+          "type": "string"
+        }
+      ]
+    },
+    "mapping_relation": {
+      "anyOf": [
+        {
+          "const": "implemented_by",
+          "type": "string"
+        },
+        {
+          "const": "exposed_by",
+          "type": "string"
+        },
+        {
+          "const": "stored_in",
+          "type": "string"
+        },
+        {
+          "const": "validated_by",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "required": [
+    "business_entity_id",
+    "engineering_entity_id",
+    "mapping_relation",
+    "mapping_basis",
+    "applicability"
+  ],
+  "type": "object"
+}

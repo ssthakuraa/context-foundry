@@ -176,6 +176,20 @@ export const BusinessRulePayloadSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:business-rule-payload', additionalProperties: false });
 export type BusinessRulePayload = Static<typeof BusinessRulePayloadSchema>;
 
+export const BusinessMappingPayloadSchema = Type.Object({
+  business_entity_id: id(),
+  engineering_entity_id: id(),
+  mapping_relation: Type.Union([
+    Type.Literal('implemented_by'), Type.Literal('exposed_by'),
+    Type.Literal('stored_in'), Type.Literal('validated_by'),
+  ]),
+  mapping_basis: Type.Union([
+    Type.Literal('explicit_reference'), Type.Literal('reviewed_association'),
+  ]),
+  applicability: RuleApplicability,
+}, { $id: 'urn:context-foundry:schema:0.2.0:business-mapping-payload', additionalProperties: false });
+export type BusinessMappingPayload = Static<typeof BusinessMappingPayloadSchema>;
+
 export const RelationshipPayloadSchema = Type.Object({
   subject_id: id(),
   object_id: id(),
@@ -370,6 +384,7 @@ export const Schemas = {
   release_set: ReleaseSetSchema,
   engineering_symbol_payload: EngineeringSymbolPayloadSchema,
   business_rule_payload: BusinessRulePayloadSchema,
+  business_mapping_payload: BusinessMappingPayloadSchema,
   relationship_payload: RelationshipPayloadSchema,
   scope_map_body: ScopeMapBodySchema,
   sufficiency_body: SufficiencyBodySchema,
@@ -393,6 +408,17 @@ function normalizedRelativePath(path: string): boolean {
   return !path.startsWith('/') && !path.includes('\\') &&
     !/[\u0000-\u001f\u007f]/.test(path) && !/^[a-zA-Z]:/.test(path) &&
     parts.every(part => !!part && part !== '.' && part !== '..');
+}
+
+function applicabilityErrors(applicability: BusinessRulePayload['applicability']): string[] {
+  const hasScope = !!applicability.product_ids?.length || !!applicability.conditions?.length;
+  if (applicability.status === 'bounded' && !hasScope) {
+    return ['/applicability bounded records require product IDs or conditions'];
+  }
+  if (applicability.status === 'unknown' && hasScope) {
+    return ['/applicability unknown cannot carry a claimed scope'];
+  }
+  return [];
 }
 
 function semanticErrors(name: SchemaName, value: unknown): string[] {
@@ -430,15 +456,10 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
       ? ['/signature is required for callable symbols'] : [];
   }
   if (name === 'business_rule_payload') {
-    const applicability = (value as BusinessRulePayload).applicability;
-    const hasScope = !!applicability.product_ids?.length || !!applicability.conditions?.length;
-    if (applicability.status === 'bounded' && !hasScope) {
-      return ['/applicability bounded rules require product IDs or conditions'];
-    }
-    if (applicability.status === 'unknown' && hasScope) {
-      return ['/applicability unknown cannot carry a claimed scope'];
-    }
-    return [];
+    return applicabilityErrors((value as BusinessRulePayload).applicability);
+  }
+  if (name === 'business_mapping_payload') {
+    return applicabilityErrors((value as BusinessMappingPayload).applicability);
   }
   if (name === 'scope_map_body') {
     const body = value as ScopeMapBody;
@@ -537,6 +558,21 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
     if (record.kind === 'business.rule') {
       return validateDetailed('business_rule_payload', record.payload).valid
         ? [] : ['/payload must conform to business_rule_payload'];
+    }
+    if (record.kind === 'business.mapping') {
+      if (!validateDetailed('business_mapping_payload', record.payload).valid) {
+        return ['/payload must conform to business_mapping_payload'];
+      }
+      const mapping = record.payload as BusinessMappingPayload;
+      if (mapping.mapping_basis === 'explicit_reference' &&
+        !['source_declared', 'static_resolution'].includes(record.origin)) {
+        return ['/origin must be source_declared or static_resolution for explicit_reference'];
+      }
+      if (mapping.mapping_basis === 'reviewed_association' &&
+        !['human_asserted', 'model_proposed'].includes(record.origin)) {
+        return ['/origin must be human_asserted or model_proposed for reviewed_association'];
+      }
+      return [];
     }
     return ['/kind is not registered as a required record kind'];
   }

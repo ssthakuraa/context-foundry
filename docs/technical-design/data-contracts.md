@@ -2,10 +2,10 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains nineteen
+**Implementation note (2026-09-20):** `packages/contracts` now contains twenty
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, coverage, release manifest/set, relationship payload, task artifact,
-engineering symbol payload, business rule payload, all five task artifact bodies,
+engineering symbol payload, business rule and mapping payloads, all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
@@ -115,13 +115,17 @@ initial first-party validation dialect; generated TypeScript types must stay in 
 The owning release supplies pack/revision bindings. A relationship includes qualified
 subject/object, relation type, direction, evidence, and supporting record references.
 The initial registered record kinds are `engineering.symbol`,
-`engineering.relationship` and `business.rule`. Symbol payloads require Java or
+`engineering.relationship`, `business.rule` and `business.mapping`. Symbol payloads require Java or
 TypeScript language and a declared artifact kind; methods, constructors and
 functions require a signature so overloaded callables are not silently conflated.
 Business rules require a name, statement and explicit applicability state. A bounded
 rule names at least a product or condition; unknown applicability cannot carry a
-claimed scope and is never treated as universal. These checks constrain shape, not
-the truth of the rule, review authority or effective-time semantics.
+claimed scope and is never treated as universal. Business mappings explicitly bind
+business and engineering entity IDs, a relation, applicability and either an
+`explicit_reference` or `reviewed_association` basis. The basis constrains the
+permitted origin; a reviewed association never becomes a source-declared runtime
+call merely by approval. These checks constrain shape, not the truth of a rule or
+mapping, review authority or effective-time semantics.
 Registered extension kinds will use namespaced payload schemas and immutable schema
 digests. Unknown required kinds currently fail validation. Preserving optional
 unknown kinds with explicit coverage status is not implemented yet.
