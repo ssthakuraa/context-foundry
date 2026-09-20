@@ -17,6 +17,13 @@ or content digest. Release-wide duplicate evidence IDs fail support validation.
 Symlink/case-collision checks, live local-byte comparison and authorization remain
 for WP2. The contract version is not frozen.
 
+`verifyCapturedFileBytes` now compares caller-supplied raw bytes against one valid
+captured-file entry's SHA-256 digest **and** byte length. It does not open paths,
+prove the bytes came from the declared source/revision, establish a complete capture,
+or authorize their use. A trusted capture producer/local helper must supply bytes
+through an approved, path-safe handle; a changed result cannot be silently rebound
+to the old locator. No local-root or symlink safety claim follows from this function.
+
 Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
 supported patterns; it does not promise a complete program-analysis engine.
 

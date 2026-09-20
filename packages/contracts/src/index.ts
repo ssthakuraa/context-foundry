@@ -1,4 +1,5 @@
 import { Ajv, type ValidateFunction } from 'ajv';
+import { createHash } from 'node:crypto';
 import { Type, type Static } from '@sinclair/typebox';
 import { canonicalSha256 } from './canonical.js';
 export { canonicalJson, canonicalRecordLines, canonicalSha256, parseJsonStrict } from './canonical.js';
@@ -865,6 +866,23 @@ export function validateDetailed(name: SchemaName, value: unknown): { valid: boo
 
 export function validate(name: SchemaName, value: unknown): boolean {
   return validateDetailed(name, value).valid;
+}
+
+export type ByteBindingResult =
+  | { status: 'exact'; actual_digest: string; actual_bytes: number }
+  | { status: 'changed'; actual_digest: string; actual_bytes: number }
+  | { status: 'invalid_file' };
+
+/** Compare supplied immutable bytes to a declared file. Caller owns source access and trust. */
+export function verifyCapturedFileBytes(file: CapturedFile, bytes: Uint8Array): ByteBindingResult {
+  if (!validate('captured_file', file)) return { status: 'invalid_file' };
+  const actualDigest = createHash('sha256').update(bytes).digest('hex');
+  const actualBytes = bytes.byteLength;
+  return {
+    status: actualDigest === file.file_digest && actualBytes === file.bytes ? 'exact' : 'changed',
+    actual_digest: actualDigest,
+    actual_bytes: actualBytes,
+  };
 }
 
 export type BindingIssueCode =

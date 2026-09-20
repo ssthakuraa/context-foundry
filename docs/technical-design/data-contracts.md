@@ -52,6 +52,9 @@ are separate failures and cannot establish manifest closure. This detects a chan
 or omitted declared file record; it does **not** prove the actual file bytes match
 their claimed digests, prove that no source file was omitted before capture, or grant
 access. Those require trusted capture and local binding checks.
+The pure `verifyCapturedFileBytes` helper now checks raw caller-supplied bytes and
+length against an individual valid file record. It does not open paths or prove
+producer identity, capture completeness, revision or publication authority.
 
 Source locators now carry a unique `evidence_id` within the supplied release set.
 `checkSupportClosure` verifies that record evidence/dependency references resolve,

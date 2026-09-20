@@ -87,7 +87,10 @@ file list hashes as the canonical empty array. Invalid or duplicate file records
 are separate failures and cannot establish manifest closure. This detects a changed
 or omitted declared file record; it does <strong>not</strong> prove the actual file bytes match
 their claimed digests, prove that no source file was omitted before capture, or grant
-access. Those require trusted capture and local binding checks.</p>
+access. Those require trusted capture and local binding checks.
+The pure <code>verifyCapturedFileBytes</code> helper now checks raw caller-supplied bytes and
+length against an individual valid file record. It does not open paths or prove
+producer identity, capture completeness, revision or publication authority.</p>
 <p>Source locators now carry a unique <code>evidence_id</code> within the supplied release set.
 <code>checkSupportClosure</code> verifies that record evidence/dependency references resolve,
 that relationship payload support is declared on its envelope, and that IDs are
