@@ -119,7 +119,9 @@ Apache-2.0 `rfc8785==0.1.4` implementation pinned in
 and six rejected JSON vectors, plus three accepted/three rejected JSONL vectors
 for UTF-16 record ordering, LF termination and identity rejection. This is not
 all possible cross-language edge cases or a frozen portable importer. Expand
-size limits and the compatibility report before freeze.
+broader property cases and the compatibility report before freeze. Generated
+boundary tests now check the exact 16 MiB input, canonical output and JSONL
+shard limits independently in TypeScript and Python; this is not a property proof.
 Build timestamps live in provenance/run metadata and are not invented to force
 semantic equality between independently captured evidence.
 

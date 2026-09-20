@@ -10,6 +10,7 @@ import rfc8785
 
 
 MAX_SAFE_INTEGER = 2**53 - 1
+MAX_BYTES = 16 * 1024 * 1024
 VECTORS = Path(__file__).resolve().parents[1] / "packages/contracts/fixtures/canonical-vectors.json"
 
 
@@ -41,6 +42,8 @@ def reject_constant(raw):
 
 
 def strict_parse(raw):
+    if len(raw.encode("utf-8")) > MAX_BYTES:
+        raise ValueError("JSON input size limit exceeded")
     return json.loads(
         raw,
         object_pairs_hook=reject_duplicate_keys,
@@ -48,6 +51,13 @@ def strict_parse(raw):
         parse_float=parse_finite_float,
         parse_constant=reject_constant,
     )
+
+
+def canonical_bytes(value):
+    result = rfc8785.dumps(value)
+    if len(result) > MAX_BYTES:
+        raise ValueError("canonical JSON size limit exceeded")
+    return result
 
 
 def jsonl_bytes(records):
@@ -58,20 +68,48 @@ def jsonl_bytes(records):
             raise ValueError("missing or duplicate record_id")
         ids.add(record_id)
     ordered = sorted(records, key=lambda record: record["record_id"].encode("utf-16-be"))
-    return b"".join(rfc8785.dumps(record) + b"\n" for record in ordered)
+    result = b"".join(canonical_bytes(record) + b"\n" for record in ordered)
+    if len(result) > MAX_BYTES:
+        raise ValueError("JSONL shard size limit exceeded")
+    return result
+
+
+def check_size_boundaries():
+    at_limit = '"' + 'x' * (MAX_BYTES - 2) + '"'
+    assert len(canonical_bytes(strict_parse(at_limit))) == MAX_BYTES
+    try:
+        strict_parse('"' + 'x' * (MAX_BYTES - 1) + '"')
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("oversized input accepted")
+    try:
+        canonical_bytes("x" * (MAX_BYTES - 1))
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("oversized canonical output accepted")
+    overhead = len(jsonl_bytes([{"record_id": "r", "value": ""}]))
+    assert len(jsonl_bytes([{"record_id": "r", "value": "x" * (MAX_BYTES - overhead)}])) == MAX_BYTES
+    try:
+        jsonl_bytes([{"record_id": "r", "value": "x" * (MAX_BYTES - overhead + 1)}])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("oversized JSONL accepted")
 
 
 def main():
     vectors = json.loads(VECTORS.read_text(encoding="utf-8"))
     assert vectors["format"] == "context-foundry-canonical-vectors-1"
     for vector in vectors["valid"]:
-        actual = rfc8785.dumps(strict_parse(vector["input"]))
+        actual = canonical_bytes(strict_parse(vector["input"]))
         expected = vector["canonical"].encode("utf-8")
         assert actual == expected, vector["name"]
         assert hashlib.sha256(actual).hexdigest() == vector["sha256"], vector["name"]
     for vector in vectors["invalid"]:
         try:
-            rfc8785.dumps(strict_parse(vector["input"]))
+            canonical_bytes(strict_parse(vector["input"]))
         except (ValueError, UnicodeError, rfc8785.CanonicalizationError):
             continue
         raise AssertionError(f"invalid vector accepted: {vector['name']}")
@@ -85,6 +123,7 @@ def main():
         except ValueError:
             continue
         raise AssertionError(f"invalid JSONL vector accepted: {vector['name']}")
+    check_size_boundaries()
     print(f"Verified {len(vectors['valid'])} valid/{len(vectors['invalid'])} invalid JSON and "
           f"{len(vectors['jsonl_valid'])} valid/{len(vectors['jsonl_invalid'])} invalid JSONL Python vectors")
 

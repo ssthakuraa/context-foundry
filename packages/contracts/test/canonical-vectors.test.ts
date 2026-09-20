@@ -38,3 +38,17 @@ test('portable JSONL vectors pin record ordering, LF and invalid identity behavi
     assert.throws(() => canonicalRecordLines(vector.records as { record_id: string }[]), Error, vector.name);
   }
 });
+
+test('16 MiB input, output and JSONL shard byte boundaries are exact', () => {
+  const limit = 16 * 1024 * 1024;
+  const atLimit = `"${'x'.repeat(limit - 2)}"`;
+  assert.equal(canonicalJson(parseJsonStrict(atLimit)).length, limit);
+  assert.throws(() => parseJsonStrict(`"${'x'.repeat(limit - 1)}"`), /size limit/);
+  assert.throws(() => canonicalJson('x'.repeat(limit - 1)), /size limit/);
+  const emptyRecord = { record_id: 'r', value: '' };
+  const overhead = Buffer.byteLength(canonicalRecordLines([emptyRecord]));
+  const exact = { record_id: 'r', value: 'x'.repeat(limit - overhead) };
+  assert.equal(Buffer.byteLength(canonicalRecordLines([exact])), limit);
+  const tooLarge = { ...exact, value: `${exact.value}x` };
+  assert.throws(() => canonicalRecordLines([tooLarge]), /size limit/);
+});
