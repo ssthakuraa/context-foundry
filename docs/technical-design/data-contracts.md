@@ -14,6 +14,8 @@ cross-artifact checks, broader semantic cross-record checks and independent cros
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
+The [proposed record-kind catalog](record-kind-catalog.md) names the unimplemented
+first-slice kinds and their trust boundaries; it is not an optional-payload escape hatch.
 
 Strict task body schemas now cover `scope_map`, `sufficiency`, `findings`,
 `implementation_proposal` and `completion`. Scope-map

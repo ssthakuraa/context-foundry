@@ -51,7 +51,9 @@ tests exist. This is only a WP1 subset: remaining registered record kinds, deepe
 cross-artifact checks, broader semantic cross-record checks and independent cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
-an envelope passing schema validation as a reviewed or fully supported assertion.</p>
+an envelope passing schema validation as a reviewed or fully supported assertion.
+The <a href="record-kind-catalog.html">proposed record-kind catalog</a> names the unimplemented
+first-slice kinds and their trust boundaries; it is not an optional-payload escape hatch.</p>
 <p>Strict task body schemas now cover <code>scope_map</code>, <code>sufficiency</code>, <code>findings</code>,
 <code>implementation_proposal</code> and <code>completion</code>. Scope-map
 candidates label evidence versus hypothesis and give a relevance reason; an
