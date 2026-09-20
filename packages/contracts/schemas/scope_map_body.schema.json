@@ -1,0 +1,134 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:scope-map-body",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "assumptions": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "candidates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "basis": {
+            "anyOf": [
+              {
+                "const": "evidence",
+                "type": "string"
+              },
+              {
+                "const": "hypothesis",
+                "type": "string"
+              }
+            ]
+          },
+          "entity_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "evidence_refs": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "relevance_reason": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity_id",
+          "relevance_reason",
+          "basis",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "intent": {
+      "anyOf": [
+        {
+          "const": "inquiry",
+          "type": "string"
+        },
+        {
+          "const": "consume_api",
+          "type": "string"
+        },
+        {
+          "const": "diagnose",
+          "type": "string"
+        },
+        {
+          "const": "impact_analysis",
+          "type": "string"
+        },
+        {
+          "const": "implement_change",
+          "type": "string"
+        }
+      ]
+    },
+    "material_scope_boundaries": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "questions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "question_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "text"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "unknowns": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "intent",
+    "questions",
+    "candidates",
+    "assumptions",
+    "unknowns",
+    "material_scope_boundaries"
+  ],
+  "type": "object"
+}

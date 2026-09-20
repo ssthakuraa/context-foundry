@@ -1,0 +1,98 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:sufficiency-body",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "assessments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_refs": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "intended_action": {
+            "anyOf": [
+              {
+                "const": "answer",
+                "type": "string"
+              },
+              {
+                "const": "inspect_source",
+                "type": "string"
+              },
+              {
+                "const": "propose_change",
+                "type": "string"
+              }
+            ]
+          },
+          "judgment": {
+            "anyOf": [
+              {
+                "const": "sufficient",
+                "type": "string"
+              },
+              {
+                "const": "inspect_source",
+                "type": "string"
+              },
+              {
+                "const": "unresolved",
+                "type": "string"
+              }
+            ]
+          },
+          "open_questions": {
+            "items": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "planned_local_reads": {
+            "items": {
+              "maxLength": 512,
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "question_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "rationale": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "intended_action",
+          "judgment",
+          "evidence_refs",
+          "rationale",
+          "planned_local_reads",
+          "open_questions"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "assessments"
+  ],
+  "type": "object"
+}

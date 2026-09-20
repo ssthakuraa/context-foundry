@@ -190,6 +190,46 @@ export const RelationshipPayloadSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:relationship-payload', additionalProperties: false });
 export type RelationshipPayload = Static<typeof RelationshipPayloadSchema>;
 
+const boundedText = () => Type.String({ minLength: 1, maxLength: 2048 });
+const ScopeCandidate = Type.Object({
+  entity_id: id(),
+  relevance_reason: boundedText(),
+  basis: Type.Union([Type.Literal('evidence'), Type.Literal('hypothesis')]),
+  evidence_refs: refs(),
+}, { additionalProperties: false });
+export const ScopeMapBodySchema = Type.Object({
+  intent: Type.Union([
+    Type.Literal('inquiry'), Type.Literal('consume_api'), Type.Literal('diagnose'),
+    Type.Literal('impact_analysis'), Type.Literal('implement_change'),
+  ]),
+  questions: Type.Array(Type.Object({
+    question_id: id(), text: boundedText(),
+  }, { additionalProperties: false }), { minItems: 1 }),
+  candidates: Type.Array(ScopeCandidate),
+  assumptions: Type.Array(boundedText()),
+  unknowns: Type.Array(boundedText()),
+  material_scope_boundaries: Type.Array(boundedText()),
+}, { $id: 'urn:context-foundry:schema:0.2.0:scope-map-body', additionalProperties: false });
+export type ScopeMapBody = Static<typeof ScopeMapBodySchema>;
+
+const SufficiencyAssessment = Type.Object({
+  question_id: id(),
+  intended_action: Type.Union([
+    Type.Literal('answer'), Type.Literal('inspect_source'), Type.Literal('propose_change'),
+  ]),
+  judgment: Type.Union([
+    Type.Literal('sufficient'), Type.Literal('inspect_source'), Type.Literal('unresolved'),
+  ]),
+  evidence_refs: refs(),
+  rationale: boundedText(),
+  planned_local_reads: refs(),
+  open_questions: Type.Array(boundedText()),
+}, { additionalProperties: false });
+export const SufficiencyBodySchema = Type.Object({
+  assessments: Type.Array(SufficiencyAssessment, { minItems: 1 }),
+}, { $id: 'urn:context-foundry:schema:0.2.0:sufficiency-body', additionalProperties: false });
+export type SufficiencyBody = Static<typeof SufficiencyBodySchema>;
+
 export const TaskArtifactSchema = Type.Object({
   schema_version: Type.Literal(CONTRACT_VERSION),
   artifact_id: id(),
@@ -280,6 +320,8 @@ export const Schemas = {
   engineering_symbol_payload: EngineeringSymbolPayloadSchema,
   business_rule_payload: BusinessRulePayloadSchema,
   relationship_payload: RelationshipPayloadSchema,
+  scope_map_body: ScopeMapBodySchema,
+  sufficiency_body: SufficiencyBodySchema,
   task_artifact: TaskArtifactSchema,
   human_decision_receipt: HumanDecisionReceiptSchema,
   task_error: TaskErrorSchema,
@@ -341,6 +383,58 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
     }
     if (applicability.status === 'unknown' && hasScope) {
       return ['/applicability unknown cannot carry a claimed scope'];
+    }
+    return [];
+  }
+  if (name === 'scope_map_body') {
+    const body = value as ScopeMapBody;
+    const questionIds = body.questions.map(question => question.question_id);
+    if (new Set(questionIds).size !== questionIds.length) return ['/questions contains duplicate question_id'];
+    if (body.candidates.some(candidate => candidate.basis === 'evidence' && !candidate.evidence_refs.length)) {
+      return ['/candidates evidence basis requires an evidence reference'];
+    }
+    return [];
+  }
+  if (name === 'sufficiency_body') {
+    const body = value as SufficiencyBody;
+    const questionIds = body.assessments.map(item => item.question_id);
+    if (new Set(questionIds).size !== questionIds.length) return ['/assessments contains duplicate question_id'];
+    if (body.assessments.some(item => item.judgment === 'inspect_source' && !item.planned_local_reads.length)) {
+      return ['/assessments inspect_source requires planned_local_reads'];
+    }
+    return [];
+  }
+  if (name === 'task_artifact') {
+    const artifact = value as TaskArtifact;
+    try {
+      if (canonicalSha256(artifact.body) !== artifact.body_digest) {
+        return ['/body_digest does not match canonical body'];
+      }
+    } catch {
+      return ['/body is not canonical JSON'];
+    }
+    if (artifact.version === 1 && artifact.previous_version !== undefined) {
+      return ['/previous_version must be absent for version 1'];
+    }
+    if (artifact.version > 1 && artifact.previous_version !== artifact.version - 1) {
+      return ['/previous_version must immediately precede version'];
+    }
+    if (artifact.kind === 'scope_map') {
+      const checked = validateDetailed('scope_map_body', artifact.body);
+      if (!checked.valid) return ['/body must conform to scope_map_body', ...checked.errors];
+      const body = artifact.body as ScopeMapBody;
+      if (body.candidates.some(candidate => candidate.evidence_refs.some(ref => !artifact.evidence_refs.includes(ref)))) {
+        return ['/evidence_refs must include candidate support'];
+      }
+    }
+    if (artifact.kind === 'sufficiency') {
+      const checked = validateDetailed('sufficiency_body', artifact.body);
+      if (!checked.valid) return ['/body must conform to sufficiency_body', ...checked.errors];
+      const body = artifact.body as SufficiencyBody;
+      if (body.assessments.some(item => [...item.evidence_refs, ...item.planned_local_reads]
+        .some(ref => !artifact.evidence_refs.includes(ref)))) {
+        return ['/evidence_refs must include assessment support and planned reads'];
+      }
     }
     return [];
   }

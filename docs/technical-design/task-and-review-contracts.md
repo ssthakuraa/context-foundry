@@ -7,6 +7,14 @@ Implements CF-R03–CF-R11, CF-R13 and CF-R15. Product semantics are defined by 
 All shapes below become strict first-party JSON schemas and conformance fixtures
 in WP1; they are not claims of existing endpoints.
 
+**WP1 implementation note (2026-09-20):** `TaskArtifactSchema` checks the canonical
+body digest and immediate prior version. `ScopeMapBodySchema` and
+`SufficiencyBodySchema` are the first strict bodies: scope candidates carry a
+relevance reason and evidence/hypothesis basis, and `inspect_source` assessments
+must identify planned evidence-linked reads. Body evidence references must also be
+declared on the artifact envelope. Findings, proposal and completion body schemas,
+task-state authority and review decisions remain unimplemented.
+
 ## Task aggregate
 
 Task fields: task_id, owner_subject, intent, request_origin, original_request_ref,

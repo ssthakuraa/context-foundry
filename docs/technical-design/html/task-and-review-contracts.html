@@ -44,6 +44,13 @@ p, li, td, a { overflow-wrap: anywhere; }
 <a href="../../design/html/human-reviewed-engineering-workflow.html">human-reviewed workflow</a>.
 All shapes below become strict first-party JSON schemas and conformance fixtures
 in WP1; they are not claims of existing endpoints.</p>
+<p><strong>WP1 implementation note (2026-09-20):</strong> <code>TaskArtifactSchema</code> checks the canonical
+body digest and immediate prior version. <code>ScopeMapBodySchema</code> and
+<code>SufficiencyBodySchema</code> are the first strict bodies: scope candidates carry a
+relevance reason and evidence/hypothesis basis, and <code>inspect_source</code> assessments
+must identify planned evidence-linked reads. Body evidence references must also be
+declared on the artifact envelope. Findings, proposal and completion body schemas,
+task-state authority and review decisions remain unimplemented.</p>
 <h2 id="task-aggregate">Task aggregate</h2>
 <p>Task fields: task_id, owner_subject, intent, request_origin, original_request_ref,
 selected_pack_ids, release_set_id, phase, wait_reason, task_version, created_at.

@@ -2,17 +2,27 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains fourteen
+**Implementation note (2026-09-20):** `packages/contracts` now contains sixteen
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, coverage, release manifest/set, relationship payload, task artifact,
-engineering symbol payload, business rule payload, human decision receipt, task error
+engineering symbol payload, business rule payload, scope map and sufficiency bodies,
+human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
-tests exist. This is only a WP1 subset: remaining registered payload kinds, task body
+tests exist. This is only a WP1 subset: remaining registered payload kinds and task body
 subschemas, broader semantic cross-record checks and independent cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
+
+The first strict task body schemas are `scope_map` and `sufficiency`. Scope-map
+candidates label evidence versus hypothesis and give a relevance reason; an
+evidence-based candidate must cite evidence. An `inspect_source` sufficiency
+judgment must name a planned local read. The artifact envelope's `body_digest`
+must match canonical SHA-256 of the actual body, and its prior-version link must
+immediately precede its version. Referenced evidence in these two bodies must be
+declared in the envelope. These checks neither prove the evidence is accessible nor
+authorize any action; task state and human review remain server responsibilities.
 
 The capture/locator/coverage envelopes were reconciled with the more precise
 [extraction and binding contract](extraction-and-source-binding.md) before freeze.

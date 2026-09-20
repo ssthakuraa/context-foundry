@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { CONTRACT_VERSION, Schemas, validate, validateDetailed } from '../src/index.js';
+import { canonicalSha256, CONTRACT_VERSION, Schemas, validate, validateDetailed } from '../src/index.js';
 
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 14);
+  assert.equal(Object.keys(Schemas).length, 16);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -121,16 +121,51 @@ test('coverage and release manifest reject unsupported values', () => {
 });
 
 test('task artifact requires an immutable envelope and rejects unknown kinds', () => {
+  const body = {
+    intent: 'implement_change', questions: [{ question_id: 'q1', text: 'Change approval behavior?' }],
+    candidates: [{ entity_id: 'repo:A:ApprovalService', relevance_reason: 'Owns the approval entry point',
+      basis: 'evidence', evidence_refs: ['ev:1'] }],
+    assumptions: [], unknowns: [], material_scope_boundaries: [],
+  };
   const artifact = {
     schema_version: CONTRACT_VERSION, artifact_id: 'artifact:1', task_id: 'task:1',
-    kind: 'scope_map', version: 1, body_digest: hash, created_by: 'agent:1',
+    kind: 'scope_map', version: 1, body_digest: canonicalSha256(body), created_by: 'agent:1',
     origin: 'agent', created_at: '2026-09-20T00:00:00Z', release_set_id: 'release-set:1',
-    evidence_refs: ['ev:1'], visibility_requirements: ['ev:1'], body: { questions: ['q1'] },
+    evidence_refs: ['ev:1'], visibility_requirements: ['ev:1'], body,
   };
   assert.equal(validate('task_artifact', artifact), true);
   assert.equal(validate('task_artifact', { ...artifact, kind: 'agent_approval' }), false);
   assert.equal(validate('task_artifact', { ...artifact, body_digest: 'not-a-digest' }), false);
+  assert.equal(validate('task_artifact', { ...artifact, body_digest: hash }), false);
   assert.equal(validate('task_artifact', { ...artifact, approved: true }), false);
+  assert.equal(validate('task_artifact', { ...artifact, previous_version: 1 }), false);
+  assert.equal(validate('task_artifact', { ...artifact, version: 2, previous_version: 1 }), true);
+  assert.equal(validate('task_artifact', { ...artifact, evidence_refs: [] }), false);
+  const ungrounded = { ...body, candidates: [{ ...body.candidates[0], evidence_refs: [] }] };
+  assert.equal(validate('scope_map_body', ungrounded), false);
+  assert.equal(validate('task_artifact', {
+    ...artifact, body: ungrounded, body_digest: canonicalSha256(ungrounded),
+  }), false);
+});
+
+test('sufficiency body requires a plan for selective source inspection', () => {
+  const body = { assessments: [{
+    question_id: 'q1', intended_action: 'propose_change', judgment: 'inspect_source',
+    evidence_refs: ['ev:1'], rationale: 'Need implementation details',
+    planned_local_reads: ['ev:1'], open_questions: [],
+  }] };
+  assert.equal(validate('sufficiency_body', body), true);
+  const base = {
+    schema_version: CONTRACT_VERSION, artifact_id: 'artifact:2', task_id: 'task:1',
+    kind: 'sufficiency', version: 1, body_digest: canonicalSha256(body), created_by: 'agent:1',
+    origin: 'agent', created_at: '2026-09-20T00:00:00Z', release_set_id: 'release-set:1',
+    evidence_refs: ['ev:1'], visibility_requirements: ['ev:1'], body,
+  };
+  assert.equal(validate('task_artifact', base), true);
+  assert.equal(validate('task_artifact', { ...base, evidence_refs: [] }), false);
+  const noRead = { assessments: [{ ...body.assessments[0], planned_local_reads: [] }] };
+  assert.equal(validate('sufficiency_body', noRead), false);
+  assert.equal(validate('task_artifact', { ...base, body: noRead, body_digest: canonicalSha256(noRead) }), false);
 });
 
 test('human decision receipt is server-shaped but not proof of authority', () => {
