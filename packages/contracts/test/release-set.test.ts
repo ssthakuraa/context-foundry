@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import test from 'node:test';
 import {
-  canonicalSha256, checkReleaseSetBindings, CONTRACT_VERSION,
+  canonicalSha256, checkReleaseSetBindings, checkReleaseSetByteClosure, CONTRACT_VERSION,
   type ReleaseManifest, type ReleaseSet,
 } from '../src/index.js';
 
@@ -43,4 +44,40 @@ test('ambiguous, extra and invalid manifests cannot be a clean release set', () 
     .map(issue => issue.code), ['INVALID_RELEASE_MANIFEST', 'MISSING_RELEASE_MANIFEST']);
   assert.deepEqual(checkReleaseSetBindings({ ...releaseSet, packs: [releaseSet.packs[0]!, releaseSet.packs[0]!] },
     [manifestA, manifestB]).map(issue => issue.code), ['INVALID_RELEASE_SET']);
+});
+
+test('ordered shard and bridge bytes close only against exact two-pack metadata', () => {
+  const shardA = Buffer.from('A shard');
+  const shardB = Buffer.from('B shard');
+  const bridge = Buffer.from('A to B bridge');
+  const hashBytes = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
+  const a: ReleaseManifest = { ...manifestA, ordered_shard_digests: [hashBytes(shardA)] };
+  const b: ReleaseManifest = { ...manifestB, ordered_shard_digests: [hashBytes(shardB)] };
+  const set: ReleaseSet = {
+    ...releaseSet, cross_pack_bridge_digest: hashBytes(bridge),
+    packs: [
+      { pack_id: a.pack_id, release_id: a.release_id, manifest_digest: canonicalSha256(a) },
+      { pack_id: b.pack_id, release_id: b.release_id, manifest_digest: canonicalSha256(b) },
+    ],
+  };
+  const supplied = [
+    { pack_id: b.pack_id, ordered_shard_bytes: [shardB] },
+    { pack_id: a.pack_id, ordered_shard_bytes: [shardA] },
+  ];
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, b], supplied, bridge), []);
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, b], supplied, Buffer.from('forged'))
+    .map(issue => issue.code), ['BRIDGE_DIGEST_MISMATCH']);
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, b], [
+    supplied[0]!, { pack_id: a.pack_id, ordered_shard_bytes: [shardB] },
+  ], bridge).map(issue => issue.code), ['SHARD_DIGEST_MISMATCH']);
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, b], supplied.slice(0, 1), bridge)
+    .map(issue => issue.code), ['MISSING_PACK_BYTES']);
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, b], [
+    ...supplied, supplied[0]!, { pack_id: 'pack:extra', ordered_shard_bytes: [] },
+  ], bridge).map(issue => issue.code), ['DUPLICATE_PACK_BYTES', 'UNLISTED_PACK_BYTES']);
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, b], [
+    supplied[0]!, { pack_id: a.pack_id, ordered_shard_bytes: [] },
+  ], bridge).map(issue => issue.code), ['SHARD_COUNT_MISMATCH']);
+  assert.deepEqual(checkReleaseSetByteClosure(set, [a, { ...b, config_digest: 'b'.repeat(64) }],
+    supplied, bridge).map(issue => issue.code), ['INVALID_RELEASE_METADATA']);
 });

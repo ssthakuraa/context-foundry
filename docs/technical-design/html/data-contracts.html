@@ -370,6 +370,11 @@ requires one exact pack/release identity and canonical manifest digest per entry
 no ambiguous or unlisted manifest. This is metadata closure only: a claimed shard or
 bridge digest is not evidence that bytes were loaded or reviewed. Byte verification,
 cross-pack entity conflict detection and activation authorization remain separate.
+<code>checkReleaseSetByteClosure</code> now compares all ordered, caller-supplied shard bytes
+and the caller-supplied bridge bytes to those digests after metadata closure. Missing,
+extra, duplicated or changed inputs fail the check. This is still not producer
+authentication, source-manifest provenance, a compiled-generation conflict check,
+review, or permission to activate.
 Activation transaction verifies reviewed manifest identity, compiled generation,
 policy compatibility, and expected prior activation version. Idempotency key prevents
 duplicate promotion. Concurrent mismatches return CONFLICT rather than last-writer wins.</p>

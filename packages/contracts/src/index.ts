@@ -287,6 +287,60 @@ export function checkReleaseSetBindings(
   return issues;
 }
 
+export type ReleaseByteIssueCode =
+  | 'INVALID_RELEASE_METADATA' | 'DUPLICATE_PACK_BYTES' | 'UNLISTED_PACK_BYTES'
+  | 'MISSING_PACK_BYTES' | 'SHARD_COUNT_MISMATCH' | 'INVALID_SHARD_BYTES'
+  | 'SHARD_DIGEST_MISMATCH' | 'INVALID_BRIDGE_BYTES' | 'BRIDGE_DIGEST_MISMATCH';
+export type ReleaseByteIssue = { code: ReleaseByteIssueCode; index: number };
+
+/** Compare ordered shard and bridge bytes supplied by caller; not authenticity or activation. */
+export function checkReleaseSetByteClosure(
+  releaseSet: ReleaseSet,
+  manifests: readonly ReleaseManifest[],
+  supplied: readonly { pack_id: string; ordered_shard_bytes: readonly Uint8Array[] }[],
+  bridgeBytes: Uint8Array,
+): readonly ReleaseByteIssue[] {
+  if (checkReleaseSetBindings(releaseSet, manifests).length) {
+    return [{ code: 'INVALID_RELEASE_METADATA', index: 0 }];
+  }
+  const issues: ReleaseByteIssue[] = [];
+  const declared = new Set(releaseSet.packs.map(pack => pack.pack_id));
+  const suppliedByPack = new Map<string, { bytes: readonly Uint8Array[]; index: number }>();
+  supplied.forEach((item, index) => {
+    if (suppliedByPack.has(item.pack_id)) {
+      issues.push({ code: 'DUPLICATE_PACK_BYTES', index });
+    } else if (!declared.has(item.pack_id)) {
+      issues.push({ code: 'UNLISTED_PACK_BYTES', index });
+    } else suppliedByPack.set(item.pack_id, { bytes: item.ordered_shard_bytes, index });
+  });
+  manifests.forEach((manifest, index) => {
+    const entry = suppliedByPack.get(manifest.pack_id);
+    if (!entry) {
+      issues.push({ code: 'MISSING_PACK_BYTES', index });
+      return;
+    }
+    if (!Array.isArray(entry.bytes) || entry.bytes.length !== manifest.ordered_shard_digests.length) {
+      issues.push({ code: 'SHARD_COUNT_MISMATCH', index });
+      return;
+    }
+    entry.bytes.forEach((bytes, shardIndex) => {
+      if (!(bytes instanceof Uint8Array)) {
+        issues.push({ code: 'INVALID_SHARD_BYTES', index: entry.index });
+      } else if (createHash('sha256').update(bytes).digest('hex') !==
+        manifest.ordered_shard_digests[shardIndex]) {
+        issues.push({ code: 'SHARD_DIGEST_MISMATCH', index: entry.index });
+      }
+    });
+  });
+  if (!(bridgeBytes instanceof Uint8Array)) {
+    issues.push({ code: 'INVALID_BRIDGE_BYTES', index: 0 });
+  } else if (createHash('sha256').update(bridgeBytes).digest('hex') !==
+    releaseSet.cross_pack_bridge_digest) {
+    issues.push({ code: 'BRIDGE_DIGEST_MISMATCH', index: 0 });
+  }
+  return issues;
+}
+
 export const EngineeringSymbolPayloadSchema = Type.Object({
   name: id(),
   artifact_kind: Type.Union([
