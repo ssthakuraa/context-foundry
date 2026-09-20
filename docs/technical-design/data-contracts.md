@@ -44,6 +44,10 @@ proposal was actually approved or remains valid.
 
 The capture/locator/coverage envelopes were reconciled with the more precise
 [extraction and binding contract](extraction-and-source-binding.md) before freeze.
+`engineering.symbol` now has an optional qualified name in addition to its short
+name and callable signature. The TypeScript spike emits it for exact local lookup;
+older provisional records may omit it, and a name match alone does not establish a
+resolved dependency or runtime behavior.
 Their individual normalized-path, line/byte-order and coverage-count checks are
 supplemented by `checkCaptureBindings`, which compares source/snapshot/revision/path
 and captured-file digests without reading source. Git captures and locators require

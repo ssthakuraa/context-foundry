@@ -4,7 +4,7 @@
 
 | Kind | Meaning and minimum payload | Permitted origin and support boundary | Status |
 |---|---|---|---|
-| `engineering.symbol` | Language, declaration kind, name and callable signature | Source declaration with exact locator; no runtime behavior implied | Implemented |
+| `engineering.symbol` | Language, declaration kind, short name, optional qualified name and callable signature | Source declaration with exact locator; no runtime behavior implied | Implemented; TypeScript spike emits qualified names |
 | `engineering.relationship` | Qualified subject, relation, object and declared supporting records | Static or source-declared relationship; an unresolved candidate is not a confirmed edge | Implemented |
 | `business.rule` | Rule statement and bounded/unknown applicability | Human asserted or source declared; review state stays separate from origin | Implemented |
 | `business.mapping` | Business and engineering entities, mapping relation/basis and applicability | Explicit reference versus reviewed association; never silently converted to runtime call | Implemented |

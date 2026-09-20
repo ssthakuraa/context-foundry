@@ -34,6 +34,8 @@ test('one supplied file yields deterministic source-bound symbols and explicit p
   assert.deepEqual(extractTypeScriptCapture(supplied), first);
   assert.deepEqual(first.records.map(record => record.payload['name']),
     ['Approval', 'approve', 'submit']);
+  assert.deepEqual(first.records.map(record => record.payload['qualified_name']),
+    ['Approval', 'Approval.approve', 'submit']);
   assert.deepEqual(first.records.map(record => record.classification),
     ['restricted', 'restricted', 'restricted']);
   assert.ok(first.records.every(record => record.evidence_refs.length === 1));

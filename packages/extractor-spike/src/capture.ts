@@ -87,7 +87,7 @@ export function extractTypeScriptCapture(input: CaptureInput): CaptureResult {
       record_id: stableId('rec', [capture.capture_id, evidenceId]), entity_id: entityId,
       kind: 'engineering.symbol', owner_id: capture.authority_id,
       origin: 'source_declared', review: { state: 'pending' },
-      payload: { name: declaration.name,
+      payload: { name: declaration.name, qualified_name: declaration.qualified_name,
         artifact_kind: declaration.kind === 'class' || declaration.kind === 'interface'
           ? 'type' : declaration.kind,
         language: 'typescript',

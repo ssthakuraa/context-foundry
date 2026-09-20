@@ -16,8 +16,16 @@ The check recomputes the capture's file-manifest digest from canonical, path-sor
 declared file metadata; this is metadata closure, not a read of actual source bytes.
 Each locator has an `evidence_id` for support resolution, distinct from the file path
 or content digest. Release-wide duplicate evidence IDs fail support validation.
-Symlink/case-collision checks, live local-byte comparison and authorization remain
-for WP2. The contract version is not frozen.
+Generalized symlink/case-collision checks, trusted revision-bound local-byte
+comparison and authorization remain for WP2. The contract version is not frozen.
+
+The isolated TypeScript local proof helper now performs Linux descriptor-anchored
+reads of an explicit file list, rejects symlink components and non-regular files,
+and compares read bytes to declared digests. It does not discover files, verify that
+the supplied snapshot is a Git revision, establish a source owner's publication
+authority, or enforce enterprise principal access. Case-collision behavior on other
+filesystems and general multi-language adapters remain open. See the
+[TypeScript spike](typescript-declaration-spike.md).
 
 `verifyCapturedFileBytes` now compares caller-supplied raw bytes against one valid
 captured-file entry's SHA-256 digest **and** byte length. It does not open paths,

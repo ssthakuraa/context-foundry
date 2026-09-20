@@ -382,6 +382,7 @@ export function checkCrossPackEntityOwnership(
 
 export const EngineeringSymbolPayloadSchema = Type.Object({
   name: id(),
+  qualified_name: Type.Optional(Type.String({ minLength: 1, maxLength: 2048 })),
   artifact_kind: Type.Union([
     Type.Literal('package'), Type.Literal('type'), Type.Literal('method'),
     Type.Literal('constructor'), Type.Literal('field'), Type.Literal('function'),

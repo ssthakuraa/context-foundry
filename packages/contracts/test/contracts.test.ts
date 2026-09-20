@@ -176,6 +176,10 @@ test('symbol and business rule payloads retain explicit kind and applicability',
   };
   assert.equal(validate('record_envelope', symbol), true);
   assert.equal(validate('engineering_symbol_payload', symbol.payload), true);
+  assert.equal(validate('engineering_symbol_payload', { ...symbol.payload,
+    qualified_name: 'ApprovalService.m' }), true);
+  assert.equal(validate('engineering_symbol_payload', { ...symbol.payload,
+    qualified_name: '' }), false);
   assert.equal(validate('record_envelope', { ...symbol, payload: { ...symbol.payload, signature: undefined } }), false);
   assert.equal(validate('engineering_symbol_payload', { ...symbol.payload, signature: undefined }), false);
   assert.equal(validate('record_envelope', { ...symbol, payload: { ...symbol.payload, runtime_behavior: 'proven' } }), false);
