@@ -114,7 +114,10 @@ tests automatically. Selection safety requires separate mutation/fault experimen
 <p>CI imports authenticate the reporting system and bind results to source snapshot/revision, environment,
 test identities, report digest, coverage format/version, and attachments. Duplicate
 imports are idempotent; wrong-revision evidence cannot validate a new change. XML/JSON
-reports are parsed under the same hostile-input limits as other sources.</p>
+reports are parsed under the same hostile-input limits as other sources.
+The initial <code>ExecutionEvidenceSchema</code> is only a bounded report envelope. It is not
+yet an authenticated import or support record; no released result may rely on it
+until producer, report bytes, revision and publication checks are implemented.</p>
 <h2 id="migration-and-parity-extensions">Migration and parity extensions</h2>
 <p>Later mapping records connect old tests/behaviors to new components without replacing
 their historical identities. Differential comparisons record both revisions,

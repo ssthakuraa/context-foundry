@@ -79,6 +79,32 @@ export const EvidenceLocatorSchema = Type.Union([FileLocator, FileRangeLocator, 
 });
 export type EvidenceLocator = Static<typeof EvidenceLocatorSchema>;
 
+// Shape only. An authenticated importer must verify producer, inputs and report bytes.
+export const ExecutionEvidenceSchema = Type.Object({
+  schema_version: Type.Literal(CONTRACT_VERSION),
+  evidence_id: id(),
+  run_id: id(),
+  producer_id: id(),
+  runner_kind: Type.Union([
+    Type.Literal('ci'), Type.Literal('local_tool'), Type.Literal('imported_report'),
+  ]),
+  input_capture_digests: Type.Array(digest(), { minItems: 1, uniqueItems: true }),
+  report_digest: digest(),
+  environment_id: id(),
+  started_at: Type.String({ minLength: 1 }),
+  completed_at: Type.Optional(Type.String({ minLength: 1 })),
+  outcome: Type.Union([
+    Type.Literal('passed'), Type.Literal('failed'), Type.Literal('skipped'),
+    Type.Literal('inconclusive'),
+  ]),
+  observed_test_ids: refs(),
+  observed_obligation_ids: refs(),
+  classification: Type.Union([
+    Type.Literal('public'), Type.Literal('internal'), Type.Literal('restricted'),
+  ]),
+}, { $id: 'urn:context-foundry:schema:0.2.0:execution-evidence', additionalProperties: false });
+export type ExecutionEvidence = Static<typeof ExecutionEvidenceSchema>;
+
 const Review = Type.Object({
   state: Type.Union([
     Type.Literal('pending'), Type.Literal('approved'), Type.Literal('rejected'),
@@ -378,6 +404,7 @@ export const Schemas = {
   source_capture: SourceCaptureSchema,
   captured_file: CapturedFileSchema,
   evidence_locator: EvidenceLocatorSchema,
+  execution_evidence: ExecutionEvidenceSchema,
   record_envelope: RecordEnvelopeSchema,
   coverage: CoverageSchema,
   release_manifest: ReleaseManifestSchema,
@@ -439,6 +466,16 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
   if (name === 'captured_file') {
     return normalizedRelativePath((value as CapturedFile).path)
       ? [] : ['/path must be a normalized relative POSIX path'];
+  }
+  if (name === 'execution_evidence') {
+    const run = value as ExecutionEvidence;
+    if (run.outcome === 'skipped' && run.observed_obligation_ids.length) {
+      return ['/observed_obligation_ids must be empty for skipped runs'];
+    }
+    if (run.outcome === 'passed' && !run.completed_at) {
+      return ['/completed_at is required for passed runs'];
+    }
+    return [];
   }
   if (name === 'coverage') {
     const coverage = value as Coverage;

@@ -89,6 +89,9 @@ CI imports authenticate the reporting system and bind results to source snapshot
 test identities, report digest, coverage format/version, and attachments. Duplicate
 imports are idempotent; wrong-revision evidence cannot validate a new change. XML/JSON
 reports are parsed under the same hostile-input limits as other sources.
+The initial `ExecutionEvidenceSchema` is only a bounded report envelope. It is not
+yet an authenticated import or support record; no released result may rely on it
+until producer, report bytes, revision and publication checks are implemented.
 
 ## Migration and parity extensions
 

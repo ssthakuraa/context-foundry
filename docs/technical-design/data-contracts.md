@@ -2,9 +2,9 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains twenty
+**Implementation note (2026-09-20):** `packages/contracts` now contains twenty-one
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
-captured file, coverage, release manifest/set, relationship payload, task artifact,
+captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
 engineering symbol payload, business rule and mapping payloads, all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
@@ -59,8 +59,17 @@ cycle members. This initial slice rejects cycles rather than publishing a partia
 strongly connected group. Call `checkReleaseIntegrity` to combine this check with
 capture/file/locator binding; it withholds closure if either side fails. These are
 metadata checks, not checks of current source bytes, evidence truth, approval,
-publication permission or a user's current grants. Non-source evidence kinds and
-cross-pack composition need explicit contracts before the freeze.
+publication permission or a user's current grants. Authenticated non-source support
+and cross-pack composition need explicit contracts before the freeze.
+
+`ExecutionEvidenceSchema` now records a test/report run's producer claim, input
+capture digests, report digest, environment, observed tests/obligations and outcome.
+A skipped run cannot claim observed obligations, and a passed run needs a completion
+time. This is a **shape only**: it is not accepted by `checkSupportClosure` or
+`checkReleaseIntegrity` as released support. A future authenticated importer must
+verify the producer, actual report bytes, capture/revision bindings, test identities
+and publication policy before a run can support a released assertion or discharge a
+validation obligation. In particular, a caller-supplied `passed` value proves nothing.
 
 ## Identity and versioning
 
@@ -159,7 +168,7 @@ nor approval. Relevance scores live on query results, not canonical evidence tru
 | Worked business procedure | Prerequisites, illustrative steps/outcomes, applicability, supporting evidence and review; never implicit execution authority |
 | Business mapping | Business and engineering endpoints, mapping relation, support and review |
 | Test association | Test identity, relation type, evidence, revision and optional run |
-| Execution evidence | Tool/run ID, environment, revision, outcomes, coverage inputs, attachments |
+| Execution evidence | Tool/run ID, environment, input capture digests, report digest, outcome and observed tests/obligations; importer authentication pending |
 | Semantic index receipt | Producer identity, format/indexer version, repository/revision, input digests, dependency context, validation outcome |
 | Behavior obligation | Requirement, input partition, observable output/side effects, tolerance, exclusions, linked validation evidence |
 | Architecture proposal | Baseline release set, constraints, changes, assumptions, review version |

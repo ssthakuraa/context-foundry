@@ -8,7 +8,7 @@ import {
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 20);
+  assert.equal(Object.keys(Schemas).length, 21);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -125,6 +125,29 @@ test('business mappings keep basis and origin separate from runtime relationship
   }), true);
   assert.equal(validate('business_mapping_payload', { ...payload, applicability: { status: 'bounded' } }), false);
   assert.equal(validate('business_mapping_payload', { ...payload, mapping_relation: 'calls' }), false);
+});
+
+test('execution evidence describes a bounded observation, not implied authorization', () => {
+  const run = {
+    schema_version: CONTRACT_VERSION, evidence_id: 'ev:run:1', run_id: 'run:1',
+    producer_id: 'ci:1', runner_kind: 'ci', input_capture_digests: [hash],
+    report_digest: hash, environment_id: 'env:test',
+    started_at: '2026-09-20T01:00:00Z', completed_at: '2026-09-20T01:03:00Z',
+    outcome: 'passed', observed_test_ids: ['test:approval'],
+    observed_obligation_ids: ['obligation:approval'], classification: 'internal',
+  };
+  assert.equal(validate('execution_evidence', run), true);
+  assert.equal(validate('execution_evidence', { ...run, input_capture_digests: [] }), false);
+  assert.equal(validate('execution_evidence', { ...run, report_digest: 'wrong' }), false);
+  assert.equal(validate('execution_evidence', { ...run, authenticated: true }), false);
+  const { completed_at: _omitted, ...incomplete } = run;
+  assert.equal(validate('execution_evidence', incomplete), false);
+  assert.equal(validate('execution_evidence', {
+    ...run, outcome: 'skipped', observed_obligation_ids: ['obligation:approval'],
+  }), false);
+  assert.equal(validate('execution_evidence', {
+    ...run, outcome: 'skipped', observed_obligation_ids: [], observed_test_ids: [],
+  }), true);
 });
 
 test('coverage and release manifest reject unsupported values', () => {

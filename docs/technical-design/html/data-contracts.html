@@ -40,9 +40,9 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
-<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twenty
+<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twenty-one
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
-captured file, coverage, release manifest/set, relationship payload, task artifact,
+captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
 engineering symbol payload, business rule and mapping payloads, all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
@@ -94,8 +94,16 @@ cycle members. This initial slice rejects cycles rather than publishing a partia
 strongly connected group. Call <code>checkReleaseIntegrity</code> to combine this check with
 capture/file/locator binding; it withholds closure if either side fails. These are
 metadata checks, not checks of current source bytes, evidence truth, approval,
-publication permission or a user's current grants. Non-source evidence kinds and
-cross-pack composition need explicit contracts before the freeze.</p>
+publication permission or a user's current grants. Authenticated non-source support
+and cross-pack composition need explicit contracts before the freeze.</p>
+<p><code>ExecutionEvidenceSchema</code> now records a test/report run's producer claim, input
+capture digests, report digest, environment, observed tests/obligations and outcome.
+A skipped run cannot claim observed obligations, and a passed run needs a completion
+time. This is a <strong>shape only</strong>: it is not accepted by <code>checkSupportClosure</code> or
+<code>checkReleaseIntegrity</code> as released support. A future authenticated importer must
+verify the producer, actual report bytes, capture/revision bindings, test identities
+and publication policy before a run can support a released assertion or discharge a
+validation obligation. In particular, a caller-supplied <code>passed</code> value proves nothing.</p>
 <h2 id="identity-and-versioning">Identity and versioning</h2>
 <p>An entity ID combines logical repository or document namespace with adapter-owned
 artifact identity. A record ID identifies an assertion about an entity; a content
@@ -248,7 +256,7 @@ nor approval. Relevance scores live on query results, not canonical evidence tru
 </tr>
 <tr>
 <td>Execution evidence</td>
-<td>Tool/run ID, environment, revision, outcomes, coverage inputs, attachments</td>
+<td>Tool/run ID, environment, input capture digests, report digest, outcome and observed tests/obligations; importer authentication pending</td>
 </tr>
 <tr>
 <td>Semantic index receipt</td>

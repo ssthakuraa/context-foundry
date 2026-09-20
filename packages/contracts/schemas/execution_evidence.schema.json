@@ -1,0 +1,138 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:execution-evidence",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "anyOf": [
+        {
+          "const": "public",
+          "type": "string"
+        },
+        {
+          "const": "internal",
+          "type": "string"
+        },
+        {
+          "const": "restricted",
+          "type": "string"
+        }
+      ]
+    },
+    "completed_at": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "environment_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "evidence_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "input_capture_digests": {
+      "items": {
+        "pattern": "^[a-f0-9]{64}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "observed_obligation_ids": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "observed_test_ids": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "outcome": {
+      "anyOf": [
+        {
+          "const": "passed",
+          "type": "string"
+        },
+        {
+          "const": "failed",
+          "type": "string"
+        },
+        {
+          "const": "skipped",
+          "type": "string"
+        },
+        {
+          "const": "inconclusive",
+          "type": "string"
+        }
+      ]
+    },
+    "producer_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "report_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "run_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "runner_kind": {
+      "anyOf": [
+        {
+          "const": "ci",
+          "type": "string"
+        },
+        {
+          "const": "local_tool",
+          "type": "string"
+        },
+        {
+          "const": "imported_report",
+          "type": "string"
+        }
+      ]
+    },
+    "schema_version": {
+      "const": "0.2.0",
+      "type": "string"
+    },
+    "started_at": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "evidence_id",
+    "run_id",
+    "producer_id",
+    "runner_kind",
+    "input_capture_digests",
+    "report_digest",
+    "environment_id",
+    "started_at",
+    "outcome",
+    "observed_test_ids",
+    "observed_obligation_ids",
+    "classification"
+  ],
+  "type": "object"
+}
