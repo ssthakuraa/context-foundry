@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { canonicalJson, canonicalSha256, parseJsonStrict } from '../src/index.js';
+import { canonicalJson, canonicalRecordLines, canonicalSha256, parseJsonStrict } from '../src/index.js';
 
 type VectorFile = {
   format: string;
   valid: { name: string; input: string; canonical: string; sha256: string }[];
   invalid: { name: string; input: string }[];
+  jsonl_valid: { name: string; records: { record_id: string }[]; jsonl: string; sha256: string }[];
+  jsonl_invalid: { name: string; records: unknown[] }[];
 };
 const vectors = JSON.parse(readFileSync(new URL('../../fixtures/canonical-vectors.json', import.meta.url),
   'utf8')) as VectorFile;
@@ -23,5 +25,16 @@ test('portable canonical vectors match bytes and independently pinned SHA-256 va
   }
   for (const vector of vectors.invalid) {
     assert.throws(() => parseJsonStrict(vector.input), Error, vector.name);
+  }
+});
+
+test('portable JSONL vectors pin record ordering, LF and invalid identity behavior', () => {
+  for (const vector of vectors.jsonl_valid) {
+    const actual = canonicalRecordLines(vector.records);
+    assert.equal(actual, vector.jsonl, vector.name);
+    assert.equal(createHash('sha256').update(actual, 'utf8').digest('hex'), vector.sha256, vector.name);
+  }
+  for (const vector of vectors.jsonl_invalid) {
+    assert.throws(() => canonicalRecordLines(vector.records as { record_id: string }[]), Error, vector.name);
   }
 });

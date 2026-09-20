@@ -56,6 +56,31 @@
       "sha256": "5274eb3771d44c0dc4c8145127c27d94a9a8128420eb69f1ea038d267ac28b06"
     }
   ],
+  "jsonl_valid": [
+    {
+      "name": "record-id-order",
+      "records": [{"record_id":"z","value":1},{"record_id":"a","value":2}],
+      "jsonl": "{\"record_id\":\"a\",\"value\":2}\n{\"record_id\":\"z\",\"value\":1}\n",
+      "sha256": "8baf6c7f5563f62f7099f094994dfe8381542a4a72c6820a08a26debea04b12b"
+    },
+    {
+      "name": "record-id-utf16-order",
+      "records": [{"record_id":"ﬀ","v":"ligature"},{"record_id":"😀","v":"emoji"}],
+      "jsonl": "{\"record_id\":\"😀\",\"v\":\"emoji\"}\n{\"record_id\":\"ﬀ\",\"v\":\"ligature\"}\n",
+      "sha256": "1b1cf0b0d7324c5a56b46d5cc18bee2770c65d778b17fc3e30f32cd7235148fd"
+    },
+    {
+      "name": "empty-shard",
+      "records": [],
+      "jsonl": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "jsonl_invalid": [
+    {"name":"duplicate-record-id","records":[{"record_id":"a"},{"record_id":"a"}]},
+    {"name":"missing-record-id","records":[{"value":1}]},
+    {"name":"empty-record-id","records":[{"record_id":""}]}
+  ],
   "invalid": [
     { "name": "decoded-duplicate-key", "input": "{\"x\":1,\"\\u0078\":2}" },
     { "name": "unsafe-bare-integer", "input": "{\"x\":9007199254740993}" },

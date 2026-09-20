@@ -116,8 +116,10 @@ the TypeScript canonicalizer. The vectors pass TypeScript and the independent
 [Python conformance check](../../scripts/check-canonical-python.py) using the
 Apache-2.0 `rfc8785==0.1.4` implementation pinned in
 `scripts/requirements-canonical-python.txt`. This verifies the current nine valid
-and six rejected vectors, not all possible cross-language edge cases or a frozen
-portable importer. Expand the fixture set and compatibility report before freeze.
+and six rejected JSON vectors, plus three accepted/three rejected JSONL vectors
+for UTF-16 record ordering, LF termination and identity rejection. This is not
+all possible cross-language edge cases or a frozen portable importer. Expand
+size limits and the compatibility report before freeze.
 Build timestamps live in provenance/run metadata and are not invented to force
 semantic equality between independently captured evidence.
 

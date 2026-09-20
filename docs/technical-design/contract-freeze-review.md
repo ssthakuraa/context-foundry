@@ -6,7 +6,7 @@
 
 - Twenty-six Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes.
 - Metadata checks cover capture/file/locator binding, canonical declared-file manifest digests, acyclic source-evidence support with no empty-support record, and exact same-task artifact references. These checks return issues instead of partial authorization decisions.
-- The current fifty package tests, typecheck, build, schema export check, forty-nine generated HTML pages, seventeen bounded semantic vectors in TypeScript/Python and nine valid/six rejected canonical vectors in TypeScript/Python pass. These are bounded fixtures, not a completeness claim.
+- The current fifty-one package tests, typecheck, build, schema export check, forty-nine generated HTML pages, seventeen bounded semantic vectors in TypeScript/Python, nine valid/six rejected canonical JSON and three valid/three rejected JSONL vectors in TypeScript/Python pass. These are bounded fixtures, not a completeness claim.
 
 ## Blocking gaps before a shared contract freeze
 
@@ -17,7 +17,7 @@
 | Evidence trust | Execution-evidence JSON is shape-only; raw-byte and complete declared-manifest checks still trust caller-supplied bytes and declaration, not source origin, producer authenticity or publication authority | Authenticated importer and digest/revision/policy receipts; forged or stale report denial tests |
 | Task authority | Receipt shape and artifact references cannot establish a human session, current grant, nonrevocation or valid state transition | WP3 transactional authorization/state tests before any implementation approval claim |
 | Release-set closure | Exact two-pack manifest identity/digest closure now has synthetic positive/negative tests, but cross-pack entity conflicts, source-manifest provenance, shard/bridge byte closure and activation compatibility are not checked end to end | Verified bytes and provenance, cross-pack conflict cases and transactional activation tests |
-| Cross-language boundaries | Nine valid/six rejected canonical vectors now include Unicode normalization, numeric notation boundaries and escaped keys, but not size/JSONL limits or an independent importer round-trip | Size/JSONL boundary cases and parity report with supported limits and rejection behavior |
+| Cross-language boundaries | Nine valid/six rejected JSON and three valid/three rejected JSONL vectors include Unicode, numeric notation, ordering, LF and identity cases, but not size limits or an independent importer round-trip | Size-boundary cases and parity report with supported limits and rejection behavior |
 
 ## Decision
 
