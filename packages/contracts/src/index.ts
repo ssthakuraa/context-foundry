@@ -230,6 +230,50 @@ export const SufficiencyBodySchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:sufficiency-body', additionalProperties: false });
 export type SufficiencyBody = Static<typeof SufficiencyBodySchema>;
 
+const FindingClaim = Type.Object({
+  statement: boundedText(),
+  claim_type: Type.Union([
+    Type.Literal('source_observed'), Type.Literal('business_asserted'),
+    Type.Literal('inference'), Type.Literal('hypothesis'),
+  ]),
+  evidence_refs: refs(),
+  read_receipt_refs: refs(),
+}, { additionalProperties: false });
+export const FindingsBodySchema = Type.Object({
+  claims: Type.Array(FindingClaim, { minItems: 1 }),
+  contradictions: Type.Array(boundedText()),
+  impacts: Type.Array(boundedText()),
+  unresolved_obligations: Type.Array(boundedText()),
+  source_fingerprints: Type.Array(digest(), { uniqueItems: true }),
+}, { $id: 'urn:context-foundry:schema:0.2.0:findings-body', additionalProperties: false });
+export type FindingsBody = Static<typeof FindingsBodySchema>;
+
+export const ImplementationProposalBodySchema = Type.Object({
+  findings_artifact_id: id(),
+  design_summary: boundedText(),
+  affected_entity_ids: refs(),
+  ordered_steps: Type.Array(boundedText(), { minItems: 1 }),
+  permitted_actions_requested: refs(),
+  exclusions: Type.Array(boundedText()),
+  validation_obligations: Type.Array(boundedText(), { minItems: 1 }),
+  risks: Type.Array(boundedText()),
+  rollback_approach: boundedText(),
+  source_fingerprints: Type.Array(digest(), { uniqueItems: true }),
+}, { $id: 'urn:context-foundry:schema:0.2.0:implementation-proposal-body', additionalProperties: false });
+export type ImplementationProposalBody = Static<typeof ImplementationProposalBodySchema>;
+
+export const CompletionBodySchema = Type.Object({
+  findings_artifact_id: id(),
+  approved_proposal_artifact_id: Type.Optional(id()),
+  actual_changes: Type.Array(boundedText()),
+  check_refs: refs(),
+  skipped_checks: Type.Array(boundedText()),
+  deviations: Type.Array(boundedText()),
+  residual_risks: Type.Array(boundedText()),
+  requested_final_review: Type.Boolean(),
+}, { $id: 'urn:context-foundry:schema:0.2.0:completion-body', additionalProperties: false });
+export type CompletionBody = Static<typeof CompletionBodySchema>;
+
 export const TaskArtifactSchema = Type.Object({
   schema_version: Type.Literal(CONTRACT_VERSION),
   artifact_id: id(),
@@ -322,6 +366,9 @@ export const Schemas = {
   relationship_payload: RelationshipPayloadSchema,
   scope_map_body: ScopeMapBodySchema,
   sufficiency_body: SufficiencyBodySchema,
+  findings_body: FindingsBodySchema,
+  implementation_proposal_body: ImplementationProposalBodySchema,
+  completion_body: CompletionBodySchema,
   task_artifact: TaskArtifactSchema,
   human_decision_receipt: HumanDecisionReceiptSchema,
   task_error: TaskErrorSchema,
@@ -404,6 +451,16 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
     }
     return [];
   }
+  if (name === 'findings_body') {
+    const body = value as FindingsBody;
+    if (body.claims.some(claim => claim.claim_type === 'source_observed' && !claim.read_receipt_refs.length)) {
+      return ['/claims source_observed requires a local read receipt'];
+    }
+    if (body.claims.some(claim => claim.claim_type === 'business_asserted' && !claim.evidence_refs.length)) {
+      return ['/claims business_asserted requires evidence'];
+    }
+    return [];
+  }
   if (name === 'task_artifact') {
     const artifact = value as TaskArtifact;
     try {
@@ -435,6 +492,21 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
         .some(ref => !artifact.evidence_refs.includes(ref)))) {
         return ['/evidence_refs must include assessment support and planned reads'];
       }
+    }
+    if (artifact.kind === 'findings') {
+      const checked = validateDetailed('findings_body', artifact.body);
+      if (!checked.valid) return ['/body must conform to findings_body', ...checked.errors];
+      const body = artifact.body as FindingsBody;
+      if (body.claims.some(claim => claim.evidence_refs.some(ref => !artifact.evidence_refs.includes(ref)))) {
+        return ['/evidence_refs must include finding claim support'];
+      }
+    }
+    if (artifact.kind === 'implementation_proposal' &&
+      !validateDetailed('implementation_proposal_body', artifact.body).valid) {
+      return ['/body must conform to implementation_proposal_body'];
+    }
+    if (artifact.kind === 'completion' && !validateDetailed('completion_body', artifact.body).valid) {
+      return ['/body must conform to completion_body'];
     }
     return [];
   }

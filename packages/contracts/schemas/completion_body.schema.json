@@ -1,0 +1,71 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:completion-body",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "actual_changes": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "approved_proposal_artifact_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "check_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "deviations": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "findings_artifact_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "requested_final_review": {
+      "type": "boolean"
+    },
+    "residual_risks": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "skipped_checks": {
+      "items": {
+        "maxLength": 2048,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "findings_artifact_id",
+    "actual_changes",
+    "check_refs",
+    "skipped_checks",
+    "deviations",
+    "residual_risks",
+    "requested_final_review"
+  ],
+  "type": "object"
+}

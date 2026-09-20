@@ -8,12 +8,14 @@ All shapes below become strict first-party JSON schemas and conformance fixtures
 in WP1; they are not claims of existing endpoints.
 
 **WP1 implementation note (2026-09-20):** `TaskArtifactSchema` checks the canonical
-body digest and immediate prior version. `ScopeMapBodySchema` and
-`SufficiencyBodySchema` are the first strict bodies: scope candidates carry a
-relevance reason and evidence/hypothesis basis, and `inspect_source` assessments
-must identify planned evidence-linked reads. Body evidence references must also be
-declared on the artifact envelope. Findings, proposal and completion body schemas,
-task-state authority and review decisions remain unimplemented.
+body digest and immediate prior version. Strict body schemas exist for all five
+artifact kinds. Scope candidates carry a relevance reason and evidence/hypothesis
+basis, and `inspect_source` assessments identify planned evidence-linked reads.
+Findings distinguish claim types and require read-receipt references for
+source-observed claims; proposals and completions retain plans, checks and risks.
+Body evidence references must also be declared on the artifact envelope.
+Cross-artifact identity/digest checks, task-state authority, read-receipt authenticity,
+validation-run authenticity and human review decisions remain unimplemented.
 
 ## Task aggregate
 

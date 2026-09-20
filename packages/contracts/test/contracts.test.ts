@@ -5,7 +5,7 @@ import { canonicalSha256, CONTRACT_VERSION, Schemas, validate, validateDetailed 
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 16);
+  assert.equal(Object.keys(Schemas).length, 19);
 });
 
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
@@ -166,6 +166,46 @@ test('sufficiency body requires a plan for selective source inspection', () => {
   const noRead = { assessments: [{ ...body.assessments[0], planned_local_reads: [] }] };
   assert.equal(validate('sufficiency_body', noRead), false);
   assert.equal(validate('task_artifact', { ...base, body: noRead, body_digest: canonicalSha256(noRead) }), false);
+});
+
+test('findings, proposal and completion bodies stay typed through review gates', () => {
+  const artifact = (kind: string, body: object, evidenceRefs: string[] = []) => ({
+    schema_version: CONTRACT_VERSION, artifact_id: `artifact:${kind}`, task_id: 'task:1',
+    kind, version: 1, body_digest: canonicalSha256(body), created_by: 'agent:1',
+    origin: 'agent', created_at: '2026-09-20T00:00:00Z', release_set_id: 'release-set:1',
+    evidence_refs: evidenceRefs, visibility_requirements: evidenceRefs, body,
+  });
+  const findings = {
+    claims: [{ statement: 'ApprovalService checks the threshold', claim_type: 'source_observed',
+      evidence_refs: ['ev:1'], read_receipt_refs: ['read:1'] }],
+    contradictions: [], impacts: ['Approval flow'], unresolved_obligations: ['Check override behavior'],
+    source_fingerprints: [hash],
+  };
+  assert.equal(validate('task_artifact', artifact('findings', findings, ['ev:1'])), true);
+  const noReceipt = { ...findings, claims: [{ ...findings.claims[0], read_receipt_refs: [] }] };
+  assert.equal(validate('findings_body', noReceipt), false);
+  assert.equal(validate('task_artifact', artifact('findings', noReceipt, ['ev:1'])), false);
+  assert.equal(validate('task_artifact', artifact('findings', findings, [])), false);
+
+  const proposal = {
+    findings_artifact_id: 'artifact:findings', design_summary: 'Add a bounded threshold override',
+    affected_entity_ids: ['repo:A:ApprovalService'], ordered_steps: ['Update service', 'Add tests'],
+    permitted_actions_requested: ['modify_source'], exclusions: [],
+    validation_obligations: ['Verify old and new approval paths'], risks: ['Wrong override precedence'],
+    rollback_approach: 'Revert the service change', source_fingerprints: [hash],
+  };
+  assert.equal(validate('task_artifact', artifact('implementation_proposal', proposal)), true);
+  assert.equal(validate('task_artifact', artifact('implementation_proposal', {
+    ...proposal, ordered_steps: [],
+  })), false);
+
+  const completion = {
+    findings_artifact_id: 'artifact:findings', approved_proposal_artifact_id: 'artifact:implementation_proposal',
+    actual_changes: ['Updated service'], check_refs: ['run:1'], skipped_checks: [],
+    deviations: [], residual_risks: [], requested_final_review: true,
+  };
+  assert.equal(validate('task_artifact', artifact('completion', completion)), true);
+  assert.equal(validate('task_artifact', artifact('completion', { ...completion, checked: true })), false);
 });
 
 test('human decision receipt is server-shaped but not proof of authority', () => {

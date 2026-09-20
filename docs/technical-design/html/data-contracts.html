@@ -40,26 +40,34 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
-<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains sixteen
+<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains nineteen
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, coverage, release manifest/set, relationship payload, task artifact,
-engineering symbol payload, business rule payload, scope map and sufficiency bodies,
+engineering symbol payload, business rule payload, all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
-tests exist. This is only a WP1 subset: remaining registered payload kinds and task body
-subschemas, broader semantic cross-record checks and independent cross-language
+tests exist. This is only a WP1 subset: remaining registered record kinds, deeper
+cross-artifact checks, broader semantic cross-record checks and independent cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.</p>
-<p>The first strict task body schemas are <code>scope_map</code> and <code>sufficiency</code>. Scope-map
+<p>Strict task body schemas now cover <code>scope_map</code>, <code>sufficiency</code>, <code>findings</code>,
+<code>implementation_proposal</code> and <code>completion</code>. Scope-map
 candidates label evidence versus hypothesis and give a relevance reason; an
 evidence-based candidate must cite evidence. An <code>inspect_source</code> sufficiency
 judgment must name a planned local read. The artifact envelope's <code>body_digest</code>
 must match canonical SHA-256 of the actual body, and its prior-version link must
-immediately precede its version. Referenced evidence in these two bodies must be
-declared in the envelope. These checks neither prove the evidence is accessible nor
-authorize any action; task state and human review remain server responsibilities.</p>
+immediately precede its version. Referenced evidence in scope, sufficiency and finding bodies must be
+declared in the envelope. Findings distinguish observed source, business assertions,
+inferences and hypotheses; a source-observed claim names a local read receipt, and a
+business assertion cites evidence. Proposal bodies carry findings identity, ordered
+steps, requested actions, validation obligations, risks and rollback. Completion
+bodies record actual changes, check references, skips, deviations and residual risks.
+These checks neither prove evidence or check receipts are authentic nor authorize
+any action; cross-artifact references, task state and human review remain server
+responsibilities. In particular, implementation completion's approved proposal
+binding depends on task intent and current review state, not JSON shape alone.</p>
 <p>The capture/locator/coverage envelopes were reconciled with the more precise
 <a href="extraction-and-source-binding.html">extraction and binding contract</a> before freeze.
 Their individual normalized-path, line/byte-order and coverage-count checks are
