@@ -11,33 +11,55 @@ export const SourceCaptureSchema = Type.Object({
   schema_version: Type.Literal(CONTRACT_VERSION),
   capture_id: id(),
   source_id: id(),
-  logical_authority: id(),
-  uri: Type.String({ minLength: 1, maxLength: 4096 }),
-  revision_kind: Type.Union([Type.Literal('git'), Type.Literal('edition'), Type.Literal('snapshot')]),
-  revision: id(),
-  content_sha256: digest(),
+  authority_id: id(),
+  snapshot_id: id(),
+  revision_kind: Type.Union([
+    Type.Literal('git'), Type.Literal('enterprise_view'), Type.Literal('supplied_snapshot'),
+  ]),
+  revision_value: Type.Optional(id()),
+  captured_at: Type.String({ minLength: 1 }),
+  file_manifest_digest: digest(),
+  publication_policy_ref: id(),
+  capture_producer_id: id(),
   capture_policy: Type.Union([Type.Literal('metadata_only'), Type.Literal('approved_content')]),
   classification: Type.Union([Type.Literal('public'), Type.Literal('internal'), Type.Literal('restricted')]),
 }, { $id: 'urn:context-foundry:schema:0.2.0:source-capture', additionalProperties: false });
 export type SourceCapture = Static<typeof SourceCaptureSchema>;
 
+const LocatorBase = {
+  source_id: id(),
+  snapshot_id: id(),
+  revision_kind: Type.Union([
+    Type.Literal('git'), Type.Literal('enterprise_view'), Type.Literal('supplied_snapshot'),
+  ]),
+  revision_value: Type.Optional(id()),
+  path: Type.String({ minLength: 1, maxLength: 4096 }),
+  file_digest: digest(),
+  symbol_id: Type.Optional(id()),
+  byte_span: Type.Optional(Type.Object({
+    start: Type.Integer({ minimum: 0 }), end: Type.Integer({ minimum: 1 }),
+  }, { additionalProperties: false })),
+} as const;
+
+const FileLocator = Type.Object({
+  kind: Type.Literal('file'),
+  ...LocatorBase,
+}, { additionalProperties: false });
+
 const FileRangeLocator = Type.Object({
   kind: Type.Literal('file_range'),
-  capture_id: id(),
-  path: Type.String({ minLength: 1, maxLength: 4096 }),
+  ...LocatorBase,
   start_line: Type.Integer({ minimum: 1 }),
   end_line: Type.Integer({ minimum: 1 }),
-  content_sha256: digest(),
 }, { additionalProperties: false });
 
 const DocumentSectionLocator = Type.Object({
   kind: Type.Literal('document_section'),
-  capture_id: id(),
-  section: Type.String({ minLength: 1, maxLength: 1024 }),
-  content_sha256: digest(),
+  ...LocatorBase,
+  section_id: Type.String({ minLength: 1, maxLength: 1024 }),
 }, { additionalProperties: false });
 
-export const EvidenceLocatorSchema = Type.Union([FileRangeLocator, DocumentSectionLocator], {
+export const EvidenceLocatorSchema = Type.Union([FileLocator, FileRangeLocator, DocumentSectionLocator], {
   $id: 'urn:context-foundry:schema:0.2.0:evidence-locator',
 });
 export type EvidenceLocator = Static<typeof EvidenceLocatorSchema>;
@@ -71,9 +93,16 @@ export type RecordEnvelope = Static<typeof RecordEnvelopeSchema>;
 export const CoverageSchema = Type.Object({
   schema_version: Type.Literal(CONTRACT_VERSION),
   source_id: id(),
-  revision: id(),
+  capture_digest: digest(),
   adapter_id: id(),
-  facet: id(),
+  artifact_family: id(),
+  supported_patterns: refs(),
+  eligible_count: Type.Integer({ minimum: 0 }),
+  processed_count: Type.Integer({ minimum: 0 }),
+  failed_count: Type.Integer({ minimum: 0 }),
+  excluded_count: Type.Integer({ minimum: 0 }),
+  known_unsupported: refs(),
+  diagnostic_refs: refs(),
   status: Type.Union([
     Type.Literal('complete_for_declared_scope'), Type.Literal('partial'),
     Type.Literal('unsupported'), Type.Literal('unavailable'),
@@ -193,10 +222,43 @@ const validators = Object.fromEntries(
   Object.entries(Schemas).map(([name, schema]) => [name, ajv.compile(schema)]),
 ) as Record<SchemaName, ValidateFunction>;
 
-export function validate(name: SchemaName, value: unknown): boolean {
-  return validators[name](value) as boolean;
+function semanticErrors(name: SchemaName, value: unknown): string[] {
+  if (name === 'evidence_locator') {
+    const locator = value as EvidenceLocator;
+    const errors: string[] = [];
+    const parts = locator.path.split('/');
+    if (locator.path.startsWith('/') || locator.path.includes('\\') || /[\u0000-\u001f\u007f]/.test(locator.path) ||
+        /^[a-zA-Z]:/.test(locator.path) || parts.some(part => !part || part === '.' || part === '..')) {
+      errors.push('/path must be a normalized relative POSIX path');
+    }
+    if (locator.kind === 'file_range' && locator.start_line > locator.end_line) {
+      errors.push('/start_line must not exceed end_line');
+    }
+    if (locator.byte_span && locator.byte_span.start >= locator.byte_span.end) {
+      errors.push('/byte_span.start must be less than end');
+    }
+    return errors;
+  }
+  if (name === 'coverage') {
+    const coverage = value as Coverage;
+    return coverage.processed_count + coverage.failed_count + coverage.excluded_count > coverage.eligible_count
+      ? ['/eligible_count must cover processed, failed and excluded items'] : [];
+  }
+  return [];
 }
 
-export function validationErrors(name: SchemaName): readonly string[] {
-  return (validators[name].errors ?? []).map(error => `${error.instancePath || '/'} ${error.message ?? 'invalid'}`);
+export function validateDetailed(name: SchemaName, value: unknown): { valid: boolean; errors: readonly string[] } {
+  const validator = validators[name];
+  if (!validator(value)) {
+    return {
+      valid: false,
+      errors: (validator.errors ?? []).map(error => `${error.instancePath || '/'} ${error.message ?? 'invalid'}`),
+    };
+  }
+  const errors = semanticErrors(name, value);
+  return { valid: errors.length === 0, errors };
+}
+
+export function validate(name: SchemaName, value: unknown): boolean {
+  return validateDetailed(name, value).valid;
 }

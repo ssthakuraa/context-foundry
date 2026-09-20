@@ -8,18 +8,51 @@
       "minLength": 1,
       "type": "string"
     },
-    "facet": {
+    "artifact_family": {
       "maxLength": 512,
       "minLength": 1,
       "type": "string"
+    },
+    "capture_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "diagnostic_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "eligible_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "excluded_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "failed_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "known_unsupported": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "processed_count": {
+      "minimum": 0,
+      "type": "integer"
     },
     "reason": {
       "maxLength": 2048,
-      "minLength": 1,
-      "type": "string"
-    },
-    "revision": {
-      "maxLength": 512,
       "minLength": 1,
       "type": "string"
     },
@@ -51,14 +84,30 @@
           "type": "string"
         }
       ]
+    },
+    "supported_patterns": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
     }
   },
   "required": [
     "schema_version",
     "source_id",
-    "revision",
+    "capture_digest",
     "adapter_id",
-    "facet",
+    "artifact_family",
+    "supported_patterns",
+    "eligible_count",
+    "processed_count",
+    "failed_count",
+    "excluded_count",
+    "known_unsupported",
+    "diagnostic_refs",
     "status"
   ],
   "type": "object"

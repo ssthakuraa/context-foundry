@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { CONTRACT_VERSION, Schemas, validate, validationErrors } from '../src/index.js';
+import { CONTRACT_VERSION, Schemas, validate, validateDetailed } from '../src/index.js';
 
 const hash = 'a'.repeat(64);
 
@@ -11,29 +11,41 @@ test('all core schemas compile in strict mode', () => {
 test('capture accepts a bounded source identity and rejects unknown fields', () => {
   const capture = {
     schema_version: CONTRACT_VERSION, capture_id: 'cap:1', source_id: 'repo:demo',
-    logical_authority: 'team:demo', uri: 'src/Service.java', revision_kind: 'git',
-    revision: '0123456', content_sha256: hash, capture_policy: 'metadata_only',
-    classification: 'internal',
+    authority_id: 'team:demo', snapshot_id: 'snapshot:1', revision_kind: 'git',
+    revision_value: '0123456', captured_at: '2026-09-20T00:00:00Z',
+    file_manifest_digest: hash, publication_policy_ref: 'policy:1',
+    capture_producer_id: 'producer:1', capture_policy: 'metadata_only', classification: 'internal',
   };
   assert.equal(validate('source_capture', capture), true);
   assert.equal(validate('source_capture', { ...capture, secret: 'hidden' }), false);
-  assert.match(validationErrors('source_capture').join(' '), /additional properties/);
-  assert.equal(validate('source_capture', { ...capture, content_sha256: 'wrong' }), false);
+  assert.match(validateDetailed('source_capture', { ...capture, secret: 'hidden' }).errors.join(' '), /additional properties/);
+  assert.equal(validate('source_capture', { ...capture, file_manifest_digest: 'wrong' }), false);
   assert.equal(validate('source_capture', { ...capture, schema_version: '0.1.0' }), false);
+  assert.equal(validate('source_capture', { ...capture, revision_kind: 'unversioned' }), false);
 });
 
 test('locators discriminate file lines from document sections', () => {
+  const base = {
+    source_id: 'repo:demo', snapshot_id: 'snapshot:1', revision_kind: 'git',
+    revision_value: '0123456', path: 'src/Service.java', file_digest: hash,
+  };
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base }), true);
   assert.equal(validate('evidence_locator', {
-    kind: 'file_range', capture_id: 'cap:1', path: 'src/Service.java',
-    start_line: 3, end_line: 9, content_sha256: hash,
+    kind: 'file_range', ...base, start_line: 3, end_line: 9,
   }), true);
   assert.equal(validate('evidence_locator', {
-    kind: 'document_section', capture_id: 'cap:1', section: 'Policy > Approval', content_sha256: hash,
+    kind: 'document_section', ...base, section_id: 'Policy > Approval',
   }), true);
   assert.equal(validate('evidence_locator', {
-    kind: 'file_range', capture_id: 'cap:1', path: 'src/Service.java',
-    start_line: 0, end_line: 9, content_sha256: hash,
+    kind: 'file_range', ...base, start_line: 0, end_line: 9,
   }), false);
+  assert.equal(validate('evidence_locator', { kind: 'file_range', ...base, start_line: 3 }), false);
+  assert.equal(validate('evidence_locator', { kind: 'file_range', ...base, start_line: 9, end_line: 3 }), false);
+  assert.match(validateDetailed('evidence_locator', { kind: 'file_range', ...base, start_line: 9, end_line: 3 }).errors.join(' '), /start_line/);
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base, path: '../secret' }), false);
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base, path: 'C:\\secret' }), false);
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base, path: 'src/evil\u0000name' }), false);
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base, byte_span: { start: 5, end: 5 } }), false);
 });
 
 test('record envelope retains origin and review as separate dimensions', () => {
@@ -50,11 +62,15 @@ test('record envelope retains origin and review as separate dimensions', () => {
 
 test('coverage and release manifest reject unsupported values', () => {
   const coverage = {
-    schema_version: CONTRACT_VERSION, source_id: 'repo:demo', revision: 'r1',
-    adapter_id: 'java:0.1', facet: 'spring-routes', status: 'partial', reason: 'dynamic registration',
+    schema_version: CONTRACT_VERSION, source_id: 'repo:demo', capture_digest: hash,
+    adapter_id: 'java:0.1', artifact_family: 'spring-routes',
+    supported_patterns: ['literal-mapping'], eligible_count: 10, processed_count: 8,
+    failed_count: 1, excluded_count: 1, known_unsupported: ['dynamic-registration'],
+    diagnostic_refs: ['diag:1'], status: 'partial', reason: 'dynamic registration',
   };
   assert.equal(validate('coverage', coverage), true);
   assert.equal(validate('coverage', { ...coverage, status: 'probably-complete' }), false);
+  assert.equal(validate('coverage', { ...coverage, processed_count: 10 }), false);
   const release = {
     schema_version: CONTRACT_VERSION, pack_id: 'pack:demo', release_id: 'r:1',
     source_manifest_digests: [hash], adapter_digest: hash, config_digest: hash,

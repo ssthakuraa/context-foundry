@@ -3,6 +3,11 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "additionalProperties": false,
   "properties": {
+    "authority_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
     "capture_id": {
       "maxLength": 512,
       "minLength": 1,
@@ -20,6 +25,15 @@
         }
       ]
     },
+    "capture_producer_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "captured_at": {
+      "minLength": 1,
+      "type": "string"
+    },
     "classification": {
       "anyOf": [
         {
@@ -36,16 +50,11 @@
         }
       ]
     },
-    "content_sha256": {
+    "file_manifest_digest": {
       "pattern": "^[a-f0-9]{64}$",
       "type": "string"
     },
-    "logical_authority": {
-      "maxLength": 512,
-      "minLength": 1,
-      "type": "string"
-    },
-    "revision": {
+    "publication_policy_ref": {
       "maxLength": 512,
       "minLength": 1,
       "type": "string"
@@ -57,26 +66,31 @@
           "type": "string"
         },
         {
-          "const": "edition",
+          "const": "enterprise_view",
           "type": "string"
         },
         {
-          "const": "snapshot",
+          "const": "supplied_snapshot",
           "type": "string"
         }
       ]
+    },
+    "revision_value": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
     },
     "schema_version": {
       "const": "0.2.0",
       "type": "string"
     },
-    "source_id": {
+    "snapshot_id": {
       "maxLength": 512,
       "minLength": 1,
       "type": "string"
     },
-    "uri": {
-      "maxLength": 4096,
+    "source_id": {
+      "maxLength": 512,
       "minLength": 1,
       "type": "string"
     }
@@ -85,11 +99,13 @@
     "schema_version",
     "capture_id",
     "source_id",
-    "logical_authority",
-    "uri",
+    "authority_id",
+    "snapshot_id",
     "revision_kind",
-    "revision",
-    "content_sha256",
+    "captured_at",
+    "file_manifest_digest",
+    "publication_policy_ref",
+    "capture_producer_id",
     "capture_policy",
     "classification"
   ],

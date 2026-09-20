@@ -5,18 +5,112 @@
     {
       "additionalProperties": false,
       "properties": {
-        "capture_id": {
+        "byte_span": {
+          "additionalProperties": false,
+          "properties": {
+            "end": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "start": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ],
+          "type": "object"
+        },
+        "file_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "kind": {
+          "const": "file",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision_kind": {
+          "anyOf": [
+            {
+              "const": "git",
+              "type": "string"
+            },
+            {
+              "const": "enterprise_view",
+              "type": "string"
+            },
+            {
+              "const": "supplied_snapshot",
+              "type": "string"
+            }
+          ]
+        },
+        "revision_value": {
           "maxLength": 512,
           "minLength": 1,
           "type": "string"
         },
-        "content_sha256": {
-          "pattern": "^[a-f0-9]{64}$",
+        "snapshot_id": {
+          "maxLength": 512,
+          "minLength": 1,
           "type": "string"
+        },
+        "source_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "symbol_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "source_id",
+        "snapshot_id",
+        "revision_kind",
+        "path",
+        "file_digest"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "byte_span": {
+          "additionalProperties": false,
+          "properties": {
+            "end": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "start": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ],
+          "type": "object"
         },
         "end_line": {
           "minimum": 1,
           "type": "integer"
+        },
+        "file_digest": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
         },
         "kind": {
           "const": "file_range",
@@ -27,30 +121,81 @@
           "minLength": 1,
           "type": "string"
         },
+        "revision_kind": {
+          "anyOf": [
+            {
+              "const": "git",
+              "type": "string"
+            },
+            {
+              "const": "enterprise_view",
+              "type": "string"
+            },
+            {
+              "const": "supplied_snapshot",
+              "type": "string"
+            }
+          ]
+        },
+        "revision_value": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "snapshot_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
         "start_line": {
           "minimum": 1,
           "type": "integer"
+        },
+        "symbol_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
         }
       },
       "required": [
         "kind",
-        "capture_id",
+        "source_id",
+        "snapshot_id",
+        "revision_kind",
         "path",
+        "file_digest",
         "start_line",
-        "end_line",
-        "content_sha256"
+        "end_line"
       ],
       "type": "object"
     },
     {
       "additionalProperties": false,
       "properties": {
-        "capture_id": {
-          "maxLength": 512,
-          "minLength": 1,
-          "type": "string"
+        "byte_span": {
+          "additionalProperties": false,
+          "properties": {
+            "end": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "start": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "start",
+            "end"
+          ],
+          "type": "object"
         },
-        "content_sha256": {
+        "file_digest": {
           "pattern": "^[a-f0-9]{64}$",
           "type": "string"
         },
@@ -58,17 +203,61 @@
           "const": "document_section",
           "type": "string"
         },
-        "section": {
+        "path": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "revision_kind": {
+          "anyOf": [
+            {
+              "const": "git",
+              "type": "string"
+            },
+            {
+              "const": "enterprise_view",
+              "type": "string"
+            },
+            {
+              "const": "supplied_snapshot",
+              "type": "string"
+            }
+          ]
+        },
+        "revision_value": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "section_id": {
           "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "snapshot_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "symbol_id": {
+          "maxLength": 512,
           "minLength": 1,
           "type": "string"
         }
       },
       "required": [
         "kind",
-        "capture_id",
-        "section",
-        "content_sha256"
+        "source_id",
+        "snapshot_id",
+        "revision_kind",
+        "path",
+        "file_digest",
+        "section_id"
       ],
       "type": "object"
     }

@@ -50,6 +50,10 @@ subschemas, support closure, semantic cross-record checks and cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.</p>
+<p>The capture/locator/coverage envelopes were reconciled with the more precise
+<a href="extraction-and-source-binding.html">extraction and binding contract</a> before freeze.
+Their individual normalized-path, line/byte-order and coverage-count checks do not
+yet prove a locator belongs to a capture or that a digest matches local source.</p>
 <h2 id="identity-and-versioning">Identity and versioning</h2>
 <p>An entity ID combines logical repository or document namespace with adapter-owned
 artifact identity. A record ID identifies an assertion about an entity; a content

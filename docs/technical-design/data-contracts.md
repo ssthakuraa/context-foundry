@@ -13,6 +13,11 @@ canonicalization conformance are not implemented or frozen. A decision receipt's
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
 
+The capture/locator/coverage envelopes were reconciled with the more precise
+[extraction and binding contract](extraction-and-source-binding.md) before freeze.
+Their individual normalized-path, line/byte-order and coverage-count checks do not
+yet prove a locator belongs to a capture or that a digest matches local source.
+
 ## Identity and versioning
 
 An entity ID combines logical repository or document namespace with adapter-owned

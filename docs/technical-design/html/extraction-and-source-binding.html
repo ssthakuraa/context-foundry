@@ -40,6 +40,15 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="extraction-and-local-source-binding-contracts">Extraction and local source-binding contracts</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#source-capture-manifest">Source capture manifest</a></li><li><a href="#adapter-protocol">Adapter protocol</a></li><li><a href="#first-supported-matrix">First supported matrix</a></li><li><a href="#resolution-and-identities">Resolution and identities</a></li><li><a href="#coverage-and-incrementality">Coverage and incrementality</a></li><li><a href="#locator-and-local-resolution">Locator and local resolution</a></li><li><a href="#acceptance-fixtures">Acceptance fixtures</a></li></ul></details>
 <p><strong>Status:</strong> Implementation specification for the validation slice · CF-0.2</p>
+<p><strong>WP1 alignment note (2026-09-20):</strong> The provisional <code>SourceCaptureSchema</code> now
+includes source/authority/snapshot identities, revision kind/value, file-manifest
+digest, publication-policy reference and capture producer. The locator schema
+carries source/snapshot identity, relative path and file digest, with separate
+file, file-range and document-section shapes. Strict semantic validation rejects
+non-normalized relative paths and reversed line/byte bounds. These are envelope
+checks only: per-file manifests, symlink/case-collision checks, capture-to-locator
+binding and actual digest comparison remain for WP1/WP2. The contract version is
+not frozen.</p>
 <p>Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
 supported patterns; it does not promise a complete program-analysis engine.</p>
 <h2 id="source-capture-manifest">Source capture manifest</h2>
