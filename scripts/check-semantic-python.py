@@ -8,8 +8,11 @@ import json
 import re
 from pathlib import Path
 
+from jsonschema import Draft7Validator
 
-VECTORS = Path(__file__).resolve().parents[1] / "packages/contracts/fixtures/semantic-vectors.json"
+ROOT = Path(__file__).resolve().parents[1]
+VECTORS = ROOT / "packages/contracts/fixtures/semantic-vectors.json"
+SCHEMAS = ROOT / "packages/contracts/schemas"
 
 
 def normalized_relative_path(path):
@@ -51,11 +54,22 @@ def main():
     assert vectors["format"] == "context-foundry-semantic-vectors-1"
     assert vectors["schema_version"] == "0.2.0"
     names = set()
+    validators = {}
+    for schema_name in {vector["schema"] for vector in vectors["cases"] + vectors["shape_invalid"]}:
+        schema = json.loads((SCHEMAS / f"{schema_name}.schema.json").read_text(encoding="utf-8"))
+        Draft7Validator.check_schema(schema)
+        validators[schema_name] = Draft7Validator(schema)
     for vector in vectors["cases"]:
         assert vector["name"] not in names, vector["name"]
         names.add(vector["name"])
+        assert validators[vector["schema"]].is_valid(vector["value"]), vector["name"]
         assert valid_semantics(vector["schema"], vector["value"]) is vector["valid"], vector["name"]
-    print(f"Verified {len(names)} bounded Python semantic vectors")
+    for vector in vectors["shape_invalid"]:
+        assert vector["name"] not in names, vector["name"]
+        names.add(vector["name"])
+        assert not validators[vector["schema"]].is_valid(vector["value"]), vector["name"]
+    print(f"Verified {len(vectors['cases'])} semantic and "
+          f"{len(vectors['shape_invalid'])} shape-invalid Python vectors")
 
 
 if __name__ == "__main__":

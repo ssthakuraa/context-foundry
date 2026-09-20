@@ -7,6 +7,7 @@ import { CONTRACT_VERSION, Schemas, validate, type SchemaName } from '../src/ind
 type VectorFile = {
   format: string;
   schema_version: string;
+  shape_invalid: { name: string; schema: SchemaName; value: unknown }[];
   cases: { name: string; schema: SchemaName; valid: boolean; value: unknown }[];
 };
 const vectors = JSON.parse(readFileSync(new URL('../../fixtures/semantic-vectors.json', import.meta.url),
@@ -23,5 +24,12 @@ test('portable semantic vectors match TypeScript validation', () => {
     assert.equal(ajv.validate(Schemas[vector.schema], vector.value), true,
       `${vector.name} must be JSON Schema valid: ${ajv.errorsText()}`);
     assert.equal(validate(vector.schema, vector.value), vector.valid, vector.name);
+  }
+  for (const vector of vectors.shape_invalid) {
+    assert.equal(names.has(vector.name), false, `duplicate case ${vector.name}`);
+    names.add(vector.name);
+    assert.equal(ajv.validate(Schemas[vector.schema], vector.value), false,
+      `${vector.name} must be rejected by the exported JSON Schema`);
+    assert.equal(validate(vector.schema, vector.value), false, vector.name);
   }
 });

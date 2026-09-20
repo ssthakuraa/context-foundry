@@ -40,7 +40,7 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="portable-semantic-conformance-ledger">Portable semantic conformance ledger</h1>
 <p><strong>Status:</strong> Partial, CF-0.2. JSON Schema shape validation is necessary but insufficient. A consumer must run applicable semantic and cross-object checks before treating an object as well formed; no validator alone grants source trust, visibility or human authority.</p>
-<p>The language-neutral <a href="../../../packages/contracts/fixtures/semantic-vectors.json">semantic vectors</a> contain schema-valid objects with expected acceptance outcomes. TypeScript runs the full <code>validate</code> entry point; the independent Python checker implements only the rules listed as <em>parity checked</em> below and deliberately does not implement JSON Schema. The expected result does not establish provenance or approval.</p>
+<p>The language-neutral <a href="../../../packages/contracts/fixtures/semantic-vectors.json">semantic vectors</a> contain schema-valid objects with expected acceptance outcomes and separate shape-invalid cases. TypeScript runs the full <code>validate</code> entry point; the independent Python checker uses pinned <code>jsonschema==4.26.0</code> and the exported Draft 7 schemas to prevalidate shape before implementing only the rules listed as <em>parity checked</em> below. Three shape-invalid cases are rejected independently in both languages. The expected result does not establish provenance or approval.</p>
 <table>
 <thead>
 <tr>
@@ -143,8 +143,8 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 </tbody>
 </table>
-<p><code>CF-S01</code>–<code>CF-S05</code> and <code>CF-S11</code> are a bounded cross-language start, not a second complete validator. Every case is intended to satisfy the exported JSON Schema so its acceptance difference isolates a semantic rule. The Python script trusts that precondition; the TypeScript test checks full shape plus semantics. Before contract freeze, add a portable schema validator or schema prevalidation for the second implementation, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>
-<p>Run from the repository root: <code>pnpm test</code> and <code>python3 scripts/check-semantic-python.py</code>.</p>
+<p><code>CF-S01</code>–<code>CF-S05</code> and <code>CF-S11</code> are a bounded cross-language start, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages now check shape; Python only implements the six listed semantic families. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>
+<p>Run from the repository root: <code>pnpm test</code> and, in a Python 3.12 environment with <a href="../../../scripts/requirements-semantic-python.txt">pinned semantic-check dependencies</a>, <code>python3 scripts/check-semantic-python.py</code>. The public fixture checker has no access to private evaluation sources.</p>
 
     </article>
     <footer>CF-0.2 design review · Generated from docs/technical-design/semantic-conformance.md · Proposed behavior unless explicitly stated.</footer>

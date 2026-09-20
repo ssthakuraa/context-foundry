@@ -1,6 +1,11 @@
 {
   "format": "context-foundry-semantic-vectors-1",
   "schema_version": "0.2.0",
+  "shape_invalid": [
+    {"name":"captured-file-missing-digest","schema":"captured_file","value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src/A.java","bytes":12,"media_kind":"text/plain","classification":"internal"}},
+    {"name":"symbol-unknown-language","schema":"engineering_symbol_payload","value":{"name":"run","artifact_kind":"method","language":"unknown","signature":"run()"}},
+    {"name":"interface-forged-verification","schema":"interface_operation_payload","value":{"interface_id":"api:1","operation_key":"submit","protocol":"http","http_method":"POST","route_template":"/submit","behavior_verified":true}}
+  ],
   "cases": [
     {"name":"file-normal-path","schema":"captured_file","valid":true,"value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src/A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bytes":12,"media_kind":"text/plain","classification":"internal"}},
     {"name":"file-parent-traversal","schema":"captured_file","valid":false,"value":{"schema_version":"0.2.0","source_id":"source:1","snapshot_id":"snap:1","path":"src/../A.java","file_digest":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","bytes":12,"media_kind":"text/plain","classification":"internal"}},
