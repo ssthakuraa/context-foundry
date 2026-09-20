@@ -8,7 +8,7 @@ captured file, coverage, release manifest/set, relationship payload, task artifa
 human decision receipt, task error and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
 tests exist. This is only a WP1 subset: registered payload-kind validation, body
-subschemas, support closure, semantic cross-record checks and cross-language
+subschemas, support closure, broader semantic cross-record checks and cross-language
 canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
@@ -17,9 +17,15 @@ The capture/locator/coverage envelopes were reconciled with the more precise
 [extraction and binding contract](extraction-and-source-binding.md) before freeze.
 Their individual normalized-path, line/byte-order and coverage-count checks are
 supplemented by `checkCaptureBindings`, which compares source/snapshot/revision/path
-and captured-file digests without reading source. It does not prove the captured
-file's digest matches current local bytes, verify manifest digest closure or grant
-access.
+and captured-file digests without reading source. It also recomputes a capture's
+`file_manifest_digest` from its complete declared `CapturedFile` metadata: validate
+each entry, require one source/snapshot and unique normalized paths, sort by path
+using UTF-16 code-unit order, then SHA-256 hash the canonical JSON array. An empty
+file list hashes as the canonical empty array. Invalid or duplicate file records
+are separate failures and cannot establish manifest closure. This detects a changed
+or omitted declared file record; it does **not** prove the actual file bytes match
+their claimed digests, prove that no source file was omitted before capture, or grant
+access. Those require trusted capture and local binding checks.
 
 ## Identity and versioning
 

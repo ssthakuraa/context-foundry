@@ -10,8 +10,10 @@ file, file-range and document-section shapes. Strict semantic validation rejects
 non-normalized relative paths and reversed line/byte bounds. A captured-file
 envelope and metadata-only binding check now distinguish missing files, revision
 drift and locator/file digest disagreement across separate source identities.
-Manifest-digest closure, symlink/case-collision checks, live local-byte comparison
-and authorization remain for WP1/WP2. The contract version is not frozen.
+The check recomputes the capture's file-manifest digest from canonical, path-sorted
+declared file metadata; this is metadata closure, not a read of actual source bytes.
+Symlink/case-collision checks, live local-byte comparison and authorization remain
+for WP2. The contract version is not frozen.
 
 Implements CF-R01, CF-R02, CF-R07, CF-R11 and CF-R12. This specification narrows
 supported patterns; it does not promise a complete program-analysis engine.

@@ -1,5 +1,6 @@
 import { Ajv, type ValidateFunction } from 'ajv';
 import { Type, type Static } from '@sinclair/typebox';
+import { canonicalSha256 } from './canonical.js';
 export { canonicalJson, canonicalRecordLines, canonicalSha256, parseJsonStrict } from './canonical.js';
 
 export const CONTRACT_VERSION = '0.2.0' as const;
@@ -330,7 +331,8 @@ export function validate(name: SchemaName, value: unknown): boolean {
 export type BindingIssueCode =
   | 'INVALID_CAPTURE' | 'DUPLICATE_CAPTURE' | 'INVALID_FILE' | 'UNBOUND_FILE'
   | 'DUPLICATE_PATH' | 'INVALID_LOCATOR' | 'UNBOUND_LOCATOR_SOURCE'
-  | 'REVISION_MISMATCH' | 'MISSING_FILE' | 'FILE_DIGEST_MISMATCH';
+  | 'REVISION_MISMATCH' | 'MISSING_FILE' | 'FILE_DIGEST_MISMATCH'
+  | 'FILE_MANIFEST_DIGEST_MISMATCH';
 
 export type BindingIssue = {
   code: BindingIssueCode;
@@ -338,7 +340,27 @@ export type BindingIssue = {
   index: number;
 };
 
-/** Metadata-only consistency check. It does not read files or confer authorization. */
+/** Hash complete, validated file metadata in normalized-path order for one capture. */
+export function fileManifestDigest(files: readonly CapturedFile[]): string {
+  let sourceId: string | undefined;
+  let snapshotId: string | undefined;
+  const paths = new Set<string>();
+  for (const file of files) {
+    if (!validate('captured_file', file)) throw new TypeError('invalid captured file');
+    if (sourceId === undefined) {
+      sourceId = file.source_id;
+      snapshotId = file.snapshot_id;
+    } else if (file.source_id !== sourceId || file.snapshot_id !== snapshotId) {
+      throw new TypeError('file manifest spans multiple captures');
+    }
+    if (paths.has(file.path)) throw new TypeError('duplicate file path');
+    paths.add(file.path);
+  }
+  const ordered = [...files].sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
+  return canonicalSha256(ordered);
+}
+
+/** Metadata-only consistency check, including file-list digest closure. No byte or access check. */
 export function checkCaptureBindings(
   captures: readonly SourceCapture[],
   files: readonly CapturedFile[],
@@ -349,6 +371,10 @@ export function checkCaptureBindings(
   const fileKey = (source: string, snapshot: string, path: string) => JSON.stringify([source, snapshot, path]);
   const capturesByKey = new Map<string, SourceCapture>();
   const filesByKey = new Map<string, CapturedFile>();
+  const filesByCapture = new Map<string, CapturedFile[]>();
+  const duplicateCaptureKeys = new Set<string>();
+  const duplicateFileKeys = new Set<string>();
+  let invalidFileSeen = false;
 
   captures.forEach((capture, index) => {
     if (!validate('source_capture', capture)) {
@@ -356,13 +382,17 @@ export function checkCaptureBindings(
       return;
     }
     const key = captureKey(capture.source_id, capture.snapshot_id);
-    if (capturesByKey.has(key)) issues.push({ code: 'DUPLICATE_CAPTURE', item: 'capture', index });
+    if (capturesByKey.has(key)) {
+      issues.push({ code: 'DUPLICATE_CAPTURE', item: 'capture', index });
+      duplicateCaptureKeys.add(key);
+    }
     else capturesByKey.set(key, capture);
   });
 
   files.forEach((file, index) => {
     if (!validate('captured_file', file)) {
       issues.push({ code: 'INVALID_FILE', item: 'file', index });
+      invalidFileSeen = true;
       return;
     }
     if (!capturesByKey.has(captureKey(file.source_id, file.snapshot_id))) {
@@ -370,8 +400,26 @@ export function checkCaptureBindings(
       return;
     }
     const key = fileKey(file.source_id, file.snapshot_id, file.path);
-    if (filesByKey.has(key)) issues.push({ code: 'DUPLICATE_PATH', item: 'file', index });
-    else filesByKey.set(key, file);
+    if (filesByKey.has(key)) {
+      issues.push({ code: 'DUPLICATE_PATH', item: 'file', index });
+      duplicateFileKeys.add(captureKey(file.source_id, file.snapshot_id));
+    } else {
+      filesByKey.set(key, file);
+      const groupKey = captureKey(file.source_id, file.snapshot_id);
+      const group = filesByCapture.get(groupKey) ?? [];
+      group.push(file);
+      filesByCapture.set(groupKey, group);
+    }
+  });
+
+  // An invalid file may have lost its source identity; do not claim manifest closure.
+  if (!invalidFileSeen) captures.forEach((capture, index) => {
+    if (!validate('source_capture', capture)) return;
+    const key = captureKey(capture.source_id, capture.snapshot_id);
+    if (duplicateCaptureKeys.has(key) || duplicateFileKeys.has(key)) return;
+    if (fileManifestDigest(filesByCapture.get(key) ?? []) !== capture.file_manifest_digest) {
+      issues.push({ code: 'FILE_MANIFEST_DIGEST_MISMATCH', item: 'capture', index });
+    }
   });
 
   locators.forEach((locator, index) => {
