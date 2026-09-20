@@ -40,11 +40,12 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
-<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twenty-three
+<p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twenty-six
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
 engineering symbol payload, business rule and mapping payloads, interface operation
-and test association payloads, all five task artifact bodies,
+and test association payloads, business flow/step and behavior obligation payloads,
+all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
@@ -99,7 +100,10 @@ strongly connected group. Call <code>checkReleaseIntegrity</code> to combine thi
 capture/file/locator binding; it withholds closure if either side fails. These are
 metadata checks, not checks of current source bytes, evidence truth, approval,
 publication permission or a user's current grants. Authenticated non-source support
-and cross-pack composition need explicit contracts before the freeze.</p>
+and cross-pack composition need explicit contracts before the freeze.
+<code>checkBusinessFlowLinks</code> also verifies flow/step membership and parent identities;
+<code>checkReleaseIntegrity</code> withholds closure when those fail. Preconditions, outcomes,
+test targets and interface implementation pointers still need cross-record resolution.</p>
 <p><code>ExecutionEvidenceSchema</code> now records a test/report run's producer claim, input
 capture digests, report digest, environment, observed tests/obligations and outcome.
 A skipped run cannot claim observed obligations, and a passed run needs a completion

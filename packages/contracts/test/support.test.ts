@@ -104,6 +104,7 @@ test('combined integrity gate withholds closure when capture metadata is inconsi
     [record('rec:one', ['ev:one'])]);
   assert.deepEqual(good.bindingIssues, []);
   assert.deepEqual(good.supportIssues, []);
+  assert.deepEqual(good.flowIssues, []);
   assert.deepEqual(good.evidenceByRecord?.get('rec:one'), ['ev:one']);
 
   const altered = checkReleaseIntegrity([capture], [{ ...file, bytes: 11 }],
@@ -111,6 +112,19 @@ test('combined integrity gate withholds closure when capture metadata is inconsi
   assert.deepEqual(altered.bindingIssues.map(issue => issue.code), ['FILE_MANIFEST_DIGEST_MISMATCH']);
   assert.deepEqual(altered.supportIssues, []);
   assert.equal(altered.evidenceByRecord, undefined);
+
+  const brokenFlow: RecordEnvelope = {
+    ...record('rec:flow', ['ev:one']), entity_id: 'flow:p2p', kind: 'business.flow',
+    origin: 'human_asserted', payload: {
+      name: 'Procure to Pay', domain_id: 'domain:p2p', ordered_step_ids: ['step:missing'],
+      applicability: { status: 'bounded', product_ids: ['product:A'] },
+    },
+  };
+  const unclosed = checkReleaseIntegrity([capture], [file], [locator('ev:one')], [brokenFlow]);
+  assert.deepEqual(unclosed.bindingIssues, []);
+  assert.deepEqual(unclosed.supportIssues, []);
+  assert.deepEqual(unclosed.flowIssues.map(issue => issue.code), ['MISSING_FLOW_STEP']);
+  assert.equal(unclosed.evidenceByRecord, undefined);
 });
 
 test('oversized transitive support fails closed', () => {

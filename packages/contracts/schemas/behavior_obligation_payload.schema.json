@@ -1,0 +1,78 @@
+{
+  "$id": "urn:context-foundry:schema:0.2.0:behavior-obligation-payload",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "conditions": {
+          "items": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "product_ids": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "status": {
+          "anyOf": [
+            {
+              "const": "bounded",
+              "type": "string"
+            },
+            {
+              "const": "unknown",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "type": "object"
+    },
+    "condition_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "expected_outcome": {
+      "maxLength": 8192,
+      "minLength": 1,
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "validation_intent": {
+      "maxLength": 2048,
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "expected_outcome",
+    "condition_refs",
+    "applicability",
+    "validation_intent"
+  ],
+  "type": "object"
+}

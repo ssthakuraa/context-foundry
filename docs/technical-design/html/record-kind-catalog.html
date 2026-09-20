@@ -88,26 +88,27 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 <tr>
 <td><code>business.flow</code></td>
-<td>Flow identity, ordered step IDs, product/domain scope and variation status</td>
-<td>Expert assertion/reviewed documentation; order is not a runtime call graph</td>
-<td>Pending strict payload and curation route</td>
+<td>Flow identity, ordered step IDs and product/domain applicability</td>
+<td>Expert assertion or source-declared documentation; order is not a runtime call graph</td>
+<td>Strict payload and flow/step membership check; curation route pending</td>
 </tr>
 <tr>
 <td><code>business.flow_step</code></td>
-<td>Step identity, containing flow, involved product/capability, preconditions and outcome pointers</td>
+<td>Step identity, containing flow, involved product/capability and precondition/outcome pointers</td>
 <td>Bounded applicability and explicit source/expert support; cross-product joins require reviewed mappings</td>
-<td>Pending strict payload and curation route</td>
+<td>Strict payload and flow/step membership check; curation route pending</td>
 </tr>
 <tr>
 <td><code>behavior.obligation</code></td>
 <td>Expected outcome, conditions, product scope and validation intent</td>
 <td>Separates intended behavior from source observation; a test result can discharge it only through an authenticated run importer</td>
-<td>Pending strict payload and importer route</td>
+<td>Strict payload; importer and obligation-reference closure pending</td>
 </tr>
 </tbody>
 </table>
 <p>The minimal first-slice producer/consumer handshake must declare which of these kinds it can produce, which it can use in retrieval, and which fields are optional or unknown. A strict required-kind registry rejects unknown payloads; an extension namespace, if later allowed, must be explicitly negotiated by both producer and consumer and cannot masquerade as a first-party kind. Adapter coverage records unsupported constructs instead of promoting them to approximate facts.</p>
 <p>Three distinctions are mandatory across future payloads: API consumption details versus service implementation location; test association versus observed execution; intended business outcome versus observed code behavior. Exact evidence pointers and transitive support remain required, but support alone does not establish truth, currency, visibility or permission.</p>
+<p><code>checkBusinessFlowLinks</code> rejects missing, duplicate, unlisted and mismatched flow/step identities; <code>checkReleaseIntegrity</code> withholds its support closure if those links fail. Step precondition/outcome references, test targets and interface implementation pointers are not yet resolved by that check. Flow membership is a structural assertion, not proof of business sequence or cross-product behavior.</p>
 
     </article>
     <footer>CF-0.2 design review · Generated from docs/technical-design/record-kind-catalog.md · Proposed behavior unless explicitly stated.</footer>

@@ -2,11 +2,12 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
-**Implementation note (2026-09-20):** `packages/contracts` now contains twenty-three
+**Implementation note (2026-09-20):** `packages/contracts` now contains twenty-six
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
 engineering symbol payload, business rule and mapping payloads, interface operation
-and test association payloads, all five task artifact bodies,
+and test association payloads, business flow/step and behavior obligation payloads,
+all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
@@ -65,6 +66,9 @@ capture/file/locator binding; it withholds closure if either side fails. These a
 metadata checks, not checks of current source bytes, evidence truth, approval,
 publication permission or a user's current grants. Authenticated non-source support
 and cross-pack composition need explicit contracts before the freeze.
+`checkBusinessFlowLinks` also verifies flow/step membership and parent identities;
+`checkReleaseIntegrity` withholds closure when those fail. Preconditions, outcomes,
+test targets and interface implementation pointers still need cross-record resolution.
 
 `ExecutionEvidenceSchema` now records a test/report run's producer claim, input
 capture digests, report digest, environment, observed tests/obligations and outcome.

@@ -291,6 +291,77 @@ export const TestAssociationPayloadSchema = Type.Object({
 }, { $id: 'urn:context-foundry:schema:0.2.0:test-association-payload', additionalProperties: false });
 export type TestAssociationPayload = Static<typeof TestAssociationPayloadSchema>;
 
+export const BusinessFlowPayloadSchema = Type.Object({
+  name: id(),
+  ordered_step_ids: Type.Array(id(), { minItems: 1, uniqueItems: true }),
+  domain_id: id(),
+  applicability: RuleApplicability,
+}, { $id: 'urn:context-foundry:schema:0.2.0:business-flow-payload', additionalProperties: false });
+export type BusinessFlowPayload = Static<typeof BusinessFlowPayloadSchema>;
+
+export const BusinessFlowStepPayloadSchema = Type.Object({
+  flow_entity_id: id(),
+  name: id(),
+  product_id: id(),
+  capability_id: Type.Optional(id()),
+  precondition_refs: refs(),
+  outcome_refs: refs(),
+  applicability: RuleApplicability,
+}, { $id: 'urn:context-foundry:schema:0.2.0:business-flow-step-payload', additionalProperties: false });
+export type BusinessFlowStepPayload = Static<typeof BusinessFlowStepPayloadSchema>;
+
+export const BehaviorObligationPayloadSchema = Type.Object({
+  name: id(),
+  expected_outcome: Type.String({ minLength: 1, maxLength: 8192 }),
+  condition_refs: refs(),
+  applicability: RuleApplicability,
+  validation_intent: Type.String({ minLength: 1, maxLength: 2048 }),
+}, { $id: 'urn:context-foundry:schema:0.2.0:behavior-obligation-payload', additionalProperties: false });
+export type BehaviorObligationPayload = Static<typeof BehaviorObligationPayloadSchema>;
+
+export type FlowLinkIssueCode =
+  | 'INVALID_FLOW_RECORD' | 'DUPLICATE_FLOW_ENTITY' | 'DUPLICATE_STEP_ENTITY'
+  | 'MISSING_FLOW_STEP' | 'STEP_PARENT_MISMATCH' | 'UNLISTED_FLOW_STEP' | 'MISSING_PARENT_FLOW';
+export type FlowLinkIssue = { code: FlowLinkIssueCode; index: number };
+
+/** Checks flow/step membership identities only; not business truth or authorization. */
+export function checkBusinessFlowLinks(records: readonly RecordEnvelope[]): readonly FlowLinkIssue[] {
+  const issues: FlowLinkIssue[] = [];
+  const flows = new Map<string, { record: RecordEnvelope; index: number }>();
+  const steps = new Map<string, { record: RecordEnvelope; index: number }>();
+  records.forEach((record, index) => {
+    if (record.kind !== 'business.flow' && record.kind !== 'business.flow_step') return;
+    if (!validate('record_envelope', record)) {
+      issues.push({ code: 'INVALID_FLOW_RECORD', index });
+      return;
+    }
+    const target = record.kind === 'business.flow' ? flows : steps;
+    if (target.has(record.entity_id)) {
+      issues.push({ code: record.kind === 'business.flow' ? 'DUPLICATE_FLOW_ENTITY' :
+        'DUPLICATE_STEP_ENTITY', index });
+    } else target.set(record.entity_id, { record, index });
+  });
+  for (const [flowId, { record, index }] of flows) {
+    const payload = record.payload as BusinessFlowPayload;
+    for (const stepId of payload.ordered_step_ids) {
+      const step = steps.get(stepId);
+      if (!step) issues.push({ code: 'MISSING_FLOW_STEP', index });
+      else if ((step.record.payload as BusinessFlowStepPayload).flow_entity_id !== flowId) {
+        issues.push({ code: 'STEP_PARENT_MISMATCH', index: step.index });
+      }
+    }
+  }
+  for (const { record, index } of steps.values()) {
+    const parent = (record.payload as BusinessFlowStepPayload).flow_entity_id;
+    const flow = flows.get(parent);
+    if (!flow) issues.push({ code: 'MISSING_PARENT_FLOW', index });
+    else if (!(flow.record.payload as BusinessFlowPayload).ordered_step_ids.includes(record.entity_id)) {
+      issues.push({ code: 'UNLISTED_FLOW_STEP', index });
+    }
+  }
+  return issues;
+}
+
 export const RelationshipPayloadSchema = Type.Object({
   subject_id: id(),
   object_id: id(),
@@ -489,6 +560,9 @@ export const Schemas = {
   business_mapping_payload: BusinessMappingPayloadSchema,
   interface_operation_payload: InterfaceOperationPayloadSchema,
   test_association_payload: TestAssociationPayloadSchema,
+  business_flow_payload: BusinessFlowPayloadSchema,
+  business_flow_step_payload: BusinessFlowStepPayloadSchema,
+  behavior_obligation_payload: BehaviorObligationPayloadSchema,
   relationship_payload: RelationshipPayloadSchema,
   scope_map_body: ScopeMapBodySchema,
   sufficiency_body: SufficiencyBodySchema,
@@ -574,6 +648,15 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
   }
   if (name === 'business_mapping_payload') {
     return applicabilityErrors((value as BusinessMappingPayload).applicability);
+  }
+  if (name === 'business_flow_payload') {
+    return applicabilityErrors((value as BusinessFlowPayload).applicability);
+  }
+  if (name === 'business_flow_step_payload') {
+    return applicabilityErrors((value as BusinessFlowStepPayload).applicability);
+  }
+  if (name === 'behavior_obligation_payload') {
+    return applicabilityErrors((value as BehaviorObligationPayload).applicability);
   }
   if (name === 'interface_operation_payload') {
     const operation = value as InterfaceOperationPayload;
@@ -717,6 +800,16 @@ function semanticErrors(name: SchemaName, value: unknown): string[] {
         return ['/origin must be human_asserted for reviewed_relevance'];
       }
       return [];
+    }
+    if (record.kind === 'business.flow' || record.kind === 'business.flow_step' ||
+      record.kind === 'behavior.obligation') {
+      const schema = record.kind === 'business.flow' ? 'business_flow_payload' :
+        record.kind === 'business.flow_step' ? 'business_flow_step_payload' : 'behavior_obligation_payload';
+      if (!validateDetailed(schema, record.payload).valid) {
+        return [`/payload must conform to ${schema}`];
+      }
+      return ['human_asserted', 'source_declared'].includes(record.origin)
+        ? [] : ['/origin must be human_asserted or source_declared for intended business behavior'];
     }
     return ['/kind is not registered as a required record kind'];
   }
@@ -976,13 +1069,17 @@ export function checkReleaseIntegrity(
   locators: readonly EvidenceLocator[],
   records: readonly RecordEnvelope[],
 ): { bindingIssues: readonly BindingIssue[]; supportIssues: readonly SupportIssue[];
+  flowIssues: readonly FlowLinkIssue[];
   evidenceByRecord?: ReadonlyMap<string, readonly string[]> } {
   const bindingIssues = checkCaptureBindings(captures, files, locators);
   const support = checkSupportClosure(records, locators);
+  const flowIssues = checkBusinessFlowLinks(records);
   return {
     bindingIssues,
     supportIssues: support.issues,
-    ...(bindingIssues.length || support.issues.length ? {} : { evidenceByRecord: support.evidenceByRecord }),
+    flowIssues,
+    ...(bindingIssues.length || support.issues.length || flowIssues.length ? {} :
+      { evidenceByRecord: support.evidenceByRecord }),
   };
 }
 

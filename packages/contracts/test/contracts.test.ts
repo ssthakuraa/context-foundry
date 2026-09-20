@@ -8,7 +8,54 @@ import {
 const hash = 'a'.repeat(64);
 
 test('all core schemas compile in strict mode', () => {
-  assert.equal(Object.keys(Schemas).length, 23);
+  assert.equal(Object.keys(Schemas).length, 26);
+});
+
+test('business flow and step carry bounded scope without pretending to be call edges', () => {
+  const flow = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:flow', entity_id: 'flow:procure-to-pay',
+    kind: 'business.flow', owner_id: 'team:procurement', origin: 'human_asserted',
+    review: { state: 'pending' }, evidence_refs: ['ev:flow-doc'], dependency_refs: [],
+    classification: 'internal', payload: {
+      name: 'Procure to Pay', ordered_step_ids: ['step:request', 'step:approve'],
+      domain_id: 'domain:procurement', applicability: { status: 'bounded', product_ids: ['product:A'] },
+    },
+  };
+  assert.equal(validate('record_envelope', flow), true);
+  assert.equal(validate('record_envelope', { ...flow, origin: 'model_proposed' }), false);
+  assert.equal(validate('business_flow_payload', {
+    ...flow.payload, ordered_step_ids: ['step:request', 'step:request'],
+  }), false);
+  assert.equal(validate('business_flow_payload', {
+    ...flow.payload, applicability: { status: 'unknown', product_ids: ['product:A'] },
+  }), false);
+  const step = {
+    ...flow, record_id: 'rec:flow-step', entity_id: 'step:request', kind: 'business.flow_step',
+    payload: { flow_entity_id: 'flow:procure-to-pay', name: 'Request', product_id: 'product:A',
+      precondition_refs: [], outcome_refs: ['obligation:request-created'],
+      applicability: { status: 'bounded', product_ids: ['product:A'] } },
+  };
+  assert.equal(validate('record_envelope', step), true);
+  assert.equal(validate('business_flow_step_payload', { ...step.payload, runtime_call_edge: true }), false);
+});
+
+test('behavior obligations describe expected outcomes, not a passing test report', () => {
+  const obligation = {
+    schema_version: CONTRACT_VERSION, record_id: 'rec:obligation', entity_id: 'obligation:approval',
+    kind: 'behavior.obligation', owner_id: 'team:procurement', origin: 'human_asserted',
+    review: { state: 'pending' }, evidence_refs: ['ev:requirement'], dependency_refs: [],
+    classification: 'internal', payload: {
+      name: 'Approval required', expected_outcome: 'Above threshold requires review',
+      condition_refs: ['condition:threshold'], applicability: { status: 'bounded', product_ids: ['product:A'] },
+      validation_intent: 'Exercise below and above threshold with role-specific authorization',
+    },
+  };
+  assert.equal(validate('record_envelope', obligation), true);
+  assert.equal(validate('record_envelope', { ...obligation, origin: 'static_resolution' }), false);
+  assert.equal(validate('behavior_obligation_payload', { ...obligation.payload, outcome: 'passed' }), false);
+  assert.equal(validate('behavior_obligation_payload', {
+    ...obligation.payload, applicability: { status: 'bounded' },
+  }), false);
 });
 
 test('interface operations describe source-declared contracts without claiming runtime behavior', () => {
