@@ -39,31 +39,30 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../implementation-plan.md">Markdown source</a></nav>
     <article>
       <h1 id="detailed-implementation-plan">Detailed implementation plan</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#execution-rule">Execution rule</a></li><li><a href="#dependency-order">Dependency order</a></li><li><a href="#m0-review-research-ledger-and-experiment-specification">M0 — Review, research ledger, and experiment specification</a></li><li><a href="#m1-contracts-application-skeleton-and-access-boundaries">M1 — Contracts, application skeleton, and access boundaries</a></li><li><a href="#m2-complete-preparation-slice">M2 — Complete preparation slice</a></li><li><a href="#m3-retrieval-content-and-agent-usefulness-gate">M3 — Retrieval content and agent-usefulness gate</a></li><li><a href="#m4-business-knowledge-and-studio-review">M4 — Business knowledge and Studio review</a></li><li><a href="#m5a-architecture-workbench">M5A — Architecture workbench</a></li><li><a href="#m5b-test-impact-and-validation">M5B — Test impact and validation</a></li><li><a href="#m6-enterprise-beta-and-operational-readiness">M6 — Enterprise beta and operational readiness</a></li><li><a href="#work-item-discipline">Work-item discipline</a></li><li><a href="#deferred-work">Deferred work</a></li></ul></details>
-<p><strong>Status:</strong> Proposed roadmap; implementation has not started · CF-0.2</p>
+<p><strong>Status:</strong> Revised local utility gate before enterprise hardening · CF-0.2</p>
 <h2 id="execution-rule">Execution rule</h2>
 <p>Review this package before product implementation. Work proceeds by evidence-bearing
 milestones. A milestone completes only when its acceptance evidence exists; documents,
 schema counts, or test counts alone do not establish product usefulness. No deadline
 estimate is implied by the sequence. Record actual effort during the first slice.</p>
 <h2 id="dependency-order">Dependency order</h2>
-<p>The immediate coding queue is the narrower <a href="validation-work-packages.html">WP0–WP7 validation slice</a>,
-which implements only the necessary M0–M3 capabilities. Do not build full M1 platform
-administration or rich M4/M5 screens before the usefulness gate. Review
+<p>The immediate coding queue is the narrower <a href="validation-work-packages.html">validation work packages</a>.
+Its POV work package now proves a local single-operator knowledge/retrieval/workflow
+path before enterprise identity and secured serving. M1 below remains the enterprise
+application milestone; only its contract portion precedes that POV. Do not build
+full M1 platform administration or rich M4/M5 screens before the usefulness gate. Review
 <a href="readiness-and-risks.html">readiness/risks</a> and <a href="../../decisions/html/0005-validation-slice-baseline.html">ADR 0005</a>.</p>
-<pre><code class="language-text">M0 design/fixtures -&gt; M1 contracts/security skeleton -&gt; M2 preparation
-      |                                                  |
-      +-&gt; fixed-corpus response/directive experiment      v
-                                               M3 retrieval/agent gate
-                                                         |
-                                        M4 Studio/business review
-                                                         |
-                                 M5 architecture + test-impact tracks
-                                                         |
-                                               M6 enterprise beta
+<pre><code class="language-text">M0 design/fixtures -&gt; M1 contracts -&gt; M2 bounded preparation -&gt; local POV gate
+      |                                                       |
+      +-&gt; fixed-corpus response/directive experiment           v
+                                  enterprise identity/secured retrieval/integration
+                                                               |
+                                                M4-M6 product expansion and beta
 </code></pre>
 <p>The fixed-corpus experiment may begin as soon as inputs and a safe evaluation
-harness are available. It must not wait for a large platform build. M1-M3 include
-the minimum UI needed to operate the slice; M4 expands the review experience.</p>
+harness are available. It must not wait for a large platform build. Local POV uses
+an offline harness; M1/M3 later add authenticated UI and serving. M4 expands the
+review experience. See the POV safety/acceptance boundary in the work packages.</p>
 <p>Second-pass amendment: follow <a href="../../evaluation/html/validation-sequence.html">E0–E5</a>. A small
 reviewed business/constraint dataset belongs in M2/M3; M4 expands its authoring UI.
 Run the permission-scoped projection spike before broad platform investment. Semantic

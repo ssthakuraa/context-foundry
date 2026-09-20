@@ -50,13 +50,15 @@ all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
-tests exist. This is only a WP1 subset: remaining registered record kinds, deeper
-cross-artifact checks, broader semantic cross-record checks and independent cross-language
-canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
+tests exist. This is only a WP1 subset: remaining target-reference and provenance
+checks, broader semantic cross-record checks and contract freeze remain open.
+Independent bounded Python conformance vectors exist, but do not prove full parity.
+A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
-The <a href="record-kind-catalog.html">proposed record-kind catalog</a> names the unimplemented
-first-slice kinds and their trust boundaries; it is not an optional-payload escape hatch.</p>
+The <a href="record-kind-catalog.html">proposed record-kind catalog</a> names nine registered
+first-slice kinds and their trust boundaries; adapters remain incomplete and the
+catalog is not an optional-payload escape hatch.</p>
 <p>Strict task body schemas now cover <code>scope_map</code>, <code>sufficiency</code>, <code>findings</code>,
 <code>implementation_proposal</code> and <code>completion</code>. Scope-map
 candidates label evidence versus hypothesis and give a relevance reason; an
@@ -113,8 +115,10 @@ and cross-pack composition need explicit contracts before the freeze.
 <code>checkBusinessFlowLinks</code> also verifies flow/step membership and parent identities;
 <code>checkObligationLinks</code> resolves step outcomes and explicitly typed test-to-obligation
 targets against unique obligation records. <code>checkReleaseIntegrity</code> withholds closure
-when either fails. Preconditions, engineering test targets and interface implementation
-pointers still need cross-record resolution.</p>
+when either fails. <code>checkEngineeringTargetLinks</code> now resolves typed engineering test
+targets and interface implementation pointers against unique valid local symbols.
+Preconditions, business-mapping engineering pointers, test declaration identity and
+cross-pack targets still need cross-record resolution.</p>
 <p><code>ExecutionEvidenceSchema</code> now records a test/report run's producer claim, input
 capture digests, report digest, environment, observed tests/obligations and outcome.
 A skipped run cannot claim observed obligations, and a passed run needs a completion

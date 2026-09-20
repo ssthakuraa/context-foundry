@@ -12,13 +12,15 @@ all five task artifact bodies,
 human decision receipt, task error
 and evaluation run manifest), static TypeScript types, strict Ajv runtime validators
 and generated portable JSON files. A pinned workspace lockfile and positive/negative
-tests exist. This is only a WP1 subset: remaining registered record kinds, deeper
-cross-artifact checks, broader semantic cross-record checks and independent cross-language
-canonicalization conformance are not implemented or frozen. A decision receipt's JSON shape does not establish
+tests exist. This is only a WP1 subset: remaining target-reference and provenance
+checks, broader semantic cross-record checks and contract freeze remain open.
+Independent bounded Python conformance vectors exist, but do not prove full parity.
+A decision receipt's JSON shape does not establish
 human identity or authorization; the server must issue and verify it. Do not treat
 an envelope passing schema validation as a reviewed or fully supported assertion.
-The [proposed record-kind catalog](record-kind-catalog.md) names the unimplemented
-first-slice kinds and their trust boundaries; it is not an optional-payload escape hatch.
+The [proposed record-kind catalog](record-kind-catalog.md) names nine registered
+first-slice kinds and their trust boundaries; adapters remain incomplete and the
+catalog is not an optional-payload escape hatch.
 
 Strict task body schemas now cover `scope_map`, `sufficiency`, `findings`,
 `implementation_proposal` and `completion`. Scope-map
@@ -78,8 +80,10 @@ and cross-pack composition need explicit contracts before the freeze.
 `checkBusinessFlowLinks` also verifies flow/step membership and parent identities;
 `checkObligationLinks` resolves step outcomes and explicitly typed test-to-obligation
 targets against unique obligation records. `checkReleaseIntegrity` withholds closure
-when either fails. Preconditions, engineering test targets and interface implementation
-pointers still need cross-record resolution.
+when either fails. `checkEngineeringTargetLinks` now resolves typed engineering test
+targets and interface implementation pointers against unique valid local symbols.
+Preconditions, business-mapping engineering pointers, test declaration identity and
+cross-pack targets still need cross-record resolution.
 
 `ExecutionEvidenceSchema` now records a test/report run's producer claim, input
 capture digests, report digest, environment, observed tests/obligations and outcome.

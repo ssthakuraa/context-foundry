@@ -1,6 +1,6 @@
 # Detailed implementation plan
 
-**Status:** Proposed roadmap; implementation has not started · CF-0.2
+**Status:** Revised local utility gate before enterprise hardening · CF-0.2
 
 ## Execution rule
 
@@ -11,27 +11,26 @@ estimate is implied by the sequence. Record actual effort during the first slice
 
 ## Dependency order
 
-The immediate coding queue is the narrower [WP0–WP7 validation slice](validation-work-packages.md),
-which implements only the necessary M0–M3 capabilities. Do not build full M1 platform
-administration or rich M4/M5 screens before the usefulness gate. Review
+The immediate coding queue is the narrower [validation work packages](validation-work-packages.md).
+Its POV work package now proves a local single-operator knowledge/retrieval/workflow
+path before enterprise identity and secured serving. M1 below remains the enterprise
+application milestone; only its contract portion precedes that POV. Do not build
+full M1 platform administration or rich M4/M5 screens before the usefulness gate. Review
 [readiness/risks](readiness-and-risks.md) and [ADR 0005](../decisions/0005-validation-slice-baseline.md).
 
 ```text
-M0 design/fixtures -> M1 contracts/security skeleton -> M2 preparation
-      |                                                  |
-      +-> fixed-corpus response/directive experiment      v
-                                               M3 retrieval/agent gate
-                                                         |
-                                        M4 Studio/business review
-                                                         |
-                                 M5 architecture + test-impact tracks
-                                                         |
-                                               M6 enterprise beta
+M0 design/fixtures -> M1 contracts -> M2 bounded preparation -> local POV gate
+      |                                                       |
+      +-> fixed-corpus response/directive experiment           v
+                                  enterprise identity/secured retrieval/integration
+                                                               |
+                                                M4-M6 product expansion and beta
 ```
 
 The fixed-corpus experiment may begin as soon as inputs and a safe evaluation
-harness are available. It must not wait for a large platform build. M1-M3 include
-the minimum UI needed to operate the slice; M4 expands the review experience.
+harness are available. It must not wait for a large platform build. Local POV uses
+an offline harness; M1/M3 later add authenticated UI and serving. M4 expands the
+review experience. See the POV safety/acceptance boundary in the work packages.
 
 Second-pass amendment: follow [E0–E5](../evaluation/validation-sequence.md). A small
 reviewed business/constraint dataset belongs in M2/M3; M4 expands its authoring UI.

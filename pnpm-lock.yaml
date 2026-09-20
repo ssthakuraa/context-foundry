@@ -26,6 +26,9 @@ importers:
 
   packages/extractor-spike:
     dependencies:
+      '@context-foundry/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       typescript:
         specifier: 5.9.3
         version: 5.9.3

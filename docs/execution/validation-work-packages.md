@@ -1,32 +1,36 @@
 # Validation-slice implementation work packages
 
-**Status:** Ready for owner review and bounded implementation authorization · CF-0.2
+**Status:** Revised local proof sequence; enterprise security gate remains mandatory · CF-0.2
 
 These packages implement the first slice of the [milestone plan](implementation-plan.md).
 They replace broad M1–M3 bootstrap work as the immediate coding queue. No package is
-complete until its acceptance receipts exist. No product code has been created by
-this document. Rich Studio, connectors and workbenches are excluded from this slice.
+complete until its acceptance receipts exist. The document does not itself prove
+implementation status; use the repository-root `WORKLIST.md` for verified progress.
+Rich Studio, connectors and workbenches are excluded from this slice.
 
 ## Order and scope
 
 ```text
-WP0 fixture/rubric approval -> WP1 executable contracts
-                                  |             |
-                           WP2 extraction   WP3 task/policy core
-                                  \             /
-                            WP4 secured retrieval spike
-                                       |
-                            WP5 end-to-end guided integration
-                                       |
-                            WP6 controlled evaluation
-                                       |
-                            WP7 keep/change/stop review
+WP1 contracts -> WP2 bounded extraction -> POV local retrieval/workflow
+                                                -> local utility decision
+                                                       |
+                                            WP3 identity/policy core
+                                                       |
+                                            WP4 secured retrieval
+                                                       |
+                                            WP5 integrated guided journey
+                                                       |
+                                            WP6 controlled enterprise evaluation
+                                                       |
+                                            WP7 keep/change/stop review
 ```
 
-WP2 and WP3 can proceed independently after WP1 freezes their contracts. Shared schema
-changes require a coordinated review; do not let parallel implementations invent
-different identity or approval semantics. WP4 can start with synthetic WP1 records
-while WP2 develops, but cannot pass without real captured-shape evidence.
+WP0 fixture/rubric and source-authority decisions run alongside this path and are
+required before any private or paid benchmark. Synthetic-only contract and parser work
+does not wait for them. The POV is a **local, single-operator, offline** diagnostic,
+not a shared service or an authorization test. Reuse its retrieval and workflow
+semantics in WP4/WP5; never carry a demo identity or simulated approval into
+enterprise serving. Shared schema changes require coordinated review.
 
 ## WP0 — Freeze scope, truth and execution authority
 
@@ -84,14 +88,40 @@ tuning. **Receipts:** capture/release digest set, coverage report, reviewed mapp
 receipt, parity report, preparation/curation time. **Stop:** required critical behavior
 depends on unsupported extraction; review scope or add explicit reviewed evidence.
 
+## POV — Local knowledge, retrieval and guided-workflow utility gate
+
+**Depends on:** minimum frozen WP1 contracts and bounded WP2 outputs. Implement a
+deterministic pack over explicitly selected, read-only inputs, then a same-information
+exact/lexical pointer baseline and typed-evidence treatment. Exercise scope-map,
+review feedback, selective file inspection, findings and implementation proposal in
+an offline single-operator harness. Local reviewer choices are test inputs, **not**
+authenticated human-decision receipts. Keep implementation modular so WP3/WP4 can
+enforce policy before ranking, traversal, counts and response delivery.
+
+**Safety now:** allowlisted input paths, normalized-path and byte/digest checks,
+bounded parsing, no repository code execution, no ambient scanner roots, no secrets
+in logs, source classification/provenance on every derived fact, and no network
+listener or cross-user serving. Use public synthetic fixtures by default. Approved
+private material remains outside the public repository; WP0 owner decisions govern
+private/paid runs and model data routes. An extractor's read permission never means
+publication permission.
+
+**Acceptance:** reproducible pack and coverage, exact source pointers, baseline versus
+typed retrieval comparison, useful scope corrections and selective reads on held-out
+tasks, with failures and curation time recorded. **Stop:** unsafe source handling,
+false exact binding, or unmeasured information differences. A favorable result
+authorizes consideration of enterprise controls, not deployment to other users.
+
 ## WP3 — Minimal task, identity and policy core
 
 **Packages:** policy, reviews, storage, minimal server routes and two review pages.
-**Depends on:** WP1. Implement PostgreSQL migrations, server-side principal/delegation,
+**Depends on:** the local utility decision for this sequence, plus WP1 contracts.
+Implement PostgreSQL migrations, server-side principal/delegation,
 OIDC/session boundary for human decisions, explicit scoped grants, task CAS/idempotency,
 publication receipts and current access epoch. Demo identities are loopback/synthetic
-only; no production bypass. Stage private local evaluation only after valid identity
-and publication configuration. Initial review pages show exact artifact versions and
+only; no production bypass. Stage shared/private-serving evaluation only after valid identity
+and publication configuration; offline single-operator diagnostics remain subject to
+WP0 source authority. Initial review pages show exact artifact versions and
 Accept/Request changes/Reject; postpone broad Studio administration.
 
 **Tests:** deny/no-grant/hidden-support, agent self-approval, CSRF, digest/version drift,
@@ -104,7 +134,7 @@ transition table tests, authorization matrix, database-role checks, review scree
 ## WP4 — Secured retrieval and PostgreSQL decision spike
 
 **Packages:** retrieval, storage projections, evaluation. **Depends on:** WP1 plus
-WP2/WP3 contracts and sufficient outputs. Build exact/lexical/alias retrieval,
+WP2/WP3 contracts and sufficient outputs. Secure the proven local exact/lexical/alias retrieval,
 bounded directed traversal, support authorization, inspect/evidence rendering and
 signed continuations. Implement B (simple retrieval) before C (typed enrichment)
 using common authorized captures. Keep response caching disabled.

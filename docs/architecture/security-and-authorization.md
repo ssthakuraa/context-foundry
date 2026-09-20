@@ -6,6 +6,15 @@ Authorization is a platform invariant. A user or process that is not allowed
 to access a pack, source root, function, or result must be denied regardless of
 whether the request came from the UI, CLI, API, MCP, or an extractor.
 
+The [local proof-of-value sequence](../execution/validation-work-packages.md) may
+precede implementation of enterprise identity and serving authorization, but only
+inside a single-operator, offline harness with explicitly selected read-only inputs.
+It may not expose an API/UI to other users, serve restricted packs across principals,
+or issue authoritative human approvals. Source manifests, classification, provenance,
+support requirements and publication boundaries must already be represented so later
+authorization is enforceable at both extraction and retrieval. Passing a local
+utility test is not a security acceptance receipt.
+
 ## Security boundaries
 
 1. **Identity boundary** — authenticate users, services, and scheduled jobs.

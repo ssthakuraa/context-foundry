@@ -9,8 +9,10 @@ validation slice. Start with the [research verdict](research/design-closeout.md)
 [product requirements](requirements/product-requirements.md), and
 [readiness/risk register](execution/readiness-and-risks.md). This means a concrete
 implementation handoff exists, not that the architecture is empirically proven.
-No comparative agent experiments, PostgreSQL spike or product runtime has run;
-WP1 executable-contract work is underway.
+No comparative agent experiments, PostgreSQL spike or serving product runtime has run;
+WP1 executable-contract work and an isolated TypeScript candidate spike are underway.
+The [work packages](execution/validation-work-packages.md) now put a local,
+single-operator utility proof before enterprise identity and secured serving.
 
 The package specifies product boundaries, system architecture, a concrete technology
 proposal, preparation/business knowledge, retrieval/directives, UI journeys, security,
@@ -64,7 +66,7 @@ and [interfaces](technical-design/interfaces.md) in detail.
 | Initial stack | React/TypeScript, Node/Fastify, PostgreSQL, immutable blobs | Dependency compatibility and actual scoped workload |
 | Retrieval behavior | Compact orientation plus focused operations | Fixed-corpus ablation and interaction comparison |
 | First fixture | Private rentalapp/platform/agentic-platform maintenance plus public-safe synthetic cases | Frozen capture, owner rubric, sealed leasing stories and execution budget |
-| Initial scope | Secure Java/Spring + TypeScript preparation-to-investigation slice with both gates and minimal proposal | WP0–7 / M3 outcome gate before rich workbenches |
+| Initial scope | Offline, single-operator preparation-to-retrieval/workflow utility proof first; enterprise enforcement of both review gates and scoped serving before shared use | POV decision, then WP3–WP5 security/integration gates before rich workbenches |
 | Semantic extraction | Offline reviewable proposals, optional later | Mapping accuracy, curation cost, enterprise model policy |
 | Success thresholds | Quality-first, proposed effort and latency gates | Review threshold suitability before experiments |
 
