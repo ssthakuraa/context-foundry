@@ -26,10 +26,13 @@ def normalized_relative_path(path):
 
 
 def valid_semantics(schema, value):
+    if schema == "source_capture":
+        return value["revision_kind"] != "git" or bool(value.get("revision_value"))
     if schema == "captured_file":
         return normalized_relative_path(value["path"])
     if schema == "evidence_locator":
-        return (normalized_relative_path(value["path"])
+        return ((value["revision_kind"] != "git" or bool(value.get("revision_value")))
+                and normalized_relative_path(value["path"])
                 and (value["kind"] != "file_range" or value["start_line"] <= value["end_line"])
                 and ("byte_span" not in value
                      or value["byte_span"]["start"] < value["byte_span"]["end"]))

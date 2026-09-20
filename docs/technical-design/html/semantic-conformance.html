@@ -58,6 +58,12 @@ p, li, td, a { overflow-wrap: anywhere; }
 <td>Parity checked: path examples</td>
 </tr>
 <tr>
+<td>CF-S13</td>
+<td>Git source capture and locator</td>
+<td>Git revision value is present, while supplied snapshots may omit it</td>
+<td>Parity checked</td>
+</tr>
+<tr>
 <td>CF-S02</td>
 <td>File-range and byte-span locator</td>
 <td>Start is at most end for lines, strictly less for byte offsets</td>
@@ -149,7 +155,7 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 </tbody>
 </table>
-<p><code>CF-S01</code>–<code>CF-S05</code>, <code>CF-S11</code>, and the scope-map subset of <code>CF-S08</code> are a bounded cross-language start, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages check shape; Python does not implement the other four task body kinds or cross-object checks. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>
+<p><code>CF-S01</code>–<code>CF-S05</code>, <code>CF-S11</code>, <code>CF-S13</code>, and the scope-map subset of <code>CF-S08</code> are a bounded cross-language start, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages check shape; Python does not implement the other four task body kinds or cross-object checks. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>
 <p>Run from the repository root: <code>pnpm test</code> and, in a Python 3.12 environment with <a href="../../../scripts/requirements-semantic-python.txt">pinned semantic-check dependencies</a>, <code>python3 scripts/check-semantic-python.py</code>. The public fixture checker has no access to private evaluation sources.</p>
 
     </article>

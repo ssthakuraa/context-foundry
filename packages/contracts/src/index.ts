@@ -753,9 +753,17 @@ function applicabilityErrors(applicability: BusinessRulePayload['applicability']
 }
 
 function semanticErrors(name: SchemaName, value: unknown): string[] {
+  if (name === 'source_capture') {
+    const capture = value as SourceCapture;
+    return capture.revision_kind === 'git' && !capture.revision_value
+      ? ['/revision_value is required for Git captures'] : [];
+  }
   if (name === 'evidence_locator') {
     const locator = value as EvidenceLocator;
     const errors: string[] = [];
+    if (locator.revision_kind === 'git' && !locator.revision_value) {
+      errors.push('/revision_value is required for Git locators');
+    }
     if (!normalizedRelativePath(locator.path)) {
       errors.push('/path must be a normalized relative POSIX path');
     }

@@ -47,7 +47,7 @@ test('digest, source and revision errors remain separate outcomes', () => {
     ],
   );
   assert.deepEqual(issues.map(issue => issue.code), [
-    'FILE_DIGEST_MISMATCH', 'REVISION_MISMATCH', 'REVISION_MISMATCH', 'UNBOUND_LOCATOR_SOURCE',
+    'FILE_DIGEST_MISMATCH', 'REVISION_MISMATCH', 'INVALID_LOCATOR', 'UNBOUND_LOCATOR_SOURCE',
   ]);
 });
 
@@ -62,6 +62,15 @@ test('missing or duplicate metadata never creates an exact binding', () => {
 test('unsafe locator shape is rejected before binding', () => {
   const issues = checkCaptureBindings([captureA], [fileA], [{ ...locatorA, path: '../secret' }]);
   assert.deepEqual(issues.map(issue => issue.code), ['INVALID_LOCATOR']);
+});
+
+test('a Git source or locator without a pinned revision cannot bind', () => {
+  const { revision_value: _captureRevision, ...unpinnedCapture } = captureA;
+  const { revision_value: _locatorRevision, ...unpinnedLocator } = locatorA;
+  assert.deepEqual(checkCaptureBindings([unpinnedCapture], [fileA], []).map(issue => issue.code),
+    ['INVALID_CAPTURE', 'UNBOUND_FILE']);
+  assert.deepEqual(checkCaptureBindings([captureA], [fileA], [unpinnedLocator])
+    .map(issue => issue.code), ['INVALID_LOCATOR']);
 });
 
 test('file manifest digest is order independent but closes every metadata field', () => {

@@ -7,7 +7,9 @@ includes source/authority/snapshot identities, revision kind/value, file-manifes
 digest, publication-policy reference and capture producer. The locator schema
 carries source/snapshot identity, relative path and file digest, with separate
 file, file-range and document-section shapes. Strict semantic validation rejects
-non-normalized relative paths and reversed line/byte bounds. A captured-file
+non-normalized relative paths and reversed line/byte bounds. Git captures and
+locators require a revision value; supplied immutable snapshots may omit a separate
+revision value because their snapshot identity is explicit. A captured-file
 envelope and metadata-only binding check now distinguish missing files, revision
 drift and locator/file digest disagreement across separate source identities.
 The check recomputes the capture's file-manifest digest from canonical, path-sorted

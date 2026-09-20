@@ -7,6 +7,7 @@ The language-neutral [semantic vectors](../../packages/contracts/fixtures/semant
 | Rule ID | Scope | Invariant | Portable status |
 |---|---|---|---|
 | CF-S01 | Captured file and evidence locator | Path is relative normalized POSIX: no absolute/drive prefix, backslash, control character, empty, `.` or `..` segment | Parity checked: path examples |
+| CF-S13 | Git source capture and locator | Git revision value is present, while supplied snapshots may omit it | Parity checked |
 | CF-S02 | File-range and byte-span locator | Start is at most end for lines, strictly less for byte offsets | Parity checked |
 | CF-S03 | Coverage | Processed + failed + excluded does not exceed eligible | Parity checked |
 | CF-S04 | Engineering symbol | Callable method, constructor or function has a nonempty signature | Parity checked: method example |
@@ -23,6 +24,6 @@ The language-neutral [semantic vectors](../../packages/contracts/fixtures/semant
 | CF-X03 | Task artifacts in a task | Exact same-task referenced version/kind exists and cross-artifact links are consistent | TypeScript only; not approval |
 | CF-X04 | Flow/step/obligation records | Flow membership and explicitly typed obligation references resolve uniquely | TypeScript only; not business truth or test execution |
 
-`CF-S01`–`CF-S05`, `CF-S11`, and the scope-map subset of `CF-S08` are a bounded cross-language start, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages check shape; Python does not implement the other four task body kinds or cross-object checks. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.
+`CF-S01`–`CF-S05`, `CF-S11`, `CF-S13`, and the scope-map subset of `CF-S08` are a bounded cross-language start, not a second complete validator. Semantic cases satisfy the exported JSON Schema so their acceptance difference isolates a semantic rule. Both languages check shape; Python does not implement the other four task body kinds or cross-object checks. Before contract freeze, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.
 
 Run from the repository root: `pnpm test` and, in a Python 3.12 environment with [pinned semantic-check dependencies](../../scripts/requirements-semantic-python.txt), `python3 scripts/check-semantic-python.py`. The public fixture checker has no access to private evaluation sources.

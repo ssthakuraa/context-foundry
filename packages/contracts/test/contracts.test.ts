@@ -118,6 +118,10 @@ test('capture accepts a bounded source identity and rejects unknown fields', () 
   assert.equal(validate('source_capture', { ...capture, file_manifest_digest: 'wrong' }), false);
   assert.equal(validate('source_capture', { ...capture, schema_version: '0.1.0' }), false);
   assert.equal(validate('source_capture', { ...capture, revision_kind: 'unversioned' }), false);
+  assert.equal(validate('source_capture', { ...capture, revision_value: undefined }), false);
+  assert.equal(validate('source_capture', {
+    ...capture, revision_kind: 'supplied_snapshot', revision_value: undefined,
+  }), true);
 });
 
 test('locators discriminate file lines from document sections', () => {
@@ -126,6 +130,7 @@ test('locators discriminate file lines from document sections', () => {
     revision_value: '0123456', path: 'src/Service.java', file_digest: hash,
   };
   assert.equal(validate('evidence_locator', { kind: 'file', ...base }), true);
+  assert.equal(validate('evidence_locator', { kind: 'file', ...base, revision_value: undefined }), false);
   assert.equal(validate('evidence_locator', { kind: 'file', ...base, evidence_id: undefined }), false);
   assert.equal(validate('evidence_locator', {
     kind: 'file_range', ...base, start_line: 3, end_line: 9,

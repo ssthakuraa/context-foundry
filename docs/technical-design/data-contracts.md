@@ -44,7 +44,8 @@ The capture/locator/coverage envelopes were reconciled with the more precise
 [extraction and binding contract](extraction-and-source-binding.md) before freeze.
 Their individual normalized-path, line/byte-order and coverage-count checks are
 supplemented by `checkCaptureBindings`, which compares source/snapshot/revision/path
-and captured-file digests without reading source. It also recomputes a capture's
+and captured-file digests without reading source. Git captures and locators require
+a revision value. The check also recomputes a capture's
 `file_manifest_digest` from its complete declared `CapturedFile` metadata: validate
 each entry, require one source/snapshot and unique normalized paths, sort by path
 using UTF-16 code-unit order, then SHA-256 hash the canonical JSON array. An empty
