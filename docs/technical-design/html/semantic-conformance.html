@@ -135,6 +135,12 @@ p, li, td, a { overflow-wrap: anywhere; }
 <td>Exact same-task referenced version/kind exists and cross-artifact links are consistent</td>
 <td>TypeScript only; not approval</td>
 </tr>
+<tr>
+<td>CF-X04</td>
+<td>Flow/step/obligation records</td>
+<td>Flow membership and explicitly typed obligation references resolve uniquely</td>
+<td>TypeScript only; not business truth or test execution</td>
+</tr>
 </tbody>
 </table>
 <p><code>CF-S01</code>–<code>CF-S05</code> and <code>CF-S11</code> are a bounded cross-language start, not a second complete validator. Every case is intended to satisfy the exported JSON Schema so its acceptance difference isolates a semantic rule. The Python script trusts that precondition; the TypeScript test checks full shape plus semantics. Before contract freeze, add a portable schema validator or schema prevalidation for the second implementation, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.</p>

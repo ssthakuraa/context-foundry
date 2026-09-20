@@ -20,6 +20,7 @@ The language-neutral [semantic vectors](../../packages/contracts/fixtures/semant
 | CF-X01 | Capture, files and locators | Exact source/snapshot/revision and digest binding, declared manifest closure | TypeScript only, metadata only |
 | CF-X02 | Record support graph | References exist, graph is acyclic, every record has nonempty transitive source support | TypeScript only |
 | CF-X03 | Task artifacts in a task | Exact same-task referenced version/kind exists and cross-artifact links are consistent | TypeScript only; not approval |
+| CF-X04 | Flow/step/obligation records | Flow membership and explicitly typed obligation references resolve uniquely | TypeScript only; not business truth or test execution |
 
 `CF-S01`–`CF-S05` and `CF-S11` are a bounded cross-language start, not a second complete validator. Every case is intended to satisfy the exported JSON Schema so its acceptance difference isolates a semantic rule. The Python script trusts that precondition; the TypeScript test checks full shape plus semantics. Before contract freeze, add a portable schema validator or schema prevalidation for the second implementation, expand positive/negative boundaries, cover the remaining single-object and cross-object rules, and publish versioned rejection behavior. Consumers must not infer parity for an untested row.
 

@@ -362,6 +362,41 @@ export function checkBusinessFlowLinks(records: readonly RecordEnvelope[]): read
   return issues;
 }
 
+export type ObligationLinkIssueCode =
+  | 'INVALID_OBLIGATION_RECORD' | 'DUPLICATE_OBLIGATION_ENTITY' | 'MISSING_OUTCOME_OBLIGATION'
+  | 'MISSING_TEST_TARGET_OBLIGATION';
+export type ObligationLinkIssue = { code: ObligationLinkIssueCode; index: number };
+
+/** Resolve only explicitly typed obligation references in this record set. No test-run or truth claim. */
+export function checkObligationLinks(records: readonly RecordEnvelope[]): readonly ObligationLinkIssue[] {
+  const issues: ObligationLinkIssue[] = [];
+  const obligations = new Set<string>();
+  records.forEach((record, index) => {
+    if (record.kind !== 'behavior.obligation') return;
+    if (!validate('record_envelope', record)) {
+      issues.push({ code: 'INVALID_OBLIGATION_RECORD', index });
+    } else if (obligations.has(record.entity_id)) {
+      issues.push({ code: 'DUPLICATE_OBLIGATION_ENTITY', index });
+    } else obligations.add(record.entity_id);
+  });
+  records.forEach((record, index) => {
+    if (!validate('record_envelope', record)) return;
+    if (record.kind === 'business.flow_step') {
+      for (const ref of (record.payload as BusinessFlowStepPayload).outcome_refs) {
+        if (!obligations.has(ref)) issues.push({ code: 'MISSING_OUTCOME_OBLIGATION', index });
+      }
+    }
+    if (record.kind === 'test.association') {
+      const association = record.payload as TestAssociationPayload;
+      if (association.target_kind === 'behavior_obligation' &&
+        !obligations.has(association.target_entity_id)) {
+        issues.push({ code: 'MISSING_TEST_TARGET_OBLIGATION', index });
+      }
+    }
+  });
+  return issues;
+}
+
 export const RelationshipPayloadSchema = Type.Object({
   subject_id: id(),
   object_id: id(),
@@ -1069,16 +1104,18 @@ export function checkReleaseIntegrity(
   locators: readonly EvidenceLocator[],
   records: readonly RecordEnvelope[],
 ): { bindingIssues: readonly BindingIssue[]; supportIssues: readonly SupportIssue[];
-  flowIssues: readonly FlowLinkIssue[];
+  flowIssues: readonly FlowLinkIssue[]; obligationIssues: readonly ObligationLinkIssue[];
   evidenceByRecord?: ReadonlyMap<string, readonly string[]> } {
   const bindingIssues = checkCaptureBindings(captures, files, locators);
   const support = checkSupportClosure(records, locators);
   const flowIssues = checkBusinessFlowLinks(records);
+  const obligationIssues = checkObligationLinks(records);
   return {
     bindingIssues,
     supportIssues: support.issues,
     flowIssues,
-    ...(bindingIssues.length || support.issues.length || flowIssues.length ? {} :
+    obligationIssues,
+    ...(bindingIssues.length || support.issues.length || flowIssues.length || obligationIssues.length ? {} :
       { evidenceByRecord: support.evidenceByRecord }),
   };
 }

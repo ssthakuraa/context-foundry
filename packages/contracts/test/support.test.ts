@@ -105,6 +105,7 @@ test('combined integrity gate withholds closure when capture metadata is inconsi
   assert.deepEqual(good.bindingIssues, []);
   assert.deepEqual(good.supportIssues, []);
   assert.deepEqual(good.flowIssues, []);
+  assert.deepEqual(good.obligationIssues, []);
   assert.deepEqual(good.evidenceByRecord?.get('rec:one'), ['ev:one']);
 
   const altered = checkReleaseIntegrity([capture], [{ ...file, bytes: 11 }],
@@ -125,6 +126,17 @@ test('combined integrity gate withholds closure when capture metadata is inconsi
   assert.deepEqual(unclosed.supportIssues, []);
   assert.deepEqual(unclosed.flowIssues.map(issue => issue.code), ['MISSING_FLOW_STEP']);
   assert.equal(unclosed.evidenceByRecord, undefined);
+
+  const danglingTest: RecordEnvelope = {
+    ...record('rec:test', ['ev:one']), kind: 'test.association', origin: 'static_resolution',
+    payload: { test_entity_id: 'test:one', target_entity_id: 'obligation:missing',
+      target_kind: 'behavior_obligation', association_basis: 'static_reference',
+      expected_scope: 'approval threshold' },
+  };
+  const dangling = checkReleaseIntegrity([capture], [file], [locator('ev:one')], [danglingTest]);
+  assert.deepEqual(dangling.supportIssues, []);
+  assert.deepEqual(dangling.obligationIssues.map(issue => issue.code), ['MISSING_TEST_TARGET_OBLIGATION']);
+  assert.equal(dangling.evidenceByRecord, undefined);
 });
 
 test('oversized transitive support fails closed', () => {

@@ -67,8 +67,10 @@ metadata checks, not checks of current source bytes, evidence truth, approval,
 publication permission or a user's current grants. Authenticated non-source support
 and cross-pack composition need explicit contracts before the freeze.
 `checkBusinessFlowLinks` also verifies flow/step membership and parent identities;
-`checkReleaseIntegrity` withholds closure when those fail. Preconditions, outcomes,
-test targets and interface implementation pointers still need cross-record resolution.
+`checkObligationLinks` resolves step outcomes and explicitly typed test-to-obligation
+targets against unique obligation records. `checkReleaseIntegrity` withholds closure
+when either fails. Preconditions, engineering test targets and interface implementation
+pointers still need cross-record resolution.
 
 `ExecutionEvidenceSchema` now records a test/report run's producer claim, input
 capture digests, report digest, environment, observed tests/obligations and outcome.
