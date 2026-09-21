@@ -122,7 +122,10 @@ checkpoint. This is not evidence of retrieval utility or authorization.
 
 A3 prototype checkpoint `df91a30` is pushed. Subsequent local A3 work adds exact
 inspect, stale mapping exclusion, a negative service-to-data gap and an offline
-obligation-stage audit; the current preparation suite has 18 passing tests.
+obligation-stage audit; checkpoint `4398e77` is pushed. The next local slice
+adds exact identity precedence, a safe relation policy, reverse test-impact
+nomination and round-robin concern seeds; the current preparation suite has 21
+passing tests.
 Before another checkpoint, rerun tests/typecheck/HTML checks and update this
 receipt. A3 remains in progress, not an agent-productivity verdict.
 

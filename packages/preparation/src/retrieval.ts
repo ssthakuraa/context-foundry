@@ -2,10 +2,11 @@ import { canonicalJson, type EvidenceLocator } from '@context-foundry/contracts'
 import type { ExtensionRecord } from '@context-foundry/contracts/extensions';
 import type { CrossLayerCandidate } from './cross-layer.js';
 
-export type RetrievalIntent = 'api_use' | 'enhancement';
+export type RetrievalIntent = 'api_use' | 'enhancement' | 'test_impact';
 export type RetrievalMode = 'lexical' | 'typed';
 export type RetrievalRequest = {
   question: string; intent: RetrievalIntent; mode: RetrievalMode;
+  concerns?: readonly { id: string; text: string }[];
   max_seeds?: number; max_hops?: number; max_bytes?: number;
 };
 export type RetrievalFact = {
@@ -14,6 +15,7 @@ export type RetrievalFact = {
   classification: ExtensionRecord['classification'];
   locators: readonly { path: string; evidence_id: string; file_digest: string }[];
   reason: 'lexical' | 'exact' | 'typed_connector';
+  concern_id?: string;
   via?: string;
 };
 export type RetrievalPacket = {
@@ -56,7 +58,8 @@ const rank = (item: ExtensionRecord, query: string, terms: readonly string[]): n
     .join(' ').toLowerCase();
   if (!terms.length) return 0;
   const matched = terms.filter(term => searchable.includes(term)).length;
-  return matched ? matched * 10 + (searchable.includes(query) ? 100 : 0) : 0;
+  return matched ? matched * 10 +
+    (item.identity.key.toLowerCase() === query ? 1000 : searchable.includes(query) ? 100 : 0) : 0;
 };
 
 /** Offline same-information comparison. Caller provides an already validated candidate. */
@@ -66,19 +69,46 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
   const maxSeeds = request.max_seeds ?? 3;
   const maxHops = request.max_hops ?? 3;
   const maxBytes = request.max_bytes ?? 32 * 1024;
-  if (!question || question.length > 2048 || /[\u0000-\u001f]/u.test(question) ||
-    !['lexical', 'typed'].includes(mode) || !['api_use', 'enhancement'].includes(intent) ||
+  const suppliedConcerns = request.concerns ?? [{ id: 'original', text: question }];
+  if (!question.trim() || question.length > 2048 ||
+    /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/u.test(question) ||
+    !suppliedConcerns.length || suppliedConcerns.length > 8 ||
+    new Set(suppliedConcerns.map(item => item.id)).size !== suppliedConcerns.length ||
+    suppliedConcerns.some(item => !item.id || item.id.length > 128 || !item.text.trim() ||
+      item.text.length > 2048 ||
+      /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/u.test(item.text)) ||
+    !['lexical', 'typed'].includes(mode) ||
+    !['api_use', 'enhancement', 'test_impact'].includes(intent) ||
     !Number.isInteger(maxSeeds) || maxSeeds < 1 || maxSeeds > 32 ||
     !Number.isInteger(maxHops) || maxHops < 0 || maxHops > 4 ||
     !Number.isInteger(maxBytes) || maxBytes < 256 || maxBytes > 32 * 1024) {
     return { ok: false, code: 'INVALID_REQUEST' };
   }
-  const normalized = question.trim().toLowerCase();
-  const terms = [...new Set(normalized.match(/[\p{L}\p{N}_]+/gu) ?? [])];
-  const ranked = candidate.records.map(item => ({ item, score: rank(item, normalized, terms) }))
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score || a.item.record_id.localeCompare(b.item.record_id));
-  const seeds = ranked.slice(0, maxSeeds).map(item => item.item);
+  const lanes = suppliedConcerns.map(concern => {
+    const normalized = concern.text.trim().toLowerCase();
+    const terms = [...new Set(normalized.match(/[\p{L}\p{N}_]+/gu) ?? [])];
+    return { id: concern.id, ranked: candidate.records.map(item => ({
+      item, score: rank(item, normalized, terms),
+    })).filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score || a.item.record_id.localeCompare(b.item.record_id)) };
+  });
+  const rankedIds = new Set(lanes.flatMap(lane => lane.ranked.map(item => item.item.record_id)));
+  const seedEntries: { item: ExtensionRecord; concern_id: string }[] = [];
+  const seen = new Set<string>();
+  for (let depth = 0; seedEntries.length < maxSeeds && depth < 32; depth++) {
+    let any = false;
+    for (const lane of lanes) {
+      const match = lane.ranked[depth];
+      if (!match) continue;
+      any = true;
+      if (seen.has(match.item.record_id)) continue;
+      seen.add(match.item.record_id);
+      seedEntries.push({ item: match.item, concern_id: lane.id });
+      if (seedEntries.length >= maxSeeds) break;
+    }
+    if (!any) break;
+  }
+  const seeds = seedEntries.map(entry => entry.item);
   const byId = new Map(candidate.records.map(item => [item.record_id, item]));
   const byIdentity = new Map(candidate.records.map(item => [
     `${item.kind}\u0000${canonicalJson(item.identity)}`, item,
@@ -96,14 +126,30 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       // API consumption exposes declared contract facts; implementation links are
       // enhancement pointers, not evidence of the public API's runtime behavior.
       if (intent === 'api_use') continue;
-      const from = links.get(first.record_id) ?? [];
-      from.push({ target: second.record_id, via: edge.record_id });
-      links.set(first.record_id, from);
+      const relation = edge.payload['relation_type'];
+      const safeEngineering = edge.kind === 'engineering.relationship' &&
+        ['api.implemented_by', 'engineering.calls', 'engineering.persisted_in'].includes(
+          String(relation));
+      const safeMapping = edge.kind === 'business.mapping' &&
+        edge.payload['mapping_relation'] === 'exposed_by' &&
+        edge.payload['mapping_basis'] === 'reviewed_association';
+      const safeTest = edge.kind === 'test.association' &&
+        edge.payload['association_basis'] === 'reviewed_relevance';
+      if (intent === 'enhancement' && !(safeEngineering || safeMapping)) continue;
+      if (intent === 'test_impact' && !(safeEngineering || safeTest)) continue;
+      const from = intent === 'test_impact' ? second : first;
+      const to = intent === 'test_impact' ? first : second;
+      const group = links.get(from.record_id) ?? [];
+      group.push({ target: to.record_id, via: edge.record_id });
+      links.set(from.record_id, group);
     }
   }
-  const selected = new Map<string, { reason: RetrievalFact['reason']; via?: string }>();
-  for (const seed of seeds) selected.set(seed.record_id, {
-    reason: seed.identity.key.toLowerCase() === normalized ? 'exact' : 'lexical',
+  const selected = new Map<string, { reason: RetrievalFact['reason']; via?: string;
+    concern_id?: string }>();
+  for (const seed of seedEntries) selected.set(seed.item.record_id, {
+    reason: seed.item.identity.key.toLowerCase() ===
+      suppliedConcerns.find(item => item.id === seed.concern_id)!.text.trim().toLowerCase()
+      ? 'exact' : 'lexical', concern_id: seed.concern_id,
   });
   let examinedEdges = 0;
   const queue = seeds.map(item => ({ id: item.record_id, depth: 0 }));
@@ -130,12 +176,14 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       locators: item.evidence_refs.map(ref => locators.get(ref)).filter(
         (value): value is EvidenceLocator => !!value).map(value => ({
         path: value.path, evidence_id: value.evidence_id, file_digest: value.file_digest,
-      })), reason: selection.reason, ...(selection.via ? { via: selection.via } : {}) });
+      })), reason: selection.reason,
+      ...(selection.concern_id ? { concern_id: selection.concern_id } : {}),
+      ...(selection.via ? { via: selection.via } : {}) });
   }
   const packet: RetrievalPacket = { request, candidate_digest: candidate.digest, facts,
-    stage: { candidates: ranked.length, seeds: seeds.length, examined_edges: examinedEdges,
+    stage: { candidates: rankedIds.size, seeds: seeds.length, examined_edges: examinedEdges,
       admitted_connectors: facts.filter(item => item.reason === 'typed_connector').length,
-      omitted_for_limit: Math.max(0, ranked.length - maxSeeds) },
+      omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) },
     diagnostics: candidate.coverage.some(item => item.status !== 'complete_for_declared_scope')
       ? ['PARTIAL_COVERAGE'] : [],
   };

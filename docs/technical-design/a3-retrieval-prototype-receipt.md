@@ -14,8 +14,8 @@ refuses to truncate an oversized response into a misleading path. This library
 is neither a shared service nor an authorization boundary.
 
 The public fixture's `coordinator` enhancement query is a useful narrow test.
-With one seed in each arm, the lexical packet is 797 bytes and contains the
-business rule; the typed packet is 4,852 bytes and additionally retains the
+With one seed in each arm, the current lexical packet is 821 bytes and contains the
+business rule; the typed packet is 4,876 bytes and additionally retains the
 reviewed rule-to-operation mapping, literal operation-to-controller link and
 source-resolved controller-to-service call. It examines three edges and admits
 six connector facts. Both warn of partial coverage. The test can emit each full
@@ -44,9 +44,24 @@ by typed traversal. On service-to-data, the SQL table is source-present yet abse
 from the packet, classified as a traversal/budget gap. A wide lexical audit that
 cannot serialize is marked evaluation-incomplete, not mistaken for zero recall.
 
+Reverse `test_impact` traversal can nominate the reviewed test association from
+an exact service symbol. It does not claim that the test ran or passed. This test
+also exposed a seed-ranking bug: a relationship whose key merely contained the
+whole service identity tied with the exact symbol. Exact identity now outranks
+substring matches. Traversal uses an explicit safe relation list; an arbitrary
+relationship payload cannot silently become a core path.
+
+Up to eight caller-stated concerns can now nominate seeds in round-robin order
+under one shared seed cap; a two-concern test retains both approval and storage
+entries. The original question remains a separate request field. This is not
+yet the specified multi-lane rank fusion or concern-aware path packing, and the
+caller-supplied concerns are not treated as verified requirement truth. A multiline
+original story is preserved verbatim in the packet; disallowed control bytes
+are rejected.
+
 Open A3 work: separate orientation/trace/evidence operations; concern
 diversity, exact/lexical lane fusion and admission; path- and byte-budget stage
 loss reporting; stale/conflicting rule and unsupported-access cases; reverse
-test-impact traversal; cycle/ambiguity and tie handling; full captured packets
+broader test-impact traversal; cycle/ambiguity and tie handling; full captured packets
 for every scenario; and a measured quality/byte comparison. A3 must not be
 marked complete on this one favorable path.

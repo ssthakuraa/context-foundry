@@ -296,3 +296,50 @@ test('evaluation oracle reports connector gain and unresolved data-path loss by 
   assert.equal(missing.obligations[0]?.lexical_candidate, false);
   assert.equal(missing.obligations[0]?.loss_stage, 'typed_traversal_or_budget');
 });
+
+test('reverse test-impact path nominates reviewed test relevance without claiming execution', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, {
+    question: 'fixture.repairs.RepairService.approve(String)',
+    intent: 'test_impact', mode: 'typed', max_seeds: 1, max_hops: 2 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(result.packet.facts.some(item => item.identity.includes('rejectsSecondApproval')));
+  assert.ok(result.packet.facts.some(item => item.kind === 'test.association' &&
+    item.origin === 'human_asserted'));
+  assert.ok(!result.json.includes('test_passed'));
+});
+
+test('two explicit concerns each retain a seed under the shared cap', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, {
+    question: 'Investigate approval and request storage', intent: 'enhancement',
+    mode: 'lexical', max_seeds: 2,
+    concerns: [{ id: 'approval', text: 'coordinator' },
+      { id: 'storage', text: 'REPAIR_REQUEST' }],
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.deepEqual(result.packet.facts.map(item => item.concern_id), ['approval', 'storage']);
+  assert.equal(result.packet.stage.seeds, 2);
+});
+
+test('original multiline story is preserved separately from stated concerns', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const story = 'As a coordinator,\nI need to approve a request.';
+  const result = retrieveCandidate(built.candidate, { question: story,
+    concerns: [{ id: 'business', text: 'coordinator' }],
+    intent: 'enhancement', mode: 'lexical', max_seeds: 1 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.packet.request.question, story);
+  assert.equal(result.packet.facts[0]?.concern_id, 'business');
+  assert.deepEqual(retrieveCandidate(built.candidate, { question: 'bad\u0000story',
+    intent: 'enhancement', mode: 'lexical' }), { ok: false, code: 'INVALID_REQUEST' });
+});
