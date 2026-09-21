@@ -43,6 +43,22 @@ importers:
         specifier: 24.9.1
         version: 24.9.1
 
+  packages/preparation:
+    dependencies:
+      '@context-foundry/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@context-foundry/extractor-spike':
+        specifier: workspace:*
+        version: link:../extractor-spike
+    devDependencies:
+      '@types/node':
+        specifier: 24.9.1
+        version: 24.9.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
 packages:
 
   '@sinclair/typebox@0.34.52':

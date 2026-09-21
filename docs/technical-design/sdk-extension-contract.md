@@ -1,11 +1,13 @@
 # SDK extension and interoperability contract
 
-**Status:** CF-0.3 implementation specification; not implemented or schema-frozen.
+**Status:** CF-0.3 implementation specification; partially implemented, not schema-frozen.
 
-**A1 progress:** the [minimum compatibility receipt](a1-compatibility-receipt.md)
-documents implemented `0.3.0` profiles/manifests, records, generic descriptor
-search and Python conformance. The process runner, all first-party kind ports and
-enterprise installer enforcement below are still pending.
+**A1/A2 progress:** the [minimum compatibility receipt](a1-compatibility-receipt.md)
+documents implemented `0.3.0` profiles/manifests, records and generic descriptor
+search. The [bounded preparation receipt](a2-preparation-receipt.md) covers a
+reviewed-adapter process runner, Python producer and seven first-party profiles.
+Enterprise installer enforcement, trusted source capture and remaining kind ports
+are still pending.
 Implements CF-R11, CF-R12, CF-R13 and CF-R17. Read with the
 [architecture decision](../architecture/architecture-review.md).
 

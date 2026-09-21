@@ -39,11 +39,12 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../architecture-handoff.md">Markdown source</a></nav>
     <article>
       <h1 id="bounded-implementation-handoff-after-architecture-review">Bounded implementation handoff after architecture review</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#scope-and-model-handoff">Scope and model handoff</a></li><li><a href="#a1-freeze-the-minimum-extension-and-evidence-slice">A1 — Freeze the minimum extension and evidence slice</a></li><li><a href="#a2-conforming-producer-runner-and-one-integrated-capture">A2 — Conforming producer runner and one integrated capture</a></li><li><a href="#a3-retrieval-loop-and-same-information-baseline">A3 — Retrieval loop and same-information baseline</a></li><li><a href="#a4-reviewed-investigation-walkthrough-and-utility-decision">A4 — Reviewed investigation walkthrough and utility decision</a></li><li><a href="#a5-refresh-correctness-and-implementation-handoff-receipt">A5 — Refresh correctness and implementation handoff receipt</a></li><li><a href="#existing-code-disposition">Existing code disposition</a></li></ul></details>
-<p><strong>Status:</strong> CF-0.3 queue in progress · 2026-09-20. A1 is complete; A2–A5 are pending.
-Implementation has resumed. Resume at A2 using the
+<p><strong>Status:</strong> CF-0.3 queue in progress · 2026-09-20. A1 is complete; A2 has a
+synthetic local receipt; A3–A5 are pending. Resume at A3 using the
 root <code>WORKLIST.md</code>; do not repeat a broad research survey or build a platform shell.</p>
 <p>The <a href="../../technical-design/html/a1-compatibility-receipt.html">A1 compatibility receipt</a>
-records the implemented minimum wire slice and the remaining A2 integration work.</p>
+records the minimum wire slice. The <a href="../../technical-design/html/a2-preparation-receipt.html">A2 preparation receipt</a>
+records the current integrated-candidate boundary and unsupported semantics.</p>
 <h2 id="scope-and-model-handoff">Scope and model handoff</h2>
 <p>Read <a href="../../architecture/html/architecture-review.html">the architecture decision</a>,
 <a href="../../technical-design/html/sdk-extension-contract.html">SDK contract</a> and

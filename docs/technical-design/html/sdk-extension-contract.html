@@ -39,11 +39,13 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../sdk-extension-contract.md">Markdown source</a></nav>
     <article>
       <h1 id="sdk-extension-and-interoperability-contract">SDK extension and interoperability contract</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#extension-units-and-boundaries">Extension units and boundaries</a></li><li><a href="#installed-manifest">Installed manifest</a></li><li><a href="#common-projections-not-untyped-escape-hatches">Common projections, not untyped escape hatches</a></li><li><a href="#identity-and-resolution">Identity and resolution</a></li><li><a href="#process-exchange-and-local-safety">Process exchange and local safety</a></li><li><a href="#compatibility-and-migration">Compatibility and migration</a></li><li><a href="#extension-author-acceptance">Extension author acceptance</a></li></ul></details>
-<p><strong>Status:</strong> CF-0.3 implementation specification; not implemented or schema-frozen.</p>
-<p><strong>A1 progress:</strong> the <a href="a1-compatibility-receipt.html">minimum compatibility receipt</a>
-documents implemented <code>0.3.0</code> profiles/manifests, records, generic descriptor
-search and Python conformance. The process runner, all first-party kind ports and
-enterprise installer enforcement below are still pending.
+<p><strong>Status:</strong> CF-0.3 implementation specification; partially implemented, not schema-frozen.</p>
+<p><strong>A1/A2 progress:</strong> the <a href="a1-compatibility-receipt.html">minimum compatibility receipt</a>
+documents implemented <code>0.3.0</code> profiles/manifests, records and generic descriptor
+search. The <a href="a2-preparation-receipt.html">bounded preparation receipt</a> covers a
+reviewed-adapter process runner, Python producer and seven first-party profiles.
+Enterprise installer enforcement, trusted source capture and remaining kind ports
+are still pending.
 Implements CF-R11, CF-R12, CF-R13 and CF-R17. Read with the
 <a href="../../architecture/html/architecture-review.html">architecture decision</a>.</p>
 <h2 id="extension-units-and-boundaries">Extension units and boundaries</h2>

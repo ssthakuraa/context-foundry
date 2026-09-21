@@ -178,3 +178,30 @@ test('UTF-16 parser offsets convert to UTF-8 bytes without splitting Unicode cha
   assert.throws(() => utf16OffsetToUtf8ByteOffset(source, 5));
   assert.throws(() => utf16OffsetToUtf8ByteOffset('bad\ud800', 0));
 });
+
+test('typed relationship endpoints and dependency classification cannot be silently weakened', () => {
+  const { installed, manifest, consumer, record, locator } = fixture();
+  const relationProfile = createBuiltinProfile('engineering.relationship');
+  const allProfiles = installKindProfiles([vector.profile, relationProfile]).installed!;
+  const relationRef = { kind: relationProfile.kind, profile_digest: relationProfile.profile_digest };
+  const relation: ExtensionRecord = {
+    ...record, record_id: 'rec:relation', kind: 'engineering.relationship',
+    profile_digest: relationProfile.profile_digest,
+    identity: { ...record.identity, scheme: relationProfile.identity_scheme },
+    origin: 'static_resolution', payload: { relation_type: 'engineering.calls', basis: 'static' },
+    references: [],
+  };
+  const relationIssues = checkExtensionRecords([relation], [locator],
+    { ...manifest, emitted_profiles: [relationRef] },
+    { ...consumer, required_profiles: [relationRef], accepted_profiles: [relationRef] },
+    allProfiles).issues;
+  assert.ok(relationIssues.some(item => item.code === 'MISSING_REQUIRED_REFERENCE'));
+
+  const restricted: ExtensionRecord = { ...record, classification: 'restricted' };
+  const derived: ExtensionRecord = {
+    ...record, record_id: 'rec:derived',
+    identity: { ...record.identity, key: 'derived' }, dependency_refs: [record.record_id],
+  };
+  assert.ok(checkExtensionRecords([restricted, derived], [locator], manifest, consumer,
+    installed).issues.some(item => item.code === 'CLASSIFICATION_DOWNGRADE'));
+});

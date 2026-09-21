@@ -1,11 +1,12 @@
 # Bounded implementation handoff after architecture review
 
-**Status:** CF-0.3 queue in progress · 2026-09-20. A1 is complete; A2–A5 are pending.
-Implementation has resumed. Resume at A2 using the
+**Status:** CF-0.3 queue in progress · 2026-09-20. A1 is complete; A2 has a
+synthetic local receipt; A3–A5 are pending. Resume at A3 using the
 root `WORKLIST.md`; do not repeat a broad research survey or build a platform shell.
 
 The [A1 compatibility receipt](../technical-design/a1-compatibility-receipt.md)
-records the implemented minimum wire slice and the remaining A2 integration work.
+records the minimum wire slice. The [A2 preparation receipt](../technical-design/a2-preparation-receipt.md)
+records the current integrated-candidate boundary and unsupported semantics.
 
 ## Scope and model handoff
 

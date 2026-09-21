@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    "./java": "./dist/java-declarations.js",
+    "./spring": "./dist/spring-routes.js",
+    "./sql": "./dist/sql-ddl.js",
+    "./semantic-candidates": "./dist/java-semantic-candidates.js",
+    "./typescript": "./dist/index.js"
+  },
   "engines": {"node": ">=22"},
   "scripts": {
     "build": "tsc -p tsconfig.json",

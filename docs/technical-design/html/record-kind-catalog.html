@@ -44,11 +44,15 @@ CF-0.2 kinds. Their closed registry is not the final SDK architecture. The
 <a href="sdk-extension-contract.html">extension contract</a> adds installed namespaced profiles,
 generic projections and a minimal source-artifact kind in A1, with explicit schema
 versioning and conformance. Unknown kinds remain rejected by current code until then.</p>
-<p><strong>A1 implementation:</strong> the separate <code>0.3.0</code> extension entry point now registers
-reviewed <code>source.artifact</code> and open-language <code>engineering.symbol</code> profiles plus
-namespaced adopter kinds. See the <a href="a1-compatibility-receipt.html">compatibility receipt</a>.
-The legacy <code>0.2.0</code> kind handshake below stays closed; A2 must port the other seven
-first-party kinds before using them in integrated extension contributions.</p>
+<p><strong>A1/A2 implementation:</strong> the separate <code>0.3.0</code> extension entry point registers
+reviewed profiles for <code>source.artifact</code>, open-language <code>engineering.symbol</code>,
+<code>interface.operation</code>, <code>engineering.relationship</code>, <code>business.rule</code>,
+<code>business.mapping</code> and <code>test.association</code>, plus namespaced adopter kinds. See the
+<a href="a1-compatibility-receipt.html">A1 compatibility receipt</a> and
+<a href="a2-preparation-receipt.html">A2 bounded preparation receipt</a>. The legacy <code>0.2.0</code>
+kind handshake below stays closed; flow, flow-step and behavior-obligation kinds
+remain legacy-only. These A2 profiles are deliberately narrower than every legacy
+payload and do not represent a full migration.</p>
 <p><strong>Status:</strong> Proposed catalog for CF-0.2, not a frozen schema or permission to emit unregistered kinds. A source parser may produce only kinds registered by the runtime validator; unsupported declarations become adapter coverage/diagnostics, not loosely shaped records.</p>
 <table>
 <thead>

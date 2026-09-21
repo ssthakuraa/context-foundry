@@ -38,10 +38,11 @@ p, li, td, a { overflow-wrap: anywhere; }
   <main>
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../a1-compatibility-receipt.md">Markdown source</a></nav>
     <article>
-      <h1 id="a1-extension-contract-compatibility-receipt">A1 extension contract compatibility receipt</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#wire-and-export-inventory">Wire and export inventory</a></li><li><a href="#verification">Verification</a></li><li><a href="#open-dependencies-for-a2">Open dependencies for A2</a></li></ul></details>
+      <h1 id="a1-extension-contract-compatibility-receipt">A1 extension contract compatibility receipt</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#wire-and-export-inventory">Wire and export inventory</a></li><li><a href="#verification">Verification</a></li><li><a href="#dependencies-identified-at-a1">Dependencies identified at A1</a></li></ul></details>
 <p><strong>Status:</strong> A1 minimum contract slice implemented and tested · 2026-09-20.
-The complete preparation runner, enterprise authorization and all first-party kind
-ports remain A2 or later work.</p>
+This is the historical A1 receipt. The subsequent <a href="a2-preparation-receipt.html">A2 receipt</a>
+records the bounded runner and additional first-party profiles; enterprise
+authorization remains later work.</p>
 <h2 id="wire-and-export-inventory">Wire and export inventory</h2>
 <p>The existing twenty-eight <code>0.2.0</code> schemas and validation entry points are unchanged.
 Six <code>0.3.0</code> extension schemas are exported alongside them: kind profile, adapter
@@ -101,7 +102,8 @@ The installer compiles only a finite structural JSON Schema subset with limits o
 schema size/depth and field/string/array counts. It rejects <code>$ref</code> and <code>pattern</code> in
 adopter schemas. Installation is supplied by trusted configuration; a data pack
 cannot register its own executable schema. First-party roots cannot be impersonated;
-only <code>source.artifact</code> and <code>engineering.symbol</code> have reviewed profiles in A1.
+only <code>source.artifact</code> and <code>engineering.symbol</code> had reviewed profiles at the A1
+checkpoint. A2 added five more without changing the <code>0.3.0</code> wire generation.
 The manifest pins protocol major 1, package/configuration digests and bounded input,
 output, message and wall-time limits. These are declarations, not a sandbox.</p>
 <p>The <code>0.3.0</code> record has a standard descriptor, qualified identity, supported references,
@@ -124,11 +126,11 @@ migration, a new language, source artifacts and UTF-8 byte-offset conversion.</l
 <li>The first A1 run passed 71 contract tests. The checkpoint worklist records the
 broader workspace build/type/test, schema export and HTML checks once complete.</li>
 </ul>
-<h2 id="open-dependencies-for-a2">Open dependencies for A2</h2>
-<p>The first-party business, interface, relationship and test payloads need reviewed
-<code>0.3.0</code> profiles with their semantic validation ported; the A1 installer deliberately
-rejects their reserved names until then. The current candidate/checks bind locator
-IDs, but do not attest capture bytes, Git revision, publisher authority, installed
+<h2 id="dependencies-identified-at-a1">Dependencies identified at A1</h2>
+<p>The first-party business, interface, relationship and test payloads needed reviewed
+<code>0.3.0</code> profiles with their semantic validation ported; A2 added a bounded subset.
+The A1 candidate/checks bound locator
+IDs, but did not attest capture bytes, Git revision, publisher authority, installed
 executable identity, process isolation or source ACL. A2 must stage a whole process
 contribution, bind locators to approved bytes and report family coverage before
 claiming a release candidate. A child process alone provides no filesystem or network

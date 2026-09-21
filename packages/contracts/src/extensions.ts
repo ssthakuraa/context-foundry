@@ -129,7 +129,9 @@ const shape = {
   consumer: ajv.compile(ExtensionConsumerSchema), record: ajv.compile(ExtensionRecordSchema),
 };
 const RESERVED_KIND_ROOTS = new Set(['engineering', 'business', 'interface', 'test', 'behavior', 'source']);
-const FIRST_PARTY_KINDS = new Set(['source.artifact', 'engineering.symbol']);
+const FIRST_PARTY_KINDS = new Set(['source.artifact', 'engineering.symbol',
+  'interface.operation', 'engineering.relationship', 'business.rule',
+  'business.mapping', 'test.association']);
 
 export type ExtensionIssue = {
   code: 'INVALID_PROFILE' | 'UNSAFE_PAYLOAD_SCHEMA' | 'PROFILE_DIGEST_MISMATCH' |
@@ -137,7 +139,8 @@ export type ExtensionIssue = {
     'UNKNOWN_PROFILE' | 'PROFILE_VERSION_MISMATCH' | 'MISSING_REQUIRED_PROFILE' |
     'UNACCEPTED_PROFILE' | 'INVALID_RECORD' | 'UNDECLARED_RECORD_KIND' |
     'INVALID_PAYLOAD' | 'INVALID_ORIGIN' | 'IDENTITY_SCHEME_MISMATCH' |
-    'INVALID_REFERENCE_ROLE' | 'MISSING_REFERENCE_TARGET' | 'AMBIGUOUS_REFERENCE_TARGET' |
+    'INVALID_REFERENCE_ROLE' | 'MISSING_REQUIRED_REFERENCE' | 'MISSING_REFERENCE_DEPENDENCY' |
+    'CLASSIFICATION_DOWNGRADE' | 'MISSING_REFERENCE_TARGET' | 'AMBIGUOUS_REFERENCE_TARGET' |
     'INVALID_DESCRIPTOR_SUPPORT' | 'DUPLICATE_RECORD_ID' | 'DUPLICATE_DECLARATION_IDENTITY' |
     'INVALID_EVIDENCE' | 'DUPLICATE_EVIDENCE_ID' | 'MISSING_EVIDENCE' |
     'MISSING_DEPENDENCY' | 'MISSING_TRANSITIVE_SUPPORT' | 'DEPENDENCY_CYCLE_OR_BLOCKED' |
@@ -188,17 +191,66 @@ export function kindProfileDigest(profile: Omit<KindProfile, 'profile_digest'>):
   return canonicalSha256({ ...semantic, payload_schema_digest: canonicalSha256(payload_schema) });
 }
 
-/** Reviewed first-party profiles; other built-in families join this list as they are ported. */
-export function createBuiltinProfile(builtin: 'source.artifact' | 'engineering.symbol'): KindProfile {
-  const typebox = builtin === 'source.artifact' ? SourceArtifactPayloadSchema : EngineeringSymbolV03PayloadSchema;
-  const { $id: _schemaId, ...payload_schema } = JSON.parse(JSON.stringify(typebox)) as Record<string, unknown>;
+export type BuiltinExtensionKind = 'source.artifact' | 'engineering.symbol' |
+  'interface.operation' | 'engineering.relationship' | 'business.rule' |
+  'business.mapping' | 'test.association';
+
+/** Reviewed first-party profiles; richer business/flow payloads remain in the legacy wire. */
+export function createBuiltinProfile(builtin: BuiltinExtensionKind): KindProfile {
+  const string = (maxLength = 2048) => ({ type: 'string', minLength: 1, maxLength });
+  const choice = (...values: string[]) => ({ ...string(128), enum: values });
+  const list = () => ({ type: 'array', items: string(), maxItems: 64 });
+  const object = (properties: Record<string, unknown>, required: string[]) => ({
+    type: 'object', properties, required, additionalProperties: false,
+  });
+  const payload_schema: Record<string, unknown> = builtin === 'source.artifact'
+    ? object({ artifact_type: string(512), name: string(512), description: string(8192) },
+      ['artifact_type', 'name'])
+    : builtin === 'engineering.symbol'
+      ? object({ name: string(512), qualified_name: string(), artifact_kind: string(512),
+        language: string(512), signature: string() }, ['name', 'artifact_kind', 'language'])
+      : builtin === 'interface.operation'
+        ? object({ name: string(512), operation_key: string(), service_id: string(512),
+          version: string(512), method: choice('GET', 'POST', 'PUT', 'PATCH', 'DELETE'),
+          route: string(), responses: list() },
+        ['name', 'operation_key', 'service_id', 'version', 'method', 'route', 'responses'])
+        : builtin === 'engineering.relationship'
+          ? object({ relation_type: string(512), basis: string(512) }, ['relation_type', 'basis'])
+          : builtin === 'business.rule'
+            ? object({ statement: string(8192), edition: string(512), applicability: string(2048) },
+              ['statement', 'edition', 'applicability'])
+            : builtin === 'business.mapping'
+              ? object({ mapping_relation: choice('implemented_by', 'exposed_by', 'stored_in', 'validated_by'),
+                mapping_basis: choice('reviewed_association', 'explicit_reference'),
+                applicability: string(2048) },
+              ['mapping_relation', 'mapping_basis', 'applicability'])
+              : object({ association_basis: choice('static_reference', 'reviewed_relevance'),
+                expected_scope: string(2048) }, ['association_basis', 'expected_scope']);
+  const reference_roles = builtin === 'engineering.relationship'
+    ? [{ role: 'subject', target_kind: 'interface.operation' },
+      { role: 'subject_symbol', target_kind: 'engineering.symbol' },
+      { role: 'object', target_kind: 'engineering.symbol' },
+      { role: 'object_artifact', target_kind: 'source.artifact' }]
+    : builtin === 'business.mapping'
+      ? [{ role: 'business', target_kind: 'business.rule' },
+        { role: 'technical', target_kind: 'interface.operation' }]
+      : builtin === 'test.association'
+        ? [{ role: 'test', target_kind: 'engineering.symbol' },
+          { role: 'target', target_kind: 'engineering.symbol' }]
+        : [];
+  const allowed_origins = builtin === 'engineering.relationship'
+    ? ['static_resolution'] : builtin === 'business.mapping'
+      ? ['human_asserted', 'source_declared'] : builtin === 'business.rule'
+        ? ['source_declared', 'human_asserted'] : builtin === 'test.association'
+          ? ['static_resolution', 'human_asserted'] : ['source_declared'];
   const base = {
     schema_version: EXTENSION_RECORD_VERSION, kind: builtin, semantic_major: 1,
     payload_schema, payload_schema_digest: canonicalSha256(payload_schema),
     projection_version: STANDARD_PROJECTION_VERSION,
-    identity_scheme: builtin === 'source.artifact' ? 'source-artifact' : 'syntax',
-    scheme_version: '1', allowed_origins: ['source_declared'] as ['source_declared'],
-    reference_roles: [],
+    identity_scheme: builtin === 'source.artifact' ? 'source-artifact' :
+      builtin === 'engineering.symbol' ? 'syntax' : builtin,
+    scheme_version: '1', allowed_origins: allowed_origins as KindProfile['allowed_origins'],
+    reference_roles,
   };
   return { ...base, profile_digest: kindProfileDigest(base) };
 }
@@ -220,7 +272,7 @@ export function installKindProfiles(profiles: readonly KindProfile[]):
     if (new Set(profile.reference_roles.map(item => item.role)).size !== profile.reference_roles.length ||
       (RESERVED_KIND_ROOTS.has(profile.kind.split('.')[0]!) &&
         (!FIRST_PARTY_KINDS.has(profile.kind) ||
-          createBuiltinProfile(profile.kind as 'source.artifact' | 'engineering.symbol').profile_digest !== profile.profile_digest))) {
+          createBuiltinProfile(profile.kind as BuiltinExtensionKind).profile_digest !== profile.profile_digest))) {
       // Other built-ins will be installed with their reviewed first-party profiles in A2.
       issues.push(issue('INVALID_PROFILE', index)); return;
     }
@@ -330,16 +382,38 @@ export function checkExtensionRecords(
         issues.push(issue('INVALID_REFERENCE_ROLE', index));
       }
     }
+    const roles = record.references.map(reference => reference.role);
+    const requires = record.kind === 'engineering.relationship'
+      ? [['subject', 'subject_symbol'], ['object', 'object_artifact']]
+      : record.kind === 'business.mapping' ? [['business'], ['technical']]
+        : record.kind === 'test.association' ? [['test'], ['target']] : [];
+    if (requires.length && (record.references.length !== 2 ||
+      requires.some(group => roles.filter(role => group.includes(role)).length !== 1) ||
+      record.references.some(reference => reference.resolution !== 'resolved'))) {
+      issues.push(issue('MISSING_REQUIRED_REFERENCE', index));
+    }
   });
   if (issues.length) return { issues };
   records.forEach((record, index) => {
     for (const ref of record.evidence_refs) if (!evidenceIds.has(ref)) issues.push(issue('MISSING_EVIDENCE', index));
     for (const ref of record.dependency_refs) if (!byId.has(ref)) issues.push(issue('MISSING_DEPENDENCY', index));
+    for (const ref of record.dependency_refs) {
+      const dependency = byId.get(ref)?.record;
+      const rank = { public: 0, internal: 1, restricted: 2 };
+      if (dependency && rank[record.classification] < rank[dependency.classification]) {
+        issues.push(issue('CLASSIFICATION_DOWNGRADE', index));
+      }
+    }
     for (const reference of record.references) {
       if (reference.resolution !== 'resolved') continue;
       const candidates = byIdentity.get(`${reference.target_kind}\u0000${identityKey(reference.target)}`) ?? [];
       if (!candidates.length) issues.push(issue('MISSING_REFERENCE_TARGET', index));
       else if (candidates.length > 1) issues.push(issue('AMBIGUOUS_REFERENCE_TARGET', index));
+      else if ((record.kind === 'engineering.relationship' || record.kind === 'business.mapping' ||
+        record.kind === 'test.association') &&
+        !record.dependency_refs.includes(records[candidates[0]!]!.record_id)) {
+        issues.push(issue('MISSING_REFERENCE_DEPENDENCY', index));
+      }
     }
   });
   if (issues.length) return { issues };

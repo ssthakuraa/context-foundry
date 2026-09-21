@@ -1,8 +1,9 @@
 # A1 extension contract compatibility receipt
 
 **Status:** A1 minimum contract slice implemented and tested · 2026-09-20.
-The complete preparation runner, enterprise authorization and all first-party kind
-ports remain A2 or later work.
+This is the historical A1 receipt. The subsequent [A2 receipt](a2-preparation-receipt.md)
+records the bounded runner and additional first-party profiles; enterprise
+authorization remains later work.
 
 ## Wire and export inventory
 
@@ -34,7 +35,8 @@ The installer compiles only a finite structural JSON Schema subset with limits o
 schema size/depth and field/string/array counts. It rejects `$ref` and `pattern` in
 adopter schemas. Installation is supplied by trusted configuration; a data pack
 cannot register its own executable schema. First-party roots cannot be impersonated;
-only `source.artifact` and `engineering.symbol` have reviewed profiles in A1.
+only `source.artifact` and `engineering.symbol` had reviewed profiles at the A1
+checkpoint. A2 added five more without changing the `0.3.0` wire generation.
 The manifest pins protocol major 1, package/configuration digests and bounded input,
 output, message and wall-time limits. These are declarations, not a sandbox.
 
@@ -59,12 +61,12 @@ interoperability reference operation; A3 will implement full task selection.
 - The first A1 run passed 71 contract tests. The checkpoint worklist records the
   broader workspace build/type/test, schema export and HTML checks once complete.
 
-## Open dependencies for A2
+## Dependencies identified at A1
 
-The first-party business, interface, relationship and test payloads need reviewed
-`0.3.0` profiles with their semantic validation ported; the A1 installer deliberately
-rejects their reserved names until then. The current candidate/checks bind locator
-IDs, but do not attest capture bytes, Git revision, publisher authority, installed
+The first-party business, interface, relationship and test payloads needed reviewed
+`0.3.0` profiles with their semantic validation ported; A2 added a bounded subset.
+The A1 candidate/checks bound locator
+IDs, but did not attest capture bytes, Git revision, publisher authority, installed
 executable identity, process isolation or source ACL. A2 must stage a whole process
 contribution, bind locators to approved bytes and report family coverage before
 claiming a release candidate. A child process alone provides no filesystem or network
