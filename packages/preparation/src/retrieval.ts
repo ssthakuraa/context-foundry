@@ -174,6 +174,8 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       group.push({ target: to.record_id, via: edge.record_id });
       links.set(from.record_id, group);
     }
+    for (const group of links.values()) group.sort((a, b) =>
+      a.target.localeCompare(b.target) || a.via.localeCompare(b.via));
   }
   const selected = new Map<string, { reason: RetrievalFact['reason']; via?: string;
     concern_id?: string }>();

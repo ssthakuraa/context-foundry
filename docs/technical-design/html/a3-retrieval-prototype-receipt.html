@@ -66,7 +66,8 @@ make a coding agent repeat the discovery work.</p>
 descriptor, qualified-identity and string-payload lexical lanes with reciprocal
 rank fusion (<code>1/(60 + rank)</code>, rank starting at one). Each lane is capped at 32;
 ties break by immutable record ID. Reversing the input record order does not
-change exact or tied lexical results. This is still a reference in-memory
+change exact, tied lexical or typed-neighbor results; typed adjacency is sorted
+by qualified target and edge ID before traversal. This is still a reference in-memory
 ranker, not a tuned search-quality claim.
 The independently written Python <code>acme.workflow</code> vector is also visible through
 this generic descriptor ranker without a new kind-specific retrieval branch;
@@ -78,7 +79,10 @@ visibility and executable core relation policy are intentionally separate.</p>
 <p>Traversal caps now report <code>HOP_LIMIT</code>, <code>NODE_LIMIT</code> or <code>EDGE_LIMIT</code> when they
 actually stop expansion. The favorable three-hop packet also carries <code>HOP_LIMIT</code>
 because a service call continues beyond its selected depth; reaching the service
-is not evidence that all downstream impact was explored.</p>
+is not evidence that all downstream impact was explored.
+A synthetic supported call cycle terminates under the visited-record set without
+duplicating the controller fact; this is a graph-mechanics test, not a validated
+new release fixture.</p>
 <p>An API-use query is restricted to declared contract facts and does not traverse
 implementation links. A 256-byte cap returns <code>PACKET_TOO_LARGE</code> rather than a
 partial edge. Exact record inspection returns a bounded file-range pointer and

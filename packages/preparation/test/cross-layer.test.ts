@@ -502,6 +502,11 @@ test('exact identity and fused-lane ties are stable across candidate record orde
   assert.equal(tieA.ok, true);
   assert.equal(tieB.ok, true);
   if (tieA.ok && tieB.ok) assert.deepEqual(tieA.packet.facts, tieB.packet.facts);
+  const typedA = retrieveCandidate(built.candidate, { ...lexical, mode: 'typed' });
+  const typedB = retrieveCandidate(reordered, { ...lexical, mode: 'typed' });
+  assert.equal(typedA.ok, true);
+  assert.equal(typedB.ok, true);
+  if (typedA.ok && typedB.ok) assert.deepEqual(typedA.packet.facts, typedB.packet.facts);
 });
 
 test('adopter-defined kind enters descriptor retrieval without a core kind switch', () => {
@@ -538,4 +543,26 @@ test('generic relationship label cannot authorize core enhancement traversal', a
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.ok(!result.packet.facts.some(item => item.identity.includes('RepairController.approve')));
+});
+
+test('a supported call cycle terminates without duplicating source facts', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const call = built.candidate.records.find(item => item.kind === 'engineering.relationship' &&
+    item.payload['relation_type'] === 'engineering.calls' &&
+    item.identity.key.includes('RepairController.approve'))!;
+  const [controller, service] = call.references;
+  const returnCall = { ...call, record_id: 'rec:synthetic-cycle',
+    identity: { ...call.identity, key: 'cycle:service-to-controller' },
+    references: [{ ...service!, role: 'subject_symbol' }, { ...controller!, role: 'object' }] };
+  const candidate = { ...built.candidate, records: [...built.candidate.records, returnCall] };
+  const result = retrieveCandidate(candidate, {
+    question: 'fixture.repairs.RepairController.approve(String)',
+    intent: 'enhancement', mode: 'typed', max_seeds: 1, max_hops: 4 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.packet.facts.filter(item =>
+    item.identity === 'fixture.repairs.RepairController.approve(String)').length, 1);
+  assert.ok(result.packet.stage.examined_edges <= 400);
 });

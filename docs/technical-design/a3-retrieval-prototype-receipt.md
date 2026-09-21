@@ -30,7 +30,8 @@ Seed ranking now reserves exact identity/name/operation-key matches, then fuses
 descriptor, qualified-identity and string-payload lexical lanes with reciprocal
 rank fusion (`1/(60 + rank)`, rank starting at one). Each lane is capped at 32;
 ties break by immutable record ID. Reversing the input record order does not
-change exact or tied lexical results. This is still a reference in-memory
+change exact, tied lexical or typed-neighbor results; typed adjacency is sorted
+by qualified target and edge ID before traversal. This is still a reference in-memory
 ranker, not a tuned search-quality claim.
 The independently written Python `acme.workflow` vector is also visible through
 this generic descriptor ranker without a new kind-specific retrieval branch;
@@ -44,6 +45,9 @@ Traversal caps now report `HOP_LIMIT`, `NODE_LIMIT` or `EDGE_LIMIT` when they
 actually stop expansion. The favorable three-hop packet also carries `HOP_LIMIT`
 because a service call continues beyond its selected depth; reaching the service
 is not evidence that all downstream impact was explored.
+A synthetic supported call cycle terminates under the visited-record set without
+duplicating the controller fact; this is a graph-mechanics test, not a validated
+new release fixture.
 
 An API-use query is restricted to declared contract facts and does not traverse
 implementation links. A 256-byte cap returns `PACKET_TOO_LARGE` rather than a
