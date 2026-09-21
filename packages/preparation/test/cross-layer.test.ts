@@ -4,8 +4,9 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileManifestDigest, type CapturedFile, type SourceCapture } from '@context-foundry/contracts';
 import { assembleCrossLayerCandidate, type CrossLayerInput } from '../src/cross-layer.js';
-import { inspectCandidateRecord, retrieveCandidate } from '../src/retrieval.js';
+import { inspectCandidateRecord, retrieveCandidate, traceCandidateRecord } from '../src/retrieval.js';
 import { compareRetrieval } from '../src/evaluation.js';
+import { readBoundEvidence } from '../src/evidence.js';
 
 const paths = ['business.md', 'openapi.json', 'RepairController.java',
   'RepairService.java', 'RepairRequest.java', 'RepairServiceTest.java',
@@ -195,6 +196,9 @@ test('same-information typed retrieval retains a low-lexical business-to-service
   assert.ok(typed.packet.facts.some(item => item.identity.includes('RepairService.approve')));
   assert.ok(typed.packet.facts.some(item => item.kind === 'business.mapping'));
   assert.ok(typed.packet.facts.every(item => item.locators.length > 0));
+  assert.ok(typed.packet.facts.some(item => item.identity.includes('RepairService.approve') &&
+    item.locators.some(locator => locator.kind === 'file_range' &&
+      locator.path === 'RepairService.java')));
   assert.ok(typed.packet.diagnostics.includes('PARTIAL_COVERAGE'));
   assert.equal(Buffer.byteLength(typed.json), typed.bytes);
   assert.ok(typed.bytes > lexical.bytes);
@@ -342,4 +346,54 @@ test('original multiline story is preserved separately from stated concerns', as
   assert.equal(result.packet.facts[0]?.concern_id, 'business');
   assert.deepEqual(retrieveCandidate(built.candidate, { question: 'bad\u0000story',
     intent: 'enhancement', mode: 'lexical' }), { ok: false, code: 'INVALID_REQUEST' });
+});
+
+test('hop cutoff reports an explicit traversal gap instead of silently implying completeness', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, { question: 'coordinator',
+    intent: 'enhancement', mode: 'typed', max_seeds: 1, max_hops: 0 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.packet.stage.examined_edges, 0);
+  assert.ok(result.packet.diagnostics.includes('HOP_LIMIT'));
+  assert.ok(!result.packet.facts.some(item => item.kind === 'interface.operation'));
+});
+
+test('exact trace keeps the original task separate from a selected source record', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const story = 'What tests should I inspect before changing approval?';
+  const result = traceCandidateRecord(built.candidate, {
+    record_id: service.record_id, original_question: story, intent: 'test_impact',
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.packet.request.question, story);
+  assert.equal(result.packet.facts[0]?.record_id, service.record_id);
+  assert.ok(result.packet.facts.some(item => item.identity.includes('rejectsSecondApproval')));
+});
+
+test('selective evidence read checks the full capture and returns exact source lines', async () => {
+  const source = input();
+  const built = await assembleCrossLayerCandidate(source);
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const read = readBoundEvidence(built.candidate, source.capture, service.evidence_refs[0]!);
+  assert.equal(read.ok, true);
+  if (!read.ok) return;
+  assert.ok(read.text.includes('repository.find(id)'));
+  assert.ok(read.text.includes('repository.save(request)'));
+  assert.ok(!read.text.includes('package fixture.repairs'));
+  assert.equal(Buffer.byteLength(read.json), read.bytes);
+  const changed = { ...source.capture, supplied: source.capture.supplied.map(item =>
+    item.path === 'RepairService.java' ? { ...item, bytes: new TextEncoder().encode('changed') } : item) };
+  assert.deepEqual(readBoundEvidence(built.candidate, changed, service.evidence_refs[0]!),
+    { ok: false, code: 'CAPTURE_CHANGED' });
 });

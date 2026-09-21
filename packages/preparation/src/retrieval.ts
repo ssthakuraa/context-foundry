@@ -13,7 +13,7 @@ export type RetrievalFact = {
   record_id: string; kind: string; identity: string; name: string;
   origin: ExtensionRecord['origin']; review: ExtensionRecord['review']['state'];
   classification: ExtensionRecord['classification'];
-  locators: readonly { path: string; evidence_id: string; file_digest: string }[];
+  locators: readonly EvidenceLocator[];
   reason: 'lexical' | 'exact' | 'typed_connector';
   concern_id?: string;
   via?: string;
@@ -49,6 +49,20 @@ export function inspectCandidateRecord(candidate: CrossLayerCandidate, recordId:
   const bytes = Buffer.byteLength(json, 'utf8');
   return bytes > maxBytes ? { ok: false, code: 'PACKET_TOO_LARGE' } :
     { ok: true, json, bytes, record, locators: complete };
+}
+
+export function traceCandidateRecord(candidate: CrossLayerCandidate, args: {
+  record_id: string; original_question: string; intent: RetrievalIntent;
+  max_hops?: number; max_bytes?: number;
+}): RetrievalResult | { ok: false; code: 'NOT_FOUND' } {
+  const record = candidate.records.find(item => item.record_id === args.record_id);
+  if (!record) return { ok: false, code: 'NOT_FOUND' };
+  return retrieveCandidate(candidate, {
+    question: args.original_question, intent: args.intent, mode: 'typed',
+    concerns: [{ id: 'trace', text: record.identity.key }],
+    max_seeds: 1, max_hops: args.max_hops ?? 4,
+    max_bytes: args.max_bytes ?? 16 * 1024,
+  });
 }
 
 const rank = (item: ExtensionRecord, query: string, terms: readonly string[]): number => {
@@ -152,19 +166,24 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       ? 'exact' : 'lexical', concern_id: seed.concern_id,
   });
   let examinedEdges = 0;
+  const limitDiagnostics = new Set<string>();
   const queue = seeds.map(item => ({ id: item.record_id, depth: 0 }));
-  for (let cursor = 0; cursor < queue.length && queue.length <= 200; cursor++) {
+  for (let cursor = 0; cursor < queue.length; cursor++) {
     const item = queue[cursor]!;
-    if (item.depth >= maxHops) continue;
+    if (item.depth >= maxHops) {
+      if ((links.get(item.id)?.length ?? 0) > 0) limitDiagnostics.add('HOP_LIMIT');
+      continue;
+    }
     for (const link of links.get(item.id) ?? []) {
+      if (examinedEdges >= 400) { limitDiagnostics.add('EDGE_LIMIT'); break; }
       examinedEdges++;
-      if (examinedEdges > 400) break;
       if (selected.has(link.target)) continue;
+      if (queue.length >= 200) { limitDiagnostics.add('NODE_LIMIT'); continue; }
       selected.set(link.via, { reason: 'typed_connector', via: item.id });
       selected.set(link.target, { reason: 'typed_connector', via: link.via });
       queue.push({ id: link.target, depth: item.depth + 1 });
     }
-    if (examinedEdges > 400) break;
+    if (limitDiagnostics.has('EDGE_LIMIT')) break;
   }
   const facts: RetrievalFact[] = [];
   for (const [id, selection] of selected) {
@@ -174,9 +193,7 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       name: item.descriptor.name, origin: item.origin, review: item.review.state,
       classification: item.classification,
       locators: item.evidence_refs.map(ref => locators.get(ref)).filter(
-        (value): value is EvidenceLocator => !!value).map(value => ({
-        path: value.path, evidence_id: value.evidence_id, file_digest: value.file_digest,
-      })), reason: selection.reason,
+        (value): value is EvidenceLocator => !!value), reason: selection.reason,
       ...(selection.concern_id ? { concern_id: selection.concern_id } : {}),
       ...(selection.via ? { via: selection.via } : {}) });
   }
@@ -184,8 +201,11 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
     stage: { candidates: rankedIds.size, seeds: seeds.length, examined_edges: examinedEdges,
       admitted_connectors: facts.filter(item => item.reason === 'typed_connector').length,
       omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) },
-    diagnostics: candidate.coverage.some(item => item.status !== 'complete_for_declared_scope')
-      ? ['PARTIAL_COVERAGE'] : [],
+    diagnostics: [
+      ...(candidate.coverage.some(item => item.status !== 'complete_for_declared_scope')
+        ? ['PARTIAL_COVERAGE'] : []),
+      ...[...limitDiagnostics].sort(),
+    ],
   };
   const json = canonicalJson(packet);
   const bytes = Buffer.byteLength(json, 'utf8');
