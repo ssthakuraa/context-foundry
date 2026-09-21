@@ -201,6 +201,13 @@ business-to-service scenario, the service is not a lexical seed but is retained
 by typed traversal. On service-to-data, the SQL table is source-present yet absent
 from the packet, classified as a traversal/budget gap. A wide lexical audit that
 cannot serialize is marked evaluation-incomplete, not mistaken for zero recall.
+The stage audit now also runs a 32-seed/32 KiB typed counterfactual with the
+same question, candidate and hop cap. It calls a miss <code>seed_selection</code> only when
+that probe actually recovers the fact; if the probe cannot serialize, the audit
+marks the classification incomplete. A new competing-pending-rule test exercises
+this distinction. More seeds expose both passages but do not adjudicate which
+rule applies. The counterfactual is offline evaluation, not an unrestricted
+production retrieval request.
 For a duplicated literal Spring route, preparation withholds the exact
 API-to-controller edge. Orientation to the selected operation now carries its
 deduplicated <code>ROUTE_AMBIGUOUS</code> diagnostic, so the missing implementation path is

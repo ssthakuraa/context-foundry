@@ -618,6 +618,32 @@ test('conflicting source passages stay separate and neither becomes reviewed tru
   assert.equal(built.candidate.records.filter(item => item.kind === 'business.mapping').length, 1);
 });
 
+test('seed-selection loss is claimed only when a wider-seed counterfactual recovers the fact', async () => {
+  const original = input();
+  const business = new TextDecoder().decode(original.capture.supplied.find(
+    item => item.path === 'business.md')!.bytes);
+  const altered = replaceFile(original, 'business.md', new TextEncoder().encode(
+    `${business}\n## Alternative approval guidance\n\nAn authorized coordinator must never approve a pending request.\n`));
+  const built = await assembleCrossLayerCandidate(altered);
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const request = { question: 'coordinator', intent: 'api_use' as const, max_seeds: 1 };
+  const narrow = retrieveCandidate(built.candidate, { ...request, mode: 'typed' });
+  assert.equal(narrow.ok, true);
+  if (!narrow.ok) return;
+  const omitted = built.candidate.records.filter(item => item.kind === 'business.rule')
+    .find(item => !narrow.packet.facts.some(fact => fact.record_id === item.record_id))!;
+  assert.ok(omitted);
+  const receipt = compareRetrieval(built.candidate, 'competing-pending-rule', request,
+    [omitted.record_id]);
+  assert.equal(receipt.obligations[0]?.selected_seed, false);
+  assert.equal(receipt.obligations[0]?.typed_packet, false);
+  assert.equal(receipt.obligations[0]?.typed_with_full_wire_cap, false);
+  assert.equal(receipt.obligations[0]?.typed_with_wide_seed_cap, true);
+  assert.equal(receipt.obligations[0]?.loss_stage, 'seed_selection');
+  assert.ok(receipt.typed_wide_seed_bytes);
+});
+
 test('exact identity and fused-lane ties are stable across candidate record order', async () => {
   const built = await assembleCrossLayerCandidate(input());
   assert.equal(built.ok, true);
