@@ -248,6 +248,15 @@ function retrieveCandidateInternal(candidate: CrossLayerCandidate,
     ...[...limitDiagnostics].sort(),
   ];
   const inspectIds = () => [...new Set([...skipped, ...truncated])];
+  const selectedRouteDiagnostics = () => {
+    const operationKeys = new Set(admitted.flatMap(group => group.facts)
+      .filter(fact => fact.kind === 'interface.operation')
+      .map(fact => byId.get(fact.record_id)?.payload['operation_key'])
+      .filter((value): value is string => typeof value === 'string'));
+    return [...new Set(candidate.diagnostics.filter(item =>
+      (item.startsWith('ROUTE_AMBIGUOUS:') || item.startsWith('ROUTE_UNRESOLVED:')) &&
+      operationKeys.has(item.slice(item.indexOf(':') + 1))))].sort();
+  };
   const makePacket = (): RetrievalPacket => ({ request, candidate_digest: candidate.digest,
     facts: admitted.flatMap(group => group.facts),
     ...(inspectIds().length ? { inspect_record_ids: inspectIds() } : {}),
@@ -256,8 +265,12 @@ function retrieveCandidateInternal(candidate: CrossLayerCandidate,
         item => item.reason === 'typed_connector').length,
       omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) + skipped.length +
         truncated.length },
-    diagnostics: inspectIds().length ? [...baseDiagnostics, 'OVERSIZED_UNIT',
-      ...(truncated.length ? ['PATH_TRUNCATED'] : [])] : baseDiagnostics,
+    diagnostics: [
+      ...baseDiagnostics,
+      ...selectedRouteDiagnostics(),
+      ...(inspectIds().length ? ['OVERSIZED_UNIT'] : []),
+      ...(truncated.length ? ['PATH_TRUNCATED'] : []),
+    ],
   });
   const packetBytes = () => Buffer.byteLength(canonicalJson(makePacket()), 'utf8');
   if (!groups.length) {

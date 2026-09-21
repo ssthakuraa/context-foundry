@@ -143,6 +143,11 @@ business-to-service scenario, the service is not a lexical seed but is retained
 by typed traversal. On service-to-data, the SQL table is source-present yet absent
 from the packet, classified as a traversal/budget gap. A wide lexical audit that
 cannot serialize is marked evaluation-incomplete, not mistaken for zero recall.
+For a duplicated literal Spring route, preparation withholds the exact
+API-to-controller edge. Orientation to the selected operation now carries its
+deduplicated `ROUTE_AMBIGUOUS` diagnostic, so the missing implementation path is
+visible in the packet. Unrelated preparation diagnostics are not broadcast into
+every result. This is a negative ambiguity case, not automatic route arbitration.
 
 Reverse `test_impact` traversal can nominate the reviewed test association from
 an exact service symbol. It does not claim that the test ran or passed. This test

@@ -169,6 +169,14 @@ test('duplicate literal Spring routes remain ambiguous rather than gaining exact
   assert.ok(result.candidate.diagnostics.some(item => item.startsWith('ROUTE_AMBIGUOUS:')));
   assert.ok(!result.candidate.records.some(item => item.kind === 'engineering.relationship' &&
     item.payload['relation_type'] === 'api.implemented_by'));
+  const packet = retrieveCandidate(result.candidate, {
+    question: 'POST /v1/repairs/{id}/approve', intent: 'enhancement',
+    mode: 'typed', max_seeds: 1 });
+  assert.equal(packet.ok, true);
+  if (!packet.ok) return;
+  assert.ok(packet.packet.diagnostics.includes('ROUTE_AMBIGUOUS:POST /v1/repairs/{id}/approve'),
+    JSON.stringify({ source: result.candidate.diagnostics, packet: packet.packet }));
+  assert.ok(!packet.packet.facts.some(item => item.identity.includes('RepairController.approve')));
 });
 
 test('derived review mapping inherits restricted source classification', async () => {

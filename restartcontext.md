@@ -83,6 +83,8 @@ post-retrieval obligations; see A3 receipt. It does not cover the full negative 
 perturbation matrix or establish agent benefit.
 Stale reviewed test relevance is now excluded as well as stale business mapping;
 changing source bytes under the same question leaves competing passages separate.
+Duplicate Spring routes still produce no exact implementation edge; retrieval now
+surfaces the matching route-ambiguity diagnostic for an oriented operation.
 A4 tests the reviewed investigation loop and prepares authorized agent comparisons;
 A5 establishes refresh correctness. Preserve explicit unresolved links instead of
 using expected fixture answers as runtime data. No broad scanner expansion, rich UI,
