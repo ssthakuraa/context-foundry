@@ -65,16 +65,38 @@ export function traceCandidateRecord(candidate: CrossLayerCandidate, args: {
   });
 }
 
-const rank = (item: ExtensionRecord, query: string, terms: readonly string[]): number => {
-  const searchable = [item.descriptor.name, ...item.descriptor.aliases,
-    item.descriptor.summary ?? '', item.identity.key,
-    ...Object.values(item.payload).filter((value): value is string => typeof value === 'string')]
-    .join(' ').toLowerCase();
-  if (!terms.length) return 0;
-  const matched = terms.filter(term => searchable.includes(term)).length;
-  return matched ? matched * 10 +
-    (item.identity.key.toLowerCase() === query ? 1000 : searchable.includes(query) ? 100 : 0) : 0;
-};
+function rankConcern(records: readonly ExtensionRecord[], query: string): ExtensionRecord[] {
+  const normalized = query.trim().toLowerCase();
+  const terms = [...new Set(normalized.match(/[\p{L}\p{N}_]+/gu) ?? [])];
+  const fused = new Map<string, { item: ExtensionRecord; score: number; exact: boolean }>();
+  for (const item of records) {
+    const exact = item.identity.key.toLowerCase() === normalized ||
+      item.descriptor.name.toLowerCase() === normalized ||
+      item.payload['operation_key']?.toString().toLowerCase() === normalized;
+    if (exact) fused.set(item.record_id, { item, score: 0, exact: true });
+  }
+  const laneText = [
+    (item: ExtensionRecord) => [item.descriptor.name, ...item.descriptor.aliases,
+      item.descriptor.summary ?? ''].join(' '),
+    (item: ExtensionRecord) => item.identity.key,
+    (item: ExtensionRecord) => Object.values(item.payload).filter(
+      (value): value is string => typeof value === 'string').join(' '),
+  ];
+  for (const textOf of laneText) {
+    const lane = records.map(item => ({ item,
+      overlap: terms.filter(term => textOf(item).toLowerCase().includes(term)).length,
+    })).filter(item => item.overlap > 0)
+      .sort((a, b) => b.overlap - a.overlap || a.item.record_id.localeCompare(b.item.record_id));
+    lane.slice(0, 32).forEach((match, index) => {
+      const prior = fused.get(match.item.record_id) ?? { item: match.item, score: 0, exact: false };
+      prior.score += 1 / (60 + index + 1);
+      fused.set(match.item.record_id, prior);
+    });
+  }
+  return [...fused.values()].sort((a, b) => Number(b.exact) - Number(a.exact) ||
+    b.score - a.score || a.item.record_id.localeCompare(b.item.record_id))
+    .map(item => item.item);
+}
 
 /** Offline same-information comparison. Caller provides an already validated candidate. */
 export function retrieveCandidate(candidate: CrossLayerCandidate,
@@ -99,14 +121,9 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
     return { ok: false, code: 'INVALID_REQUEST' };
   }
   const lanes = suppliedConcerns.map(concern => {
-    const normalized = concern.text.trim().toLowerCase();
-    const terms = [...new Set(normalized.match(/[\p{L}\p{N}_]+/gu) ?? [])];
-    return { id: concern.id, ranked: candidate.records.map(item => ({
-      item, score: rank(item, normalized, terms),
-    })).filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score || a.item.record_id.localeCompare(b.item.record_id)) };
+    return { id: concern.id, ranked: rankConcern(candidate.records, concern.text) };
   });
-  const rankedIds = new Set(lanes.flatMap(lane => lane.ranked.map(item => item.item.record_id)));
+  const rankedIds = new Set(lanes.flatMap(lane => lane.ranked.map(item => item.record_id)));
   const seedEntries: { item: ExtensionRecord; concern_id: string }[] = [];
   const seen = new Set<string>();
   for (let depth = 0; seedEntries.length < maxSeeds && depth < 32; depth++) {
@@ -115,9 +132,9 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       const match = lane.ranked[depth];
       if (!match) continue;
       any = true;
-      if (seen.has(match.item.record_id)) continue;
-      seen.add(match.item.record_id);
-      seedEntries.push({ item: match.item, concern_id: lane.id });
+      if (seen.has(match.record_id)) continue;
+      seen.add(match.record_id);
+      seedEntries.push({ item: match, concern_id: lane.id });
       if (seedEntries.length >= maxSeeds) break;
     }
     if (!any) break;

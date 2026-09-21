@@ -26,6 +26,13 @@ Both packets now carry complete capture-bound locators, including revision,
 file digest and line/section range; shortening these to path-only pointers would
 make a coding agent repeat the discovery work.
 
+Seed ranking now reserves exact identity/name/operation-key matches, then fuses
+descriptor, qualified-identity and string-payload lexical lanes with reciprocal
+rank fusion (`1/(60 + rank)`, rank starting at one). Each lane is capped at 32;
+ties break by immutable record ID. Reversing the input record order does not
+change exact or tied lexical results. This is still a reference in-memory
+ranker, not a tuned search-quality claim.
+
 Traversal caps now report `HOP_LIMIT`, `NODE_LIMIT` or `EDGE_LIMIT` when they
 actually stop expansion. The favorable three-hop packet also carries `HOP_LIMIT`
 because a service call continues beyond its selected depth; reaching the service
@@ -100,8 +107,8 @@ caller-supplied concerns are not treated as verified requirement truth. A multil
 original story is preserved verbatim in the packet; disallowed control bytes
 are rejected.
 
-Open A3 work: richer orientation and document-section evidence; concern
-diversity, exact/lexical lane fusion and admission; path- and byte-budget stage
+Open A3 work: richer orientation and remaining document-section evidence;
+concern-aware path admission/packing; path- and byte-budget stage
 loss reporting; stale/conflicting rule and unsupported-access cases; reverse
 broader test-impact traversal; cycle/ambiguity and tie handling; full captured packets
 for every scenario; and a measured quality/byte comparison. A3 must not be

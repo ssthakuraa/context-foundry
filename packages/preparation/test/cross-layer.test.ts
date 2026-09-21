@@ -479,3 +479,26 @@ test('conflicting source passages stay separate and neither becomes reviewed tru
   assert.ok(rules.every(rule => result.packet.facts.some(item => item.record_id === rule.record_id)));
   assert.equal(built.candidate.records.filter(item => item.kind === 'business.mapping').length, 1);
 });
+
+test('exact identity and fused-lane ties are stable across candidate record order', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const reordered = { ...built.candidate, records: [...built.candidate.records].reverse() };
+  const exactRequest = { question: 'fixture.repairs.RepairService.approve(String)',
+    intent: 'enhancement' as const, mode: 'lexical' as const, max_seeds: 1 };
+  const first = retrieveCandidate(built.candidate, exactRequest);
+  const second = retrieveCandidate(reordered, exactRequest);
+  assert.equal(first.ok, true);
+  assert.equal(second.ok, true);
+  if (!first.ok || !second.ok) return;
+  assert.equal(first.packet.facts[0]?.identity, exactRequest.question);
+  assert.deepEqual(first.packet.facts, second.packet.facts);
+  const lexical = { question: 'coordinator', intent: 'enhancement' as const,
+    mode: 'lexical' as const, max_seeds: 2 };
+  const tieA = retrieveCandidate(built.candidate, lexical);
+  const tieB = retrieveCandidate(reordered, lexical);
+  assert.equal(tieA.ok, true);
+  assert.equal(tieB.ok, true);
+  if (tieA.ok && tieB.ok) assert.deepEqual(tieA.packet.facts, tieB.packet.facts);
+});
