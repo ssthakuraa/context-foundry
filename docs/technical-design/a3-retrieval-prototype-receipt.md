@@ -32,6 +32,13 @@ rank fusion (`1/(60 + rank)`, rank starting at one). Each lane is capped at 32;
 ties break by immutable record ID. Reversing the input record order does not
 change exact or tied lexical results. This is still a reference in-memory
 ranker, not a tuned search-quality claim.
+The independently written Python `acme.workflow` vector is also visible through
+this generic descriptor ranker without a new kind-specific retrieval branch;
+A1 separately checks its profile/record conformance. This A3 unit test is a
+projection check, not a fresh trusted-capture claim for that vector.
+Conversely, a synthetic `generic.related_to` relationship between the same
+endpoints does not authorize enhancement traversal. Descriptive extension
+visibility and executable core relation policy are intentionally separate.
 
 Traversal caps now report `HOP_LIMIT`, `NODE_LIMIT` or `EDGE_LIMIT` when they
 actually stop expansion. The favorable three-hop packet also carries `HOP_LIMIT`

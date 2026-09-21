@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileManifestDigest, type CapturedFile, type SourceCapture } from '@context-foundry/contracts';
@@ -501,4 +502,40 @@ test('exact identity and fused-lane ties are stable across candidate record orde
   assert.equal(tieA.ok, true);
   assert.equal(tieB.ok, true);
   if (tieA.ok && tieB.ok) assert.deepEqual(tieA.packet.facts, tieB.packet.facts);
+});
+
+test('adopter-defined kind enters descriptor retrieval without a core kind switch', () => {
+  const vector = JSON.parse(execFileSync('python3', [new URL(
+    '../../../contracts/fixtures/emit-extension-vector.py', import.meta.url).pathname],
+  { encoding: 'utf8' })) as {
+    record: import('@context-foundry/contracts/extensions').ExtensionRecord;
+    locator: import('@context-foundry/contracts').EvidenceLocator;
+  };
+  const candidate = { records: [vector.record], locators: [vector.locator],
+    coverage: [], diagnostics: [], digest: 'd'.repeat(64) };
+  const found = retrieveCandidate(candidate, { question: 'réparer',
+    intent: 'enhancement', mode: 'lexical' });
+  assert.equal(found.ok, true);
+  if (!found.ok) return;
+  assert.equal(found.packet.facts[0]?.kind, 'acme.workflow');
+  assert.equal(found.packet.facts[0]?.locators[0]?.evidence_id, vector.locator.evidence_id);
+});
+
+test('generic relationship label cannot authorize core enhancement traversal', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const route = built.candidate.records.find(item => item.kind === 'engineering.relationship' &&
+    item.payload['relation_type'] === 'api.implemented_by')!;
+  const generic = { ...route, record_id: 'rec:generic-relation',
+    payload: { ...route.payload, relation_type: 'generic.related_to' },
+    identity: { ...route.identity, key: 'generic:operation-controller' } };
+  const candidate = { ...built.candidate,
+    records: [...built.candidate.records.filter(item => item.record_id !== route.record_id), generic] };
+  const result = retrieveCandidate(candidate, {
+    question: 'POST /v1/repairs/{id}/approve', intent: 'enhancement',
+    mode: 'typed', max_seeds: 1, max_hops: 2 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(!result.packet.facts.some(item => item.identity.includes('RepairController.approve')));
 });
