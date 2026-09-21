@@ -86,6 +86,17 @@ than misrepresented as a raw source span. Other document sections remain
 unsupported. The host agent can still use the pointer to open the full source
 file when a deeper investigation is warranted. This is offline selective-context
 mechanics, not an enterprise file-access policy.</p>
+<p>The API-use journey now has an explicit two-step test: orientation selects the
+source-declared <code>POST /v1/repairs/{id}/approve</code> operation without traversing into
+the service; focused OpenAPI evidence supplies the declared required <code>id</code> path
+parameter and <code>204</code>/<code>409</code> responses. It does not claim that runtime behavior or
+side effects match the contract. A service-enhancement question instead follows
+the implementation pointer and reads the bound service method range.
+The synthetic business passage expects approval to record the coordinator;
+the selected service-method range does not show that term. The fixture test
+preserves those as separate observations, not an automated defect verdict or
+proof of absence elsewhere in the application. The rule still has pending
+review and no test execution evidence has been imported.</p>
 <p>The negative service-to-data query does <strong>not</strong> return <code>REPAIR_REQUEST</code>: A2 knows
 the entity/table mapping, but lacks a supported repository-to-entity edge from
 the service's call path. The missing edge is an investigation target, not a

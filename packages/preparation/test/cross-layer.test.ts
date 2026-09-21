@@ -411,3 +411,49 @@ test('OpenAPI document pointer returns a labelled canonical subtree, not fake ra
   assert.ok(read.json.includes('canonical_json_pointer'));
   assert.ok(!read.json.includes('raw_file_lines'));
 });
+
+test('API-use orientation plus focused evidence reveals declared parameter and responses only', async () => {
+  const source = input();
+  const built = await assembleCrossLayerCandidate(source);
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const oriented = retrieveCandidate(built.candidate, {
+    question: 'POST /v1/repairs/{id}/approve', intent: 'api_use',
+    mode: 'typed', max_seeds: 1 });
+  assert.equal(oriented.ok, true);
+  if (!oriented.ok) return;
+  const operation = oriented.packet.facts.find(item => item.kind === 'interface.operation');
+  assert.ok(operation);
+  assert.ok(!oriented.packet.facts.some(item => item.identity.includes('RepairService.approve')));
+  const read = readBoundEvidence(built.candidate, source.capture,
+    operation!.locators[0]!.evidence_id);
+  assert.equal(read.ok, true);
+  if (!read.ok) return;
+  const declared = JSON.parse(read.text) as {
+    parameters: { name: string; in: string; required: boolean }[];
+    responses: Record<string, unknown>;
+  };
+  assert.deepEqual(declared.parameters.map(item => [item.name, item.in, item.required]),
+    [['id', 'path', true]]);
+  assert.deepEqual(Object.keys(declared.responses).sort(), ['204', '409']);
+  assert.ok(!read.text.includes('repository.find'));
+});
+
+test('selective implementation read does not promote a business expectation into observed behavior', async () => {
+  const source = input();
+  const built = await assembleCrossLayerCandidate(source);
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const rule = built.candidate.records.find(item => item.kind === 'business.rule' &&
+    item.descriptor.name === 'Approving a request')!;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const read = readBoundEvidence(built.candidate, source.capture, service.evidence_refs[0]!);
+  assert.equal(read.ok, true);
+  if (!read.ok) return;
+  assert.ok(String(rule.payload['statement']).includes('records the coordinator'));
+  assert.equal(rule.review.state, 'pending');
+  assert.ok(!read.text.includes('coordinator'));
+  assert.ok(!built.candidate.records.some(item => item.kind === 'test.association' &&
+    item.payload['association_basis'] === 'observed_pass'));
+});
