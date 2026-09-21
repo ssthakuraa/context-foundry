@@ -49,6 +49,14 @@ A synthetic supported call cycle terminates under the visited-record set without
 duplicating the controller fact; this is a graph-mechanics test, not a validated
 new release fixture.
 
+Whole-path packing now groups each seed with its retained connector edges and
+endpoints before serialization. A 3,000-byte two-concern test omits the oversized
+approval unit, retains the storage unit in an actual 1,232-byte packet, reports
+`OVERSIZED_UNIT` and offers the omitted seed ID for focused inspection. If no
+unit fits, `PACKET_TOO_LARGE` also carries an inspectable seed. A no-match
+query returns an empty packet rather than an oversize error. This is an
+in-memory first packing rule, not yet the full concern-diverse quality gate.
+
 An API-use query is restricted to declared contract facts and does not traverse
 implementation links. A 256-byte cap returns `PACKET_TOO_LARGE` rather than a
 partial edge. Exact record inspection returns a bounded file-range pointer and
@@ -113,14 +121,14 @@ relationship payload cannot silently become a core path.
 Up to eight caller-stated concerns can now nominate seeds in round-robin order
 under one shared seed cap; a two-concern test retains both approval and storage
 entries. The original question remains a separate request field. This is not
-yet the specified multi-lane rank fusion or concern-aware path packing, and the
+yet concern-aware path packing, and the
 caller-supplied concerns are not treated as verified requirement truth. A multiline
 original story is preserved verbatim in the packet; disallowed control bytes
 are rejected.
 
 Open A3 work: richer orientation and remaining document-section evidence;
-concern-aware path admission/packing; path- and byte-budget stage
-loss reporting; stale/conflicting rule and unsupported-access cases; reverse
-broader test-impact traversal; cycle/ambiguity and tie handling; full captured packets
+more representative concern-diverse path packing; path- and byte-budget stage
+loss reporting; stronger applicability/conflict and unsupported-access cases;
+broader test-impact traversal and ambiguity handling; full captured packets
 for every scenario; and a measured quality/byte comparison. A3 must not be
 marked complete on this one favorable path.

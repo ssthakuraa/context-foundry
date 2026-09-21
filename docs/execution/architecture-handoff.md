@@ -1,7 +1,7 @@
 # Bounded implementation handoff after architecture review
 
 **Status:** CF-0.3 queue in progress · 2026-09-20. A1 is complete; A2 has a
-synthetic local receipt; A3–A5 are pending. Resume at A3 using the
+synthetic local receipt; A3 is in progress and A4–A5 are pending. Resume at A3 using the
 root `WORKLIST.md`; do not repeat a broad research survey or build a platform shell.
 
 The [A1 compatibility receipt](../technical-design/a1-compatibility-receipt.md)

@@ -230,10 +230,14 @@ test('retrieval refuses a packet that cannot fit the actual serialized wire cap'
   const built = await assembleCrossLayerCandidate(input());
   assert.equal(built.ok, true);
   if (!built.ok) return;
-  assert.deepEqual(retrieveCandidate(built.candidate, {
+  const oversized = retrieveCandidate(built.candidate, {
     question: 'coordinator', intent: 'enhancement', mode: 'typed', max_seeds: 1,
     max_bytes: 256,
-  }), { ok: false, code: 'PACKET_TOO_LARGE' });
+  });
+  assert.equal(oversized.ok, false);
+  if (oversized.ok) return;
+  assert.equal(oversized.code, 'PACKET_TOO_LARGE');
+  assert.equal(oversized.inspect_record_ids?.length, 1);
 });
 
 test('exact inspect returns an implementation source pointer without reading the file', async () => {
@@ -565,4 +569,40 @@ test('a supported call cycle terminates without duplicating source facts', async
   assert.equal(result.packet.facts.filter(item =>
     item.identity === 'fixture.repairs.RepairController.approve(String)').length, 1);
   assert.ok(result.packet.stage.examined_edges <= 400);
+});
+
+test('tight wire cap skips an oversized complete path but retains another concern', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, {
+    question: 'Investigate approval and storage', intent: 'enhancement', mode: 'typed',
+    concerns: [{ id: 'approval', text: 'coordinator' },
+      { id: 'storage', text: 'REPAIR_REQUEST' }],
+    max_seeds: 2, max_hops: 3, max_bytes: 3000,
+  });
+  assert.equal(result.ok, true, JSON.stringify(result));
+  if (!result.ok) return;
+  assert.ok(result.bytes <= 3000);
+  assert.ok(result.packet.diagnostics.includes('OVERSIZED_UNIT'));
+  assert.ok(result.packet.inspect_record_ids?.length);
+  assert.ok(result.packet.facts.some(item => item.concern_id === 'storage'));
+  assert.ok(!result.packet.facts.some(item => item.kind === 'engineering.relationship'));
+  if (process.env['CF_A3_RECEIPT'] === '1') process.stdout.write(`${JSON.stringify({
+    scenario: 'two-concern-tight-cap', arm: 'typed', bytes: result.bytes,
+    packet: result.packet,
+  })}\n`);
+});
+
+test('a valid no-match request returns an empty bounded packet, not an oversize error', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, {
+    question: 'unrepresented_zebra_operation', intent: 'api_use', mode: 'lexical',
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.deepEqual(result.packet.facts, []);
+  assert.equal(result.packet.stage.candidates, 0);
 });

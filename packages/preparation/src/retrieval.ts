@@ -21,12 +21,14 @@ export type RetrievalFact = {
 export type RetrievalPacket = {
   request: RetrievalRequest; candidate_digest: string;
   facts: readonly RetrievalFact[];
+  inspect_record_ids?: readonly string[];
   stage: { candidates: number; seeds: number; examined_edges: number;
     admitted_connectors: number; omitted_for_limit: number };
   diagnostics: readonly string[];
 };
 export type RetrievalResult = { ok: true; packet: RetrievalPacket; json: string; bytes: number } |
-  { ok: false; code: 'INVALID_REQUEST' | 'PACKET_TOO_LARGE' };
+  { ok: false; code: 'INVALID_REQUEST' | 'PACKET_TOO_LARGE';
+    inspect_record_ids?: readonly string[] };
 
 export type InspectionResult = {
   ok: true; json: string; bytes: number;
@@ -216,18 +218,57 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
       ...(selection.concern_id ? { concern_id: selection.concern_id } : {}),
       ...(selection.via ? { via: selection.via } : {}) });
   }
-  const packet: RetrievalPacket = { request, candidate_digest: candidate.digest, facts,
-    stage: { candidates: rankedIds.size, seeds: seeds.length, examined_edges: examinedEdges,
-      admitted_connectors: facts.filter(item => item.reason === 'typed_connector').length,
-      omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) },
-    diagnostics: [
-      ...(candidate.coverage.some(item => item.status !== 'complete_for_declared_scope')
-        ? ['PARTIAL_COVERAGE'] : []),
-      ...[...limitDiagnostics].sort(),
-    ],
+  const rootOf = (fact: RetrievalFact): string => {
+    let cursor = fact;
+    const visited = new Set<string>();
+    while (cursor.via && !visited.has(cursor.record_id)) {
+      visited.add(cursor.record_id);
+      const parent = facts.find(item => item.record_id === cursor.via);
+      if (!parent) break;
+      cursor = parent;
+    }
+    return cursor.record_id;
   };
+  const groups = seedEntries.map(seed => ({ seed_id: seed.item.record_id,
+    facts: facts.filter(item => rootOf(item) === seed.item.record_id) }));
+  const admitted: typeof groups = [];
+  const skipped: string[] = [];
+  const baseDiagnostics = [
+    ...(candidate.coverage.some(item => item.status !== 'complete_for_declared_scope')
+      ? ['PARTIAL_COVERAGE'] : []),
+    ...[...limitDiagnostics].sort(),
+  ];
+  const makePacket = (): RetrievalPacket => ({ request, candidate_digest: candidate.digest,
+    facts: admitted.flatMap(group => group.facts),
+    ...(skipped.length ? { inspect_record_ids: [...skipped] } : {}),
+    stage: { candidates: rankedIds.size, seeds: seeds.length, examined_edges: examinedEdges,
+      admitted_connectors: admitted.flatMap(group => group.facts).filter(
+        item => item.reason === 'typed_connector').length,
+      omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) + skipped.length },
+    diagnostics: skipped.length ? [...baseDiagnostics, 'OVERSIZED_UNIT'] : baseDiagnostics,
+  });
+  const packetBytes = () => Buffer.byteLength(canonicalJson(makePacket()), 'utf8');
+  if (!groups.length) {
+    const packet = makePacket();
+    const json = canonicalJson(packet);
+    const bytes = Buffer.byteLength(json, 'utf8');
+    return bytes > maxBytes ? { ok: false, code: 'PACKET_TOO_LARGE' } :
+      { ok: true, packet, json, bytes };
+  }
+  for (const group of groups) {
+    admitted.push(group);
+    if (packetBytes() <= maxBytes) continue;
+    admitted.pop();
+    skipped.push(group.seed_id);
+  }
+  while (admitted.length && packetBytes() > maxBytes) {
+    skipped.unshift(admitted.pop()!.seed_id);
+  }
+  if (!admitted.length || packetBytes() > maxBytes) return {
+    ok: false, code: 'PACKET_TOO_LARGE',
+    ...(skipped.length ? { inspect_record_ids: [...skipped] } : {}),
+  };
+  const packet = makePacket();
   const json = canonicalJson(packet);
-  const bytes = Buffer.byteLength(json, 'utf8');
-  return bytes > maxBytes ? { ok: false, code: 'PACKET_TOO_LARGE' } :
-    { ok: true, packet, json, bytes };
+  return { ok: true, packet, json, bytes: Buffer.byteLength(json, 'utf8') };
 }
