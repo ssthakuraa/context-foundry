@@ -102,6 +102,10 @@ declarations/columns in caller-supplied bytes and rejects lexical decoys. It is
 not a source-bound SQL adapter and does not change the WP2 status above. The
 synthetic fixture and expected/forbidden assertions are described in the
 [scanner gate](../research/scanner-and-enterprise-patterns.md#first-executable-continuation).
+A similarly isolated Java syntax reader extracts top-level type/method signatures;
+a separate Spring MVC rule recognizes literal imported `RestController`,
+`RequestMapping` and `GetMapping`/`PostMapping` forms. Both return partial status.
+They do not yet produce capture-bound records or prove controller-to-service calls.
 
 Unsupported constructs emit operation-specific coverage gaps with permitted locators.
 They do not silently disappear from the coverage denominator. Unit tests use tiny

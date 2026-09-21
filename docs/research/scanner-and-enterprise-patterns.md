@@ -78,3 +78,12 @@ syntax-only `CREATE TABLE` and column extraction on caller-supplied bytes; tests
 include comment/string decoys, quoted identifiers, nested type parentheses,
 malformed input and byte limits. It is not wired to source capture, locators,
 coverage records or release assembly, and proves nothing about runtime behavior.
+
+The next bounded spike uses Tree-sitter Java to extract top-level type and method
+signatures from caller-supplied bytes. A separate Spring MVC rule recognizes only
+literal class/method paths backed by explicit Spring imports; same-named custom
+annotations and computed paths do not produce exact routes. These are syntax/rule
+results, not semantic call edges, live endpoint observations, or an integrated pack.
+Pinned spike dependencies are `web-tree-sitter@0.25.10` (MIT) and
+`tree-sitter-wasms@0.1.13` (Unlicense package); the upstream
+[Java grammar is MIT](https://github.com/tree-sitter/tree-sitter-java).

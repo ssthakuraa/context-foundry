@@ -88,6 +88,12 @@ schemas must never be installed as executable route schemas.
 Tree-sitter provides syntax parsing, not complete semantic or runtime resolution.
 Framework adapters must preserve unresolved references.
 [Tree-sitter](https://tree-sitter.github.io/tree-sitter/).
+The Java/Spring validation spike pins `web-tree-sitter@0.25.10` and
+`tree-sitter-wasms@0.1.13`; this is a tested local parser choice, not a decision
+to bundle every grammar or to trust syntax as semantic call resolution. Package
+metadata reports MIT and Unlicense respectively; the upstream Java grammar is
+[MIT](https://github.com/tree-sitter/tree-sitter-java). Review binary provenance
+and transitive notices again before a distributable worker release.
 
 PostgreSQL row security is defense in depth. Runtime identities must not own protected
 tables or possess bypass privileges; migrations use a separate identity.

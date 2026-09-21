@@ -196,7 +196,13 @@ schemas must never be installed as executable route schemas.
 <a href="https://fastify.dev/docs/latest/Reference/Validation-and-Serialization/">Fastify</a>.</p>
 <p>Tree-sitter provides syntax parsing, not complete semantic or runtime resolution.
 Framework adapters must preserve unresolved references.
-<a href="https://tree-sitter.github.io/tree-sitter/">Tree-sitter</a>.</p>
+<a href="https://tree-sitter.github.io/tree-sitter/">Tree-sitter</a>.
+The Java/Spring validation spike pins <code>web-tree-sitter@0.25.10</code> and
+<code>tree-sitter-wasms@0.1.13</code>; this is a tested local parser choice, not a decision
+to bundle every grammar or to trust syntax as semantic call resolution. Package
+metadata reports MIT and Unlicense respectively; the upstream Java grammar is
+<a href="https://github.com/tree-sitter/tree-sitter-java">MIT</a>. Review binary provenance
+and transitive notices again before a distributable worker release.</p>
 <p>PostgreSQL row security is defense in depth. Runtime identities must not own protected
 tables or possess bypass privileges; migrations use a separate identity.
 <a href="https://www.postgresql.org/docs/17/ddl-rowsecurity.html">Row security</a>.</p>
