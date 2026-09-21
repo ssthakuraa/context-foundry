@@ -1,0 +1,198 @@
+{
+  "$id": "urn:context-foundry:schema:0.3.0:adapter-manifest",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "adapter_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "adapter_version": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "config_schema_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "consumed_profiles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "maxLength": 256,
+            "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+            "type": "string"
+          },
+          "profile_digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "profile_digest"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    },
+    "emitted_profiles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "maxLength": 256,
+            "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+            "type": "string"
+          },
+          "profile_digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "profile_digest"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    },
+    "languages": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 128,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "license": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "media_types": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 128,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "package_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "parser_version": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "protocol_major": {
+      "const": 1,
+      "type": "number"
+    },
+    "requested_capabilities": {
+      "items": {
+        "anyOf": [
+          {
+            "const": "capture.read",
+            "type": "string"
+          },
+          {
+            "const": "registry.read",
+            "type": "string"
+          }
+        ]
+      },
+      "maxItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "resource_limits": {
+      "additionalProperties": false,
+      "properties": {
+        "input_bytes": {
+          "maximum": 16777216,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "messages": {
+          "maximum": 100000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "output_bytes": {
+          "maximum": 16777216,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "wall_ms": {
+          "maximum": 300000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input_bytes",
+        "output_bytes",
+        "messages",
+        "wall_ms"
+      ],
+      "type": "object"
+    },
+    "role": {
+      "anyOf": [
+        {
+          "const": "analyzer",
+          "type": "string"
+        },
+        {
+          "const": "resolver",
+          "type": "string"
+        },
+        {
+          "const": "knowledge_importer",
+          "type": "string"
+        }
+      ]
+    },
+    "rule_version": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "0.3.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "protocol_major",
+    "adapter_id",
+    "adapter_version",
+    "package_digest",
+    "role",
+    "media_types",
+    "languages",
+    "config_schema_digest",
+    "emitted_profiles",
+    "consumed_profiles",
+    "parser_version",
+    "rule_version",
+    "requested_capabilities",
+    "resource_limits",
+    "license"
+  ],
+  "type": "object"
+}

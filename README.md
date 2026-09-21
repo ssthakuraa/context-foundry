@@ -46,7 +46,9 @@ of this repository or license grant.
 The initial contract package is under `packages/contracts`. With Node.js 22+ and
 pnpm 11, run `pnpm install --frozen-lockfile`, then `pnpm test`, `pnpm typecheck`
 and `pnpm build`. Run `pnpm --filter @context-foundry/contracts schema:check`
-to verify the twenty-eight exported Draft 7 JSON schemas match the TypeScript source.
+to verify the thirty-four exported Draft 7 JSON schemas match the TypeScript source.
+The added `0.3.0` extension schemas coexist with unchanged `0.2.0` schemas; see the
+[A1 compatibility receipt](docs/technical-design/a1-compatibility-receipt.md).
 These are a WP1 subset; they are not a complete or frozen product API.
 Canonical JSON/digest helpers and strict raw-JSON parsing are included, with their
 normalization and limits specified in [data contracts](docs/technical-design/data-contracts.md).

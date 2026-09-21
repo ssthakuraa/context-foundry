@@ -19,6 +19,14 @@ cycles; failed producer attempts cannot activate partial output. These are desig
 decisions, not implemented checks. Historical test counts below belong to their
 checkpoint; the latest pre-review suite was 64 contract and 25 extractor tests.
 
+**A1 implementation receipt:** the [compatibility matrix](a1-compatibility-receipt.md)
+now records the separate `0.3.0` extension wire slice, six added schema exports,
+independent Python custom-kind vector, generic descriptor search/inspect, explicit
+legacy-symbol migration and 71 passing contract tests. This resolves the minimum
+closed kind/language extension gap for one adopter-written producer. It does not
+freeze all 0.2.0 contracts or port business/API/test kinds to the new wire format.
+Capture attestation and a real producer runner remain open for A2.
+
 ## Verified now
 
 - Twenty-eight Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes. Producer/consumer capability manifests can check declared kind compatibility.

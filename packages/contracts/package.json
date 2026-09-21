@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "engines": {"node": ">=22"},
-  "exports": {".": "./dist/index.js"},
+  "exports": {".": "./dist/index.js", "./extensions": "./dist/extensions.js"},
   "types": "./dist/index.d.ts",
   "files": ["dist", "schemas"],
   "scripts": {

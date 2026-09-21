@@ -54,6 +54,13 @@ relation semantics distinct from generic search; proof cycles distinct from prog
 cycles; failed producer attempts cannot activate partial output. These are design
 decisions, not implemented checks. Historical test counts below belong to their
 checkpoint; the latest pre-review suite was 64 contract and 25 extractor tests.</p>
+<p><strong>A1 implementation receipt:</strong> the <a href="a1-compatibility-receipt.html">compatibility matrix</a>
+now records the separate <code>0.3.0</code> extension wire slice, six added schema exports,
+independent Python custom-kind vector, generic descriptor search/inspect, explicit
+legacy-symbol migration and 71 passing contract tests. This resolves the minimum
+closed kind/language extension gap for one adopter-written producer. It does not
+freeze all 0.2.0 contracts or port business/API/test kinds to the new wire format.
+Capture attestation and a real producer runner remain open for A2.</p>
 <h2 id="verified-now">Verified now</h2>
 <ul>
 <li>Twenty-eight Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes. Producer/consumer capability manifests can check declared kind compatibility.</li>

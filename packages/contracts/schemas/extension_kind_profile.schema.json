@@ -1,0 +1,140 @@
+{
+  "$id": "urn:context-foundry:schema:0.3.0:kind-profile",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_origins": {
+      "items": {
+        "anyOf": [
+          {
+            "const": "source_declared",
+            "type": "string"
+          },
+          {
+            "const": "static_resolution",
+            "type": "string"
+          },
+          {
+            "const": "human_asserted",
+            "type": "string"
+          },
+          {
+            "const": "model_proposed",
+            "type": "string"
+          }
+        ]
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "identity_scheme": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "kind": {
+      "maxLength": 256,
+      "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+      "type": "string"
+    },
+    "payload_schema": {
+      "patternProperties": {
+        "^(.*)$": {}
+      },
+      "type": "object"
+    },
+    "payload_schema_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "profile_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "projection_version": {
+      "const": 1,
+      "type": "number"
+    },
+    "reference_roles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "target_kind": {
+            "maxLength": 256,
+            "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "target_kind"
+        ],
+        "type": "object"
+      },
+      "maxItems": 64,
+      "type": "array"
+    },
+    "relation": {
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "anyOf": [
+            {
+              "const": "subject_to_object",
+              "type": "string"
+            },
+            {
+              "const": "object_to_subject",
+              "type": "string"
+            }
+          ]
+        },
+        "relation_type": {
+          "maxLength": 256,
+          "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "relation_type",
+        "direction"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "0.3.0",
+      "type": "string"
+    },
+    "scheme_version": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "semantic_major": {
+      "maximum": 1000,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "required": [
+    "schema_version",
+    "kind",
+    "semantic_major",
+    "profile_digest",
+    "payload_schema",
+    "payload_schema_digest",
+    "projection_version",
+    "identity_scheme",
+    "scheme_version",
+    "allowed_origins",
+    "reference_roles"
+  ],
+  "type": "object"
+}

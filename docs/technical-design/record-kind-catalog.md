@@ -6,6 +6,12 @@ CF-0.2 kinds. Their closed registry is not the final SDK architecture. The
 generic projections and a minimal source-artifact kind in A1, with explicit schema
 versioning and conformance. Unknown kinds remain rejected by current code until then.
 
+**A1 implementation:** the separate `0.3.0` extension entry point now registers
+reviewed `source.artifact` and open-language `engineering.symbol` profiles plus
+namespaced adopter kinds. See the [compatibility receipt](a1-compatibility-receipt.md).
+The legacy `0.2.0` kind handshake below stays closed; A2 must port the other seven
+first-party kinds before using them in integrated extension contributions.
+
 **Status:** Proposed catalog for CF-0.2, not a frozen schema or permission to emit unregistered kinds. A source parser may produce only kinds registered by the runtime validator; unsupported declarations become adapter coverage/diagnostics, not loosely shaped records.
 
 | Kind | Meaning and minimum payload | Permitted origin and support boundary | Status |

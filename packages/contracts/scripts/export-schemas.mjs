@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Ajv } from 'ajv';
 import { Schemas } from '../dist/index.js';
+import { ExtensionSchemas } from '../dist/extensions.js';
 
 const root = fileURLToPath(new URL('../schemas/', import.meta.url));
 const check = process.argv.includes('--check');
@@ -17,7 +18,10 @@ function sorted(value) {
 }
 
 if (!check) mkdirSync(root, { recursive: true });
-for (const [name, schema] of Object.entries(Schemas)) {
+const allSchemas = { ...Schemas, ...Object.fromEntries(
+  Object.entries(ExtensionSchemas).map(([name, schema]) => [`extension_${name}`, schema]),
+) };
+for (const [name, schema] of Object.entries(allSchemas)) {
   const path = join(root, `${name}.schema.json`);
   const content = `${JSON.stringify(sorted({ $schema: 'http://json-schema.org/draft-07/schema#', ...schema }), null, 2)}\n`;
   ajv.compile(JSON.parse(content));
@@ -27,4 +31,4 @@ for (const [name, schema] of Object.entries(Schemas)) {
     writeFileSync(path, content);
   }
 }
-console.log(`${check ? 'Verified' : 'Exported'} ${Object.keys(Schemas).length} JSON schemas`);
+console.log(`${check ? 'Verified' : 'Exported'} ${Object.keys(allSchemas).length} JSON schemas`);

@@ -55,6 +55,7 @@ is claimed. See [readiness and risks](execution/readiness-and-risks.md).
 ## Technical design and execution
 
 - [SDK extension and interoperability contract](technical-design/sdk-extension-contract.md)
+- [A1 extension compatibility receipt](technical-design/a1-compatibility-receipt.md)
 - [Knowledge lifecycle and task evidence selection](technical-design/knowledge-lifecycle-and-retrieval.md)
 - [Bounded A1–A5 implementation handoff](execution/architecture-handoff.md)
 - [Technical design](technical-design/system.md)

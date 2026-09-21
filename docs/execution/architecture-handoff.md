@@ -1,8 +1,11 @@
 # Bounded implementation handoff after architecture review
 
-**Status:** CF-0.3 queue selected · 2026-09-20. A1–A5 are pending, not completed.
-Implementation was paused during this documentation review. Resume at A1 using the
+**Status:** CF-0.3 queue in progress · 2026-09-20. A1 is complete; A2–A5 are pending.
+Implementation has resumed. Resume at A2 using the
 root `WORKLIST.md`; do not repeat a broad research survey or build a platform shell.
+
+The [A1 compatibility receipt](../technical-design/a1-compatibility-receipt.md)
+records the implemented minimum wire slice and the remaining A2 integration work.
 
 ## Scope and model handoff
 

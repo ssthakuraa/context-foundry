@@ -1,0 +1,307 @@
+{
+  "$id": "urn:context-foundry:schema:0.3.0:extension-record",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "classification": {
+      "anyOf": [
+        {
+          "const": "public",
+          "type": "string"
+        },
+        {
+          "const": "internal",
+          "type": "string"
+        },
+        {
+          "const": "restricted",
+          "type": "string"
+        }
+      ]
+    },
+    "dependency_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 1024,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "descriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "aliases": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 32,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "locator_refs": {
+          "items": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 1024,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "name": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "summary": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "aliases",
+        "locator_refs"
+      ],
+      "type": "object"
+    },
+    "evidence_refs": {
+      "items": {
+        "maxLength": 512,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 1024,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "identity": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "scheme": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "scheme_version": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_namespace": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_namespace",
+        "scheme",
+        "scheme_version",
+        "key"
+      ],
+      "type": "object"
+    },
+    "kind": {
+      "maxLength": 256,
+      "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+      "type": "string"
+    },
+    "origin": {
+      "anyOf": [
+        {
+          "const": "source_declared",
+          "type": "string"
+        },
+        {
+          "const": "static_resolution",
+          "type": "string"
+        },
+        {
+          "const": "human_asserted",
+          "type": "string"
+        },
+        {
+          "const": "model_proposed",
+          "type": "string"
+        }
+      ]
+    },
+    "owner_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "payload": {
+      "patternProperties": {
+        "^(.*)$": {}
+      },
+      "type": "object"
+    },
+    "producer_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "profile_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "type": "string"
+    },
+    "record_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "references": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "resolution": {
+            "anyOf": [
+              {
+                "const": "resolved",
+                "type": "string"
+              },
+              {
+                "const": "unresolved",
+                "type": "string"
+              },
+              {
+                "const": "ambiguous",
+                "type": "string"
+              },
+              {
+                "const": "conflict",
+                "type": "string"
+              },
+              {
+                "const": "unsupported",
+                "type": "string"
+              }
+            ]
+          },
+          "role": {
+            "maxLength": 512,
+            "minLength": 1,
+            "type": "string"
+          },
+          "target": {
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "maxLength": 2048,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scheme": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "scheme_version": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              "source_namespace": {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_namespace",
+              "scheme",
+              "scheme_version",
+              "key"
+            ],
+            "type": "object"
+          },
+          "target_kind": {
+            "maxLength": 256,
+            "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "target_kind",
+          "target",
+          "resolution"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    },
+    "review": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "const": "pending",
+              "type": "string"
+            },
+            {
+              "const": "approved",
+              "type": "string"
+            },
+            {
+              "const": "rejected",
+              "type": "string"
+            },
+            {
+              "const": "not_required",
+              "type": "string"
+            },
+            {
+              "const": "stale",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "0.3.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "record_id",
+    "kind",
+    "profile_digest",
+    "identity",
+    "producer_id",
+    "owner_id",
+    "origin",
+    "review",
+    "payload",
+    "descriptor",
+    "references",
+    "evidence_refs",
+    "dependency_refs",
+    "classification"
+  ],
+  "type": "object"
+}

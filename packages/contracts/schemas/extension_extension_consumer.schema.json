@@ -1,0 +1,69 @@
+{
+  "$id": "urn:context-foundry:schema:0.3.0:extension-consumer",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_profiles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "maxLength": 256,
+            "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+            "type": "string"
+          },
+          "profile_digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "profile_digest"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    },
+    "consumer_id": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "required_profiles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "maxLength": 256,
+            "pattern": "^[a-z][a-z0-9]*(?:[._][a-z][a-z0-9]*)+$",
+            "type": "string"
+          },
+          "profile_digest": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "profile_digest"
+        ],
+        "type": "object"
+      },
+      "maxItems": 128,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "0.3.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "consumer_id",
+    "required_profiles",
+    "accepted_profiles"
+  ],
+  "type": "object"
+}
