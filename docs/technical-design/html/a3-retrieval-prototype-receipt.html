@@ -79,11 +79,13 @@ original question in the response. This is a local library operation; it does
 not authenticate a user or read the implementation file.</p>
 <p>The focused evidence operation takes an evidence ID and the caller-supplied A2
 capture, rechecks full declared-byte closure and locator binding, then returns
-one exact UTF-8 file-line range with a raw-range digest under a 16 KiB cap. A
-changed source file aborts the read. Document-section locators are not yet
-readable through this operation; the host agent can still use the pointer to
-open the full source file when a deeper investigation is warranted. This is
-offline selective-context mechanics, not an enterprise file-access policy.</p>
+one exact UTF-8 file-line range with a content digest under a 16 KiB cap. A
+changed source file aborts the read. For OpenAPI JSON-pointer locators it can
+return a canonical subtree, explicitly labelled <code>canonical_json_pointer</code> rather
+than misrepresented as a raw source span. Other document sections remain
+unsupported. The host agent can still use the pointer to open the full source
+file when a deeper investigation is warranted. This is offline selective-context
+mechanics, not an enterprise file-access policy.</p>
 <p>The negative service-to-data query does <strong>not</strong> return <code>REPAIR_REQUEST</code>: A2 knows
 the entity/table mapping, but lacks a supported repository-to-entity edge from
 the service's call path. The missing edge is an investigation target, not a

@@ -397,3 +397,17 @@ test('selective evidence read checks the full capture and returns exact source l
   assert.deepEqual(readBoundEvidence(built.candidate, changed, service.evidence_refs[0]!),
     { ok: false, code: 'CAPTURE_CHANGED' });
 });
+
+test('OpenAPI document pointer returns a labelled canonical subtree, not fake raw lines', async () => {
+  const source = input();
+  const built = await assembleCrossLayerCandidate(source);
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const operation = built.candidate.records.find(item => item.kind === 'interface.operation')!;
+  const read = readBoundEvidence(built.candidate, source.capture, operation.evidence_refs[0]!);
+  assert.equal(read.ok, true);
+  if (!read.ok) return;
+  assert.ok(read.text.includes('approveRepair'));
+  assert.ok(read.json.includes('canonical_json_pointer'));
+  assert.ok(!read.json.includes('raw_file_lines'));
+});

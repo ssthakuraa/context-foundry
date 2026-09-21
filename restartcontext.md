@@ -126,7 +126,7 @@ obligation-stage audit; checkpoint `4398e77` is pushed. The next local slice
 adds exact identity precedence, a safe relation policy, reverse test-impact
 nomination, round-robin concern seeds, explicit hop-limit diagnostics, exact
 trace and capture-checked file-range evidence; the
-current preparation suite has 24
+current preparation suite has 25
 passing tests.
 Before another checkpoint, rerun tests/typecheck/HTML checks and update this
 receipt. A3 remains in progress, not an agent-productivity verdict.

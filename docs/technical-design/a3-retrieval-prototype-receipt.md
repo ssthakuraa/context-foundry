@@ -46,11 +46,13 @@ not authenticate a user or read the implementation file.
 
 The focused evidence operation takes an evidence ID and the caller-supplied A2
 capture, rechecks full declared-byte closure and locator binding, then returns
-one exact UTF-8 file-line range with a raw-range digest under a 16 KiB cap. A
-changed source file aborts the read. Document-section locators are not yet
-readable through this operation; the host agent can still use the pointer to
-open the full source file when a deeper investigation is warranted. This is
-offline selective-context mechanics, not an enterprise file-access policy.
+one exact UTF-8 file-line range with a content digest under a 16 KiB cap. A
+changed source file aborts the read. For OpenAPI JSON-pointer locators it can
+return a canonical subtree, explicitly labelled `canonical_json_pointer` rather
+than misrepresented as a raw source span. Other document sections remain
+unsupported. The host agent can still use the pointer to open the full source
+file when a deeper investigation is warranted. This is offline selective-context
+mechanics, not an enterprise file-access policy.
 
 The negative service-to-data query does **not** return `REPAIR_REQUEST`: A2 knows
 the entity/table mapping, but lacks a supported repository-to-entity edge from
