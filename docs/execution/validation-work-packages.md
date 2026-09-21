@@ -71,6 +71,10 @@ freeze before downstream work; no broad application skeleton or UI design exerci
 ## WP2 — Bounded preparation and local binding
 
 **Packages:** preparation, adapters, local-client binding module. **Depends on:** WP1.
+First complete the [scanner evidence/disposition matrix](../research/scanner-and-enterprise-patterns.md)
+against v1/v2 code and primary external mechanisms. Treat that matrix as a gate,
+not a vendor dependency decision. No further TypeScript-only optimization precedes
+the multi-family conformance fixture unless a measured failure justifies it.
 Implement the declared Java/Spring, TypeScript/Hono, SQL, Markdown and test-source
 patterns, qualified identities, ambiguity outcomes and approved reviewed-mapping import.
 Add support closure, candidate validation and canonical release files. No compiler
@@ -84,7 +88,9 @@ dirty bodies or auto-clone. Cache contributions only after full-build correctnes
 partial parse, content limits, path traversal, stale local files and full/delta parity.
 **Acceptance:** all expected supported facts recovered with no false exact bindings;
 unsupported facts visible as coverage gaps; reusable business mappings predating task
-tuning. **Receipts:** capture/release digest set, coverage report, reviewed mapping
+tuning. A cross-layer task must connect a passage, API, service, data object and
+associated tests with correct source pointers, explicit gaps and selective file reads.
+**Receipts:** capture/release digest set, coverage report, reviewed mapping
 receipt, parity report, preparation/curation time. **Stop:** required critical behavior
 depends on unsupported extraction; review scope or add explicit reviewed evidence.
 

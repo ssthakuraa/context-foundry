@@ -44,6 +44,18 @@ bindings; preserve ambiguity and unsupported coverage. Do not infer runtime call
 from imports or complete data dependencies from string matches. Exact supported
 patterns and source-binding behavior are specified in
 [extraction contracts](../technical-design/extraction-and-source-binding.md).
+The [scanner audit and gate](../research/scanner-and-enterprise-patterns.md) records
+v1/v2 implementation candidates, external patterns, family-specific negative tests
+and the required cross-layer proof. A TypeScript-only candidate is not completion
+of this slice.
+
+Implement adapters as separately versioned producers of a common fact/locator/
+coverage envelope. Parsing establishes declarations; a later resolver establishes
+cross-file and cross-layer links. Java/Spring, SQL/PLSQL, OpenAPI, TypeScript/Hono,
+documents and tests each require their own bounded strategy. Company-specific
+libraries/annotations/metadata are opt-in, versioned rule packs with reviewable
+applicability, not universal parser assumptions. Preserve API contract and code
+implementation as distinct artifacts even when a route joins them.
 
 ## Precision tiers and semantic-index import
 

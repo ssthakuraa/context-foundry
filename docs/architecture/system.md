@@ -20,6 +20,9 @@ The second research pass adds CI-produced semantic-index ingestion, explicit sou
 publication/entitlement rules, and business knowledge in the first usefulness slice.
 See [keep/change/defer assessment](../research/second-pass-assessment.md). Semantic
 indexes are evidence inputs; generating them remains in the enterprise CI boundary.
+The [scanner-pattern audit](../research/scanner-and-enterprise-patterns.md) is the
+implementation gate for multi-artifact preparation. The initial TypeScript spike
+does not satisfy it.
 
 ## System arrangement
 
@@ -28,7 +31,7 @@ Source snapshots · product documents · standards · CI evidence
                             |
                scoped capture / isolated workers
                             |
-       extraction -> resolution -> validation -> candidate review
+ language/format extraction -> attributed resolution -> validation -> candidate review
                             |
               immutable knowledge release (files)
                             |
@@ -48,6 +51,9 @@ Enterprise IdP -> authenticated application services / policy enforcement
 An API process, worker process, PostgreSQL, and managed evidence storage form the
 first deployment. Use a modular application rather than a microservice estate.
 Workers isolate expensive parsing and extraction from interactive requests.
+Capture, language/format extraction, semantic-index import, framework resolution,
+reviewed business mapping and observed CI/test evidence are separate stages. A
+generic search hit must never acquire the authority of a resolved code edge.
 
 ## Components
 
@@ -106,6 +112,9 @@ The [three-repository fixture](../evaluation/three-repository-benchmark.md) requ
 narrow Java/Spring and TypeScript support from the start. Supported declarations,
 framework rules and semantic bindings have separate precision tiers. No complete
 runtime graph or business-rule inference is promised.
+Before claiming useful preparation, a task fixture must trace a business passage
+through an API, service, data object and associated tests, showing unsupported or
+ambiguous links and exact files the agent must inspect.
 
 ## Reuse and acceptance
 

@@ -57,6 +57,9 @@ Tasks:
    expired source entitlements, support density, and concurrent preparation.
 9. Map CF-R01–16 to executable acceptance; freeze both review-gate semantics and host
    assurance level. Decide exact schema/runtime versions in WP1.
+10. Audit v1/v2 extractor entry points and tests against Java/Spring, SQL/PLSQL,
+    OpenAPI, TypeScript/Hono, document and test needs; record reuse/disposition and
+    negative controls. Use the [scanner pattern gate](../research/scanner-and-enterprise-patterns.md).
 
 Deliverables: accepted/rejected ADR record, fixture manifest, expected-evidence rubric,
 trace classification guide, dependency inventory, and prioritized issues.
@@ -94,6 +97,8 @@ Tasks:
 1. Inventory supplied local snapshots and Markdown captures; validate safe paths.
 2. Implement isolated adapter runner, contribution cache, coverage inventory, and
    narrow Java/Spring and TypeScript/Hono/OpenAPI/SQL/Markdown adapters with declared limitations.
+   Separate syntax capture, framework rules, semantic-index import and business
+   review; do not infer a proven edge from a search candidate.
 3. Add qualified identity, explicit ownership, provider/consumer resolution, and
    unresolved/ambiguous reference records.
 4. Implement canonical JSONL manifests and candidate validation/diff report.
@@ -111,7 +116,9 @@ Acceptance: a complete candidate can be reviewed and activated; malformed archiv
 hidden source, ambiguous routes, deleted providers, and changed ownership are handled
 correctly. Interrupted jobs leave active release intact. Fresh/full and delta output
 match semantically. Every selected fact has valid evidence; unsupported facets remain
-visible as gaps. Measure actual build stages and memory.
+visible as gaps. A passage -> API -> service -> data -> test task yields exact pointers,
+explicit unresolved links and the files needed for deeper investigation. Measure
+actual build stages and memory.
 Evidence: fixture release, source/record manifests, validation report, parity report,
 worker isolation tests, activation/rollback drill. Test count alone is not acceptance.
 

@@ -1,0 +1,16 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Synthetic Repairs API", "version": "1" },
+  "paths": {
+    "/v1/repairs/{id}/approve": {
+      "post": {
+        "operationId": "approveRepair",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "204": { "description": "Approved" },
+          "409": { "description": "Not pending" }
+        }
+      }
+    }
+  }
+}

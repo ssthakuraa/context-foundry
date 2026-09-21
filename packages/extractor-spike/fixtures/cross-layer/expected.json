@@ -1,0 +1,27 @@
+{
+  "fixture_version": "1",
+  "required_declarations": [
+    { "family": "business", "file": "business.md", "identity": "Approving a request" },
+    { "family": "openapi", "file": "openapi.json", "identity": "POST /v1/repairs/{id}/approve" },
+    { "family": "java", "file": "RepairController.java", "identity": "fixture.repairs.RepairController.approve(String)" },
+    { "family": "java", "file": "RepairService.java", "identity": "fixture.repairs.RepairService.approve(String)" },
+    { "family": "jpa", "file": "RepairRequest.java", "identity": "repair_request" },
+    { "family": "sql", "file": "schema.sql", "identity": "repair_request" },
+    { "family": "test", "file": "RepairServiceTest.java", "identity": "rejectsSecondApproval" }
+  ],
+  "required_relationships": [
+    { "from": "POST /v1/repairs/{id}/approve", "to": "fixture.repairs.RepairController.approve(String)", "basis": "framework_route_and_service_identity" },
+    { "from": "fixture.repairs.RepairController.approve(String)", "to": "fixture.repairs.RepairService.approve(String)", "basis": "resolved_call" },
+    { "from": "fixture.repairs.RepairRequest", "to": "repair_request", "basis": "explicit_jpa_table" }
+  ],
+  "review_required_relationships": [
+    { "from": "Approving a request", "to": "POST /v1/repairs/{id}/approve", "basis": "business_mapping" },
+    { "from": "rejectsSecondApproval", "to": "fixture.repairs.RepairService.approve(String)", "basis": "test_intent_or_observed_coverage" }
+  ],
+  "forbidden_exact_claims": [
+    "phantom_request is a declared SQL table",
+    "approveRepairMaybe is an exact endpoint consumer",
+    "RepairServiceTest passed",
+    "The implementation enforces the business expectation in all cases"
+  ]
+}

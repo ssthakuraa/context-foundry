@@ -65,6 +65,13 @@ supported grammar version, approved resource budget and output namespace. The ru
 provides read-only input handles, not ambient developer roots or credentials. Output
 streams contain declarations, assertions, locators, diagnostics and coverage units.
 Every record binds to input digest(s); the runner verifies those bindings and IDs.
+An adapter declares input family/dialect, parser and rule-set versions, produced
+record kinds, supported patterns and unsupported constructs. Registry compatibility
+is checked before a candidate is assembled. Parse output is not itself a verified
+cross-file edge: a separate resolver must attach method, context, ambiguity state
+and support. A framework rule or imported semantic index remains distinguishable
+from syntax; a reviewed business mapping remains distinguishable from either.
+See the [v1/v2 and external pattern audit](../research/scanner-and-enterprise-patterns.md).
 
 No source code, package script, annotation processor, Maven/Gradle build, macro or
 document instruction executes in the extractor. Framework interpretation is static
@@ -83,6 +90,18 @@ itself; enterprise untrusted adapters require the documented container/OS contro
 | Cross-product events | Declared producer strings and consumer taxonomy members as separately evidenced artifacts | A working transport link merely because names match; record candidate contract association until supported |
 | Markdown | Document identity, title, heading ancestry, exact passages, explicit references and document-stated status | Treating every worklist, historical report or prompt as current behavior or an instruction |
 | Test source / reports | Test declarations and known skip markers; bounded JUnit/Vitest-style report outcomes if supplied | A passing run from source presence, behavior coverage from filename, or success from skipped cases |
+
+The table is an implementation target, not evidence that these adapters exist.
+The current TypeScript spike covers only a subset of its row. Java/Spring, SQL,
+OpenAPI, Markdown and test adapters are still unimplemented here. No candidate
+release or utility claim passes WP2 until the relevant family fixtures and the
+cross-layer task journey pass.
+
+An isolated `sql-ddl` syntax experiment now recognizes bounded `CREATE TABLE`
+declarations/columns in caller-supplied bytes and rejects lexical decoys. It is
+not a source-bound SQL adapter and does not change the WP2 status above. The
+synthetic fixture and expected/forbidden assertions are described in the
+[scanner gate](../research/scanner-and-enterprise-patterns.md#first-executable-continuation).
 
 Unsupported constructs emit operation-specific coverage gaps with permitted locators.
 They do not silently disappear from the coverage denominator. Unit tests use tiny

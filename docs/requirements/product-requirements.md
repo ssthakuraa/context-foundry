@@ -86,6 +86,15 @@ inquiries may combine scope confirmation with clarification and need no coding g
 | CF-R15 | Expose review and investigation artifacts accessibly | Host conversation and Studio can display the same versioned map/proposal; tables/text do not require graph visualization |
 | CF-R16 | Demonstrate benefit and maintainability | Same-information baselines, unseen tasks, missed impacts, human effort, preparation/refresh cost and scoped latency are reported |
 
+CF-R01/R07/R12 require multi-artifact evidence, not merely a populated index:
+supported Java/Spring, SQL/data, API contract, TypeScript/frontend, document and
+test facts must carry source pointers and family-specific coverage. A business
+passage -> API -> service -> data -> test example must expose exact, candidate,
+reviewed and missing links distinctly. A code-search match is not a resolved call,
+and a declared test is not a passing run. The
+[scanner gate](../research/scanner-and-enterprise-patterns.md) supplies the first
+executable acceptance shape without claiming full language coverage.
+
 ## Default source-access model
 
 The coding agent normally has authorized project-folder access already. ContextFoundry

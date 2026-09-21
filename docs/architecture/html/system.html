@@ -54,13 +54,16 @@ second reasoning agent or answer-generation loop. No-model operation remains sup
 <p>The second research pass adds CI-produced semantic-index ingestion, explicit source
 publication/entitlement rules, and business knowledge in the first usefulness slice.
 See <a href="../../research/html/second-pass-assessment.html">keep/change/defer assessment</a>. Semantic
-indexes are evidence inputs; generating them remains in the enterprise CI boundary.</p>
+indexes are evidence inputs; generating them remains in the enterprise CI boundary.
+The <a href="../../research/html/scanner-and-enterprise-patterns.html">scanner-pattern audit</a> is the
+implementation gate for multi-artifact preparation. The initial TypeScript spike
+does not satisfy it.</p>
 <h2 id="system-arrangement">System arrangement</h2>
 <pre><code class="language-text">Source snapshots · product documents · standards · CI evidence
                             |
                scoped capture / isolated workers
                             |
-       extraction -&gt; resolution -&gt; validation -&gt; candidate review
+ language/format extraction -&gt; attributed resolution -&gt; validation -&gt; candidate review
                             |
               immutable knowledge release (files)
                             |
@@ -78,7 +81,10 @@ Enterprise IdP -&gt; authenticated application services / policy enforcement
 </code></pre>
 <p>An API process, worker process, PostgreSQL, and managed evidence storage form the
 first deployment. Use a modular application rather than a microservice estate.
-Workers isolate expensive parsing and extraction from interactive requests.</p>
+Workers isolate expensive parsing and extraction from interactive requests.
+Capture, language/format extraction, semantic-index import, framework resolution,
+reviewed business mapping and observed CI/test evidence are separate stages. A
+generic search hit must never acquire the authority of a resolved code edge.</p>
 <h2 id="components">Components</h2>
 <table>
 <thead>
@@ -173,7 +179,10 @@ first slice; rich workbenches follow evidence of benefit.</p>
 <p>The <a href="../../evaluation/html/three-repository-benchmark.html">three-repository fixture</a> requires
 narrow Java/Spring and TypeScript support from the start. Supported declarations,
 framework rules and semantic bindings have separate precision tiers. No complete
-runtime graph or business-rule inference is promised.</p>
+runtime graph or business-rule inference is promised.
+Before claiming useful preparation, a task fixture must trace a business passage
+through an API, service, data object and associated tests, showing unsupported or
+ambiguous links and exact files the agent must inspect.</p>
 <h2 id="reuse-and-acceptance">Reuse and acceptance</h2>
 <p>Borrow v2's identity, provenance, extraction, interface resolution, incremental
 maintenance, and negative-test lessons. Adapt Business Map and authorization.

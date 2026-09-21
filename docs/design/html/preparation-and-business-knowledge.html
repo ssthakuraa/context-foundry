@@ -115,7 +115,18 @@ selected domain implementation is Java. Extract declared facts and supported fra
 bindings; preserve ambiguity and unsupported coverage. Do not infer runtime calls
 from imports or complete data dependencies from string matches. Exact supported
 patterns and source-binding behavior are specified in
-<a href="../../technical-design/html/extraction-and-source-binding.html">extraction contracts</a>.</p>
+<a href="../../technical-design/html/extraction-and-source-binding.html">extraction contracts</a>.
+The <a href="../../research/html/scanner-and-enterprise-patterns.html">scanner audit and gate</a> records
+v1/v2 implementation candidates, external patterns, family-specific negative tests
+and the required cross-layer proof. A TypeScript-only candidate is not completion
+of this slice.</p>
+<p>Implement adapters as separately versioned producers of a common fact/locator/
+coverage envelope. Parsing establishes declarations; a later resolver establishes
+cross-file and cross-layer links. Java/Spring, SQL/PLSQL, OpenAPI, TypeScript/Hono,
+documents and tests each require their own bounded strategy. Company-specific
+libraries/annotations/metadata are opt-in, versioned rule packs with reviewable
+applicability, not universal parser assumptions. Preserve API contract and code
+implementation as distinct artifacts even when a route joins them.</p>
 <h2 id="precision-tiers-and-semantic-index-import">Precision tiers and semantic-index import</h2>
 <p>Declare supported relationships per adapter: syntax declaration/reference,
 semantic symbol resolution, framework/interface binding, or observed runtime edge.

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scanner and enterprise-context patterns · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../scanner-and-enterprise-patterns.md">Markdown source</a></nav>
+    <article>
+      <h1 id="scanner-and-enterprise-context-patterns">Scanner and enterprise-context patterns</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#finding">Finding</a></li><li><a href="#v1v2-source-audit-candidates-not-imported-implementation">V1/V2 source audit: candidates, not imported implementation</a></li><li><a href="#implementation-gate">Implementation gate</a></li><li><a href="#first-executable-continuation">First executable continuation</a></li></ul></details>
+<p><strong>Status:</strong> Design input and implementation gate, not a claim of reproduced third-party performance · CF-0.2</p>
+<h2 id="finding">Finding</h2>
+<p>No reviewed system provides the whole ContextFoundry journey: company-specific
+functional meaning, code/API/data/test links, authorization, and a reviewed agent
+handoff. The useful common architecture is <strong>capture -&gt; specialized extractors -&gt;
+shared, source-anchored facts -&gt; resolution -&gt; task-specific retrieval</strong>. Do not use
+one parser, embedding index, or LLM extraction pass as a substitute for all stages.</p>
+<table>
+<thead>
+<tr>
+<th>Primary reference</th>
+<th>Demonstrated mechanism</th>
+<th>ContextFoundry disposition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://kythe.io/docs/schema/writing-an-indexer.html">Kythe indexer guide</a> and <a href="https://kythe.io/docs/kythe-overview.html">overview</a></td>
+<td>Separate hermetic extraction/build context from language indexers; emit anchored cross-reference facts; incomplete beats incorrect</td>
+<td>Separate capture from parsing, and declarations from resolved edges; accept partial coverage explicitly</td>
+</tr>
+<tr>
+<td><a href="https://github.com/facebookincubator/glean">Meta Glean</a></td>
+<td>Language-specific indexers and SCIP/LSIF feed a common queryable fact store</td>
+<td>Normalize approved external index output; do not build every semantic indexer ourselves</td>
+</tr>
+<tr>
+<td><a href="https://sourcegraph.com/docs/code-navigation/precise-code-navigation">Sourcegraph code navigation</a></td>
+<td>Broad search fallback plus revision-specific SCIP indexes, often generated in CI</td>
+<td>Keep lexical candidates useful but visibly different from exact semantic links; import CI-produced indexes only when revisions/dependencies match</td>
+</tr>
+<tr>
+<td><a href="https://docs.openrewrite.org/reference/type-attribution">OpenRewrite type attribution</a> and <a href="https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/">CodeQL framework coverage</a></td>
+<td>Syntax gains semantic precision from type/classpath context; framework knowledge is explicit and extensible</td>
+<td>Version framework rules and enterprise-library models; unsupported custom conventions stay unresolved or reviewed</td>
+</tr>
+<tr>
+<td><a href="https://backstage.io/docs/features/software-catalog/system-model/">Backstage system model</a></td>
+<td>Declared component/API/resource/system/domain boundaries</td>
+<td>Import/review ownership and business grouping; do not infer product domains from paths</td>
+</tr>
+<tr>
+<td><a href="https://github.com/microsoft/graphrag/blob/main/docs/index/default_dataflow.md">Microsoft GraphRAG indexing</a></td>
+<td>Document text units support extracted entities, relationships and summaries</td>
+<td>Use for candidate business/document associations; preserve passages and review status; do not promote summary similarity to code fact</td>
+</tr>
+<tr>
+<td><a href="https://docs.bazel.build/versions/main/query-how-to.html">Bazel reverse dependency query</a> and <a href="https://engineering.fb.com/2018/11/21/developer-tools/predictive-test-selection/">Meta predictive test selection</a></td>
+<td>Build dependencies nominate possibly affected tests; historical outcomes can rank likely regression detectors</td>
+<td>Keep dependency, exercised behavior, and observed pass/fail separate; advisory recommendations only until independent fault/miss validation</td>
+</tr>
+</tbody>
+</table>
+<p>These sources demonstrate mechanisms, not equivalent product outcomes. Their
+licensing, deployment assumptions, cost and fit require separate checks before a
+library or index format becomes a dependency. ContextFoundry's business-to-code
+mapping and review workflow remain a product hypothesis to evaluate.</p>
+<h2 id="v1v2-source-audit-candidates-not-imported-implementation">V1/V2 source audit: candidates, not imported implementation</h2>
+<p>The historical <a href="v2-disposition.html">v2 disposition</a> inspected selected retrieval
+paths; it did <strong>not</strong> audit all extractors. This bounded follow-up inspects source
+and test entry points, not accuracy on the ContextFoundry benchmark.</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Observed reference evidence</th>
+<th>Decision for first slice</th>
+<th>Unproven/negative controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java declarations/calls</td>
+<td>V1 <code>src/java-ast-worker.js</code> uses Tree-sitter Java. V2 <code>src/adapters/java-contracts.js</code>, <code>java-call-binding.js</code> and <code>tests/preparation/java-contracts-tests.js</code> cover anchors, overload ambiguity, receiver scope and syntax errors</td>
+<td>Adapt the <em>patterns</em> into a bounded Java worker over supplied bytes. Use qualified signatures and exact anchors. Do not copy source without provenance/license clearance</td>
+<td>Inherited/dynamic dispatch, incomplete classpath, overloads, shadowing, same-name types; no name-only exact call edges</td>
+</tr>
+<tr>
+<td>Java HTTP/framework</td>
+<td>V2 <code>java-http-binding.js</code> and its tests cover bounded JAX-RS literals, custom annotation rejection and duplicate routes</td>
+<td>Implement Spring MVC literals required by the benchmark, treating JAX-RS as a later explicit rule set. Match API to implementation only with service, method, normalized route and version evidence</td>
+<td>Composed annotations, placeholders, inherited routes, duplicate service names</td>
+</tr>
+<tr>
+<td>SQL/PLSQL/data</td>
+<td>V2 <code>sql-source.js</code>, <code>plsql-contracts.js</code>, <code>plsql-data-access.js</code> and PL/SQL tests use offset-preserving lexical treatment of strings/comments and contract extraction</td>
+<td>Reuse lexical-boundary design and explicit DDL/query patterns; keep SQL dialect/version on every parser</td>
+<td>Dynamic SQL, quoted identifiers, comments/literal decoys, implicit ORM naming and actual runtime lineage</td>
+</tr>
+<tr>
+<td>OpenAPI</td>
+<td>V1 <code>extractor-packages/sdk-openapi</code>; V2 <code>openapi-contracts.js</code> and tests cover operation identity, parameters, schemas, references, response/security facets</td>
+<td>Bounded structured OpenAPI reader with exact JSON pointer/source support; distinguish declared contract from code implementation</td>
+<td>External refs, duplicate keys, version/base path, mismatched route, security override</td>
+</tr>
+<tr>
+<td>Enterprise metadata</td>
+<td>V2 registry includes ADF, ESS, XDF, VBCS and search-index adapters, with targeted tests</td>
+<td>Keep as technology packs behind the same contract; do <strong>not</strong> make Oracle-specific records the universal model or first benchmark gate</td>
+<td>Vendor/version specificity, custom metadata, portability and artifact ownership</td>
+</tr>
+<tr>
+<td>Documents/guides</td>
+<td>V2 <code>guide-sections.js</code>; reference test fixtures</td>
+<td>Section-anchored Markdown assertions with edition/authority and review; no execution of document instructions</td>
+<td>Historical/stale docs, conflicting passages, ambiguous business mappings</td>
+</tr>
+<tr>
+<td>TypeScript/React/Hono</td>
+<td>Current TypeScript declaration spike, not a complete v1/v2 transfer</td>
+<td>Extend only patterns needed for the cross-layer fixture; route/framework rules remain separate from syntax</td>
+<td>Dynamic routes, computed imports, TSX, generated code, test-to-behavior claims</td>
+</tr>
+<tr>
+<td>Tests/CI</td>
+<td>V2 tests are extractor conformance examples, not a generic test-impact index</td>
+<td>Add test declaration and explicit target/contract associations; CI results require authenticated revision-bound import</td>
+<td>Filename heuristics, skipped/flaky runs, stale reports, uncovered behavior</td>
+</tr>
+</tbody>
+</table>
+<p>Paths above are relative to the separate reference repositories
+<code>engineering-knowledge-pack-sdk</code> and <code>engineering-knowledge-pack-sdkv2</code>; their
+content is not licensed into this public repository by our Apache-2.0 license.
+The table is an inventory/disposition, not a port-complete or full security audit.</p>
+<h2 id="implementation-gate">Implementation gate</h2>
+<ol>
+<li>Pin capture and parser versions. Run each adapter on approved immutable input,
+with byte/path limits and no execution of repository code.</li>
+<li>Emit a common record/locator/coverage envelope. Assert a producer's declared
+kinds against the registry; validate support and source-byte closure.</li>
+<li>Resolve separately from parsing. Exact means evidence and necessary context
+match; otherwise return candidate, ambiguous, unresolved or unsupported.</li>
+<li>Keep framework rules, API-contract joins, build/semantic indexes, business
+mappings and CI observations as separately versioned, attributed assertions.</li>
+<li>Conformance-fixture each supported and unsupported construct, including decoys.
+Report false exact links and missed facts by family, not a global coverage score.</li>
+<li>Before a usefulness claim, demonstrate one task at each required repo profile:
+requirement/business passage -&gt; API -&gt; service -&gt; data -&gt; associated tests,
+with exact pointers, explicit missing edges, human scope correction and selective
+full-file inspection. Compare against same-information lexical retrieval.</li>
+</ol>
+<p>This gate precedes more TypeScript-only polish or broad retrieval tuning. Synthetic
+fixtures can establish contract behavior; private three-repository utility evaluation
+still requires the WP0 owner decisions and independent held-outs.</p>
+<h2 id="first-executable-continuation">First executable continuation</h2>
+<p>The public-safe <code>packages/extractor-spike/fixtures/cross-layer/</code> fixture
+now supplies invented business, OpenAPI, Spring/Java, JPA, SQL, test and TypeScript
+artifacts plus independent expected/forbidden claims. The isolated
+<a href="../../../packages/extractor-spike/src/sql-ddl.ts"><code>sql-ddl</code> spike</a> performs bounded
+syntax-only <code>CREATE TABLE</code> and column extraction on caller-supplied bytes; tests
+include comment/string decoys, quoted identifiers, nested type parentheses,
+malformed input and byte limits. It is not wired to source capture, locators,
+coverage records or release assembly, and proves nothing about runtime behavior.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/research/scanner-and-enterprise-patterns.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

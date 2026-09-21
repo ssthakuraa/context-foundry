@@ -66,6 +66,7 @@ is claimed.
 ## Research
 
 - [Research verdict and design closeout](research/design-closeout.md)
+- [Scanner and enterprise-context patterns](research/scanner-and-enterprise-patterns.md)
 - [Enterprise modeling patterns](research/enterprise-modeling-patterns.md)
 
 - [Second-pass architecture challenge](research/second-pass-assessment.md)

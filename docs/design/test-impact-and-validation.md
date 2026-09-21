@@ -64,6 +64,13 @@ Keep static imports/references, declared requirement mappings, observed runtime
 coverage, and actual test assertions as different relation types. A static import
 nominates a test; it does not prove the test validates a behavior. Runtime coverage
 applies to a particular revision, environment, input set, and run.
+The first recommendation ladder is: declared/build dependency (may be affected),
+explicit test target/contract or coverage observation (what was exercised), and
+authenticated CI outcome (what passed or failed at one revision). Never collapse
+these into a single confidence score. [Bazel reverse dependencies](https://docs.bazel.build/versions/main/query-how-to.html)
+demonstrate the broad first set; [Meta's predictive selection report](https://engineering.fb.com/2018/11/21/developer-tools/predictive-test-selection/)
+shows why that set may be too broad and why outcome history/flakiness need separate
+handling. ContextFoundry initially recommends tests; it does not suppress CI tests.
 
 Change sets identify before/after revisions and actual changed symbols, APIs, fields,
 or configuration. Requirement-only impact is labelled hypothetical. Traverse reverse

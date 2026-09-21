@@ -8,10 +8,11 @@ Legend: `[ ]` pending, `[-]` in progress, `[x]` complete, `[!]` needs a product 
 ## Design and handoff
 
 - [x] CF-0.2 product requirements, architecture, research verdict, technical designs, traceability and execution plan written. Evidence: [review guide](docs/review-guide.md), [requirements traceability](docs/requirements/traceability.md).
-- [x] Generated HTML pages validated and visually spot checked. Evidence: 50 pages passed `python3 scripts/build-docs.py --check` on 2026-09-20; prior desktop/mobile samples were spot checked.
+- [x] Generated HTML pages validated and visually spot checked. Initial evidence: 50 pages passed `python3 scripts/build-docs.py --check` on 2026-09-20; prior desktop/mobile samples were spot checked. Current scanner update builds 51 pages with valid local links; visual recheck remains useful for the new page.
 - [x] Create this durable worklist, [restart context](restartcontext.md) and [restart prompt](restartprompt.md).
 - [x] Create the public [GitHub repository](https://github.com/ssthakuraa/context-foundry) and configure `origin`. The private `.local/` directory is Git-ignored.
 - [x] Adopt [Apache-2.0](LICENSE) with owner approval and record [ADR 0006](docs/decisions/0006-apache-2-license.md); private fixture material remains outside the public license grant.
+- [x] Correct the multi-artifact design gap: [scanner/enterprise pattern audit](docs/research/scanner-and-enterprise-patterns.md) now records bounded v1/v2 source/test evidence, primary external mechanisms, reuse decisions, unsupported cases and a cross-layer implementation gate. Architecture, preparation, extraction, test impact and execution docs link the gate. This is design evidence, not validated scanner performance.
 
 ## WP0 — Evaluation setup
 
@@ -29,6 +30,8 @@ Legend: `[ ]` pending, `[-]` in progress, `[x]` complete, `[!]` needs a product 
 
 ## WP2 — Preparation and local binding
 
+- [-] Turn the scanner disposition into executable conformance: pin source and parser versions, define a common producer envelope, then build per-family supported/unsupported synthetic fixtures and an API -> service -> data -> test plus business-passage journey. The [public-safe cross-layer fixture](packages/extractor-spike/fixtures/cross-layer/README.md) and independently written `expected.json` now exist. Its assertions are not yet fulfilled by an integrated scanner/retriever. Do not equate the TypeScript spike with WP2 coverage.
+- [-] Build bounded SQL/DDL extraction. The isolated [syntax-only SQL DDL spike](packages/extractor-spike/src/sql-ddl.ts) reads caller-supplied bytes, finds `CREATE TABLE` and columns, rejects comment/string decoys and malformed/oversized input, and reports partial support. Four dedicated tests pass; the full 64 contract + 18 extractor suite, typecheck, 51-page HTML build/check and `git diff --check` passed on 2026-09-20. It has no capture-bound locators, `Coverage` record, dialect-wide support, JPA join or release contribution yet.
 - [-] Implement bounded Java/Spring, TypeScript/Hono, SQL, Markdown and test declaration adapters with declared coverage limits. An isolated [TypeScript syntax-only spike](docs/technical-design/typescript-declaration-spike.md) now passes fourteen synthetic tests. Its caller-byte-bound functions emit deterministic symbols (including qualified names), locators and explicitly partial file-unit coverage; a multi-file in-memory candidate closes all declared file bytes and emits canonical JSONL/digest. It does not prove Git revision, undeclared-file absence, declaration-family recall, publication authority or WP2 acceptance. The other adapters and WP1 freeze remain pending.
 - [ ] Implement qualified resolution, reviewed business mapping import and portable candidate releases.
 - [-] Implement safe local source binding with digest and stale/ambiguous/missing outcomes. The Linux-only `readBoundLocalCapture` reads only an explicit declared `.ts` list beneath a selected root through descriptor-anchored `O_NOFOLLOW` opens; synthetic tests cover exact bytes, symlink/hard-link denial, changed bytes, missing paths and directories. It does not attest Git revision/source owner, select among ambiguous roots or enforce enterprise permissions; full WP2 binding remains open.
