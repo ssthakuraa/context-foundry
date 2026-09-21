@@ -120,6 +120,12 @@ cases after the duplicate-route and classification regressions. Recheck workspac
 typecheck, schema export, generated HTML and Git state before accepting the A2
 checkpoint. This is not evidence of retrieval utility or authorization.
 
+A3 prototype checkpoint `df91a30` is pushed. Subsequent local A3 work adds exact
+inspect, stale mapping exclusion, a negative service-to-data gap and an offline
+obligation-stage audit; the current preparation suite has 18 passing tests.
+Before another checkpoint, rerun tests/typecheck/HTML checks and update this
+receipt. A3 remains in progress, not an agent-productivity verdict.
+
 For code: relevant tests, `pnpm test`, `pnpm typecheck`, `pnpm build` and contract
 export check as applicable. The local Node runtime may need
 `/home/ssthakur/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin`

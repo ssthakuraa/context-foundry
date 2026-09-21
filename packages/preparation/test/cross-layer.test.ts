@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileManifestDigest, type CapturedFile, type SourceCapture } from '@context-foundry/contracts';
 import { assembleCrossLayerCandidate, type CrossLayerInput } from '../src/cross-layer.js';
-import { retrieveCandidate } from '../src/retrieval.js';
+import { inspectCandidateRecord, retrieveCandidate } from '../src/retrieval.js';
+import { compareRetrieval } from '../src/evaluation.js';
 
 const paths = ['business.md', 'openapi.json', 'RepairController.java',
   'RepairService.java', 'RepairRequest.java', 'RepairServiceTest.java',
@@ -226,4 +227,72 @@ test('retrieval refuses a packet that cannot fit the actual serialized wire cap'
     question: 'coordinator', intent: 'enhancement', mode: 'typed', max_seeds: 1,
     max_bytes: 256,
   }), { ok: false, code: 'PACKET_TOO_LARGE' });
+});
+
+test('exact inspect returns an implementation source pointer without reading the file', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const inspected = inspectCandidateRecord(built.candidate, service.record_id);
+  assert.equal(inspected.ok, true);
+  if (!inspected.ok) return;
+  assert.equal(inspected.locators[0]?.path, 'RepairService.java');
+  assert.equal(inspected.locators[0]?.kind, 'file_range');
+  assert.equal(inspected.record.identity.key, service.identity.key);
+  assert.equal(Buffer.byteLength(inspected.json), inspected.bytes);
+  assert.deepEqual(inspectCandidateRecord(built.candidate, 'missing'),
+    { ok: false, code: 'NOT_FOUND' });
+});
+
+test('stale reviewed mapping is not traversed as current business-to-technical support', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const stale = { ...built.candidate, records: built.candidate.records.map(item =>
+    item.kind === 'business.mapping' ? { ...item, review: { state: 'stale' as const } } : item) };
+  const result = retrieveCandidate(stale, {
+    question: 'coordinator', intent: 'enhancement', mode: 'typed', max_seeds: 1 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(!result.packet.facts.some(item => item.kind === 'interface.operation'));
+  assert.ok(!result.packet.facts.some(item => item.identity.includes('RepairService.approve')));
+});
+
+test('repository-to-table gap stays visible instead of inventing a service data edge', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, {
+    question: 'fixture.repairs.RepairService.approve(String)', intent: 'enhancement',
+    mode: 'typed', max_seeds: 1, max_hops: 4 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(result.packet.facts.some(item => item.identity.includes('RepairService.approve')));
+  assert.ok(!result.packet.facts.some(item => item.kind === 'source.artifact' &&
+    item.name === 'REPAIR_REQUEST'));
+});
+
+test('evaluation oracle reports connector gain and unresolved data-path loss by stage', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const table = built.candidate.records.find(item => item.kind === 'source.artifact' &&
+    item.payload['name'] === 'REPAIR_REQUEST')!;
+  const gained = compareRetrieval(built.candidate, 'business-to-service', {
+    question: 'coordinator', intent: 'enhancement', max_seeds: 1 }, [service.record_id]);
+  assert.equal(gained.obligations[0]?.source_present, true);
+  assert.equal(gained.obligations[0]?.selected_seed, false);
+  assert.equal(gained.obligations[0]?.typed_packet, true);
+  assert.equal(gained.obligations[0]?.loss_stage, 'none');
+  const missing = compareRetrieval(built.candidate, 'service-to-data', {
+    question: 'fixture.repairs.RepairService.approve(String)', intent: 'enhancement',
+    max_seeds: 1, max_hops: 4 }, [table.record_id]);
+  assert.equal(missing.obligations[0]?.source_present, true);
+  assert.equal(missing.obligations[0]?.typed_packet, false);
+  assert.equal(missing.obligations[0]?.lexical_candidate, false);
+  assert.equal(missing.obligations[0]?.loss_stage, 'typed_traversal_or_budget');
 });

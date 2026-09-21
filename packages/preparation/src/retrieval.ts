@@ -26,6 +26,29 @@ export type RetrievalPacket = {
 export type RetrievalResult = { ok: true; packet: RetrievalPacket; json: string; bytes: number } |
   { ok: false; code: 'INVALID_REQUEST' | 'PACKET_TOO_LARGE' };
 
+export type InspectionResult = {
+  ok: true; json: string; bytes: number;
+  record: ExtensionRecord; locators: readonly EvidenceLocator[];
+} | { ok: false; code: 'INVALID_REQUEST' | 'NOT_FOUND' | 'MISSING_EVIDENCE' |
+  'PACKET_TOO_LARGE' };
+
+/** Exact record inspect; returns pointers and support, never reads source bytes. */
+export function inspectCandidateRecord(candidate: CrossLayerCandidate, recordId: string,
+  maxBytes = 16 * 1024): InspectionResult {
+  if (!recordId || recordId.length > 512 || !Number.isInteger(maxBytes) ||
+    maxBytes < 256 || maxBytes > 16 * 1024) return { ok: false, code: 'INVALID_REQUEST' };
+  const record = candidate.records.find(item => item.record_id === recordId);
+  if (!record) return { ok: false, code: 'NOT_FOUND' };
+  const byId = new Map(candidate.locators.map(item => [item.evidence_id, item]));
+  const locators = record.evidence_refs.map(ref => byId.get(ref));
+  if (locators.some(item => !item)) return { ok: false, code: 'MISSING_EVIDENCE' };
+  const complete = locators as EvidenceLocator[];
+  const json = canonicalJson({ candidate_digest: candidate.digest, record, locators: complete });
+  const bytes = Buffer.byteLength(json, 'utf8');
+  return bytes > maxBytes ? { ok: false, code: 'PACKET_TOO_LARGE' } :
+    { ok: true, json, bytes, record, locators: complete };
+}
+
 const rank = (item: ExtensionRecord, query: string, terms: readonly string[]): number => {
   const searchable = [item.descriptor.name, ...item.descriptor.aliases,
     item.descriptor.summary ?? '', item.identity.key,
