@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { fileManifestDigest, type CapturedFile, type SourceCapture } from '@context-foundry/contracts';
 import { assembleCrossLayerCandidate, type CrossLayerInput } from '../src/cross-layer.js';
+import { retrieveCandidate } from '../src/retrieval.js';
 
 const paths = ['business.md', 'openapi.json', 'RepairController.java',
   'RepairService.java', 'RepairRequest.java', 'RepairServiceTest.java',
@@ -176,4 +177,53 @@ test('derived review mapping inherits restricted source classification', async (
   if (!result.ok) return;
   assert.equal(result.candidate.records.find(item => item.kind === 'business.mapping')?.classification,
     'restricted');
+});
+
+test('same-information typed retrieval retains a low-lexical business-to-service connector', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const request = { question: 'coordinator', intent: 'enhancement' as const, max_seeds: 1 };
+  const lexical = retrieveCandidate(built.candidate, { ...request, mode: 'lexical' });
+  const typed = retrieveCandidate(built.candidate, { ...request, mode: 'typed' });
+  assert.equal(lexical.ok, true);
+  assert.equal(typed.ok, true);
+  if (!lexical.ok || !typed.ok) return;
+  assert.equal(lexical.packet.stage.seeds, typed.packet.stage.seeds);
+  assert.ok(!lexical.packet.facts.some(item => item.identity.includes('RepairService.approve')));
+  assert.ok(typed.packet.facts.some(item => item.identity.includes('RepairService.approve')));
+  assert.ok(typed.packet.facts.some(item => item.kind === 'business.mapping'));
+  assert.ok(typed.packet.facts.every(item => item.locators.length > 0));
+  assert.ok(typed.packet.diagnostics.includes('PARTIAL_COVERAGE'));
+  assert.equal(Buffer.byteLength(typed.json), typed.bytes);
+  assert.ok(typed.bytes > lexical.bytes);
+  if (process.env['CF_A3_RECEIPT'] === '1') {
+    process.stdout.write(`${JSON.stringify({ scenario: 'coordinator', arm: 'lexical',
+      bytes: lexical.bytes, packet: lexical.packet })}\n`);
+    process.stdout.write(`${JSON.stringify({ scenario: 'coordinator', arm: 'typed',
+      bytes: typed.bytes, packet: typed.packet })}\n`);
+  }
+});
+
+test('API-use policy does not traverse from operation into service implementation', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const result = retrieveCandidate(built.candidate, { question: 'POST /v1/repairs/{id}/approve',
+    intent: 'api_use', mode: 'typed', max_seeds: 1 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(!result.packet.facts.some(item => item.identity.includes('RepairService.approve')));
+  assert.ok(!result.packet.facts.some(item => item.identity.includes('RepairController.approve')));
+  assert.ok(!result.packet.facts.some(item => item.kind === 'business.mapping'));
+});
+
+test('retrieval refuses a packet that cannot fit the actual serialized wire cap', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  assert.deepEqual(retrieveCandidate(built.candidate, {
+    question: 'coordinator', intent: 'enhancement', mode: 'typed', max_seeds: 1,
+    max_bytes: 256,
+  }), { ok: false, code: 'PACKET_TOO_LARGE' });
 });
