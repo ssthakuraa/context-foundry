@@ -1,7 +1,7 @@
 # A3 retrieval prototype receipt
 
-**Status:** in progress · 2026-09-20. One same-information synthetic comparison
-is executable. The full A3 scenario, selection and budget gates are not complete.
+**Status:** in progress · 2026-09-20. Same-information synthetic comparisons
+are executable. The full A3 scenario, selection and budget gates are not complete.
 
 `packages/preparation/src/retrieval.ts` accepts the A2 validated in-memory
 candidate, one question and an explicit intent. Both arms use the same records,
@@ -49,13 +49,20 @@ A synthetic supported call cycle terminates under the visited-record set without
 duplicating the controller fact; this is a graph-mechanics test, not a validated
 new release fixture.
 
-Whole-path packing now groups each seed with its retained connector edges and
-endpoints before serialization. A 3,000-byte two-concern test omits the oversized
-approval unit, retains the storage unit in an actual 1,232-byte packet, reports
-`OVERSIZED_UNIT` and offers the omitted seed ID for focused inspection. If no
-unit fits, `PACKET_TOO_LARGE` also carries an inspectable seed. A no-match
-query returns an empty packet rather than an oversize error. This is an
-in-memory first packing rule, not yet the full concern-diverse quality gate.
+Whole-path packing groups each seed with its retained connector edges and
+endpoints before serialization, but reserves one independent orientation anchor
+per nominated seed first (round-robin across stated concerns). The earlier
+greedy implementation was a real
+failure: in the 3,000-byte two-concern scenario, it dropped the approval rule
+despite a 1,762-byte lexical packet retaining both concerns. The corrected
+typed packet is 1,900 bytes, retains both approval-rule and storage anchors,
+and omits the approval connector path as a unit. It reports `PATH_TRUNCATED`
+and `OVERSIZED_UNIT`, with an inspectable seed ID; it does not present a partial
+connector chain as complete. At the same seed/hop settings with a 32 KiB wire
+cap, the typed path costs 7,156 bytes and reaches the service. This comparison
+demonstrates budget behavior, not net retrieval advantage under the tight cap.
+If no anchor fits, `PACKET_TOO_LARGE` carries an inspectable seed. A no-match
+query returns an empty packet rather than an oversize error.
 
 An API-use query is restricted to declared contract facts and does not traverse
 implementation links. A 256-byte cap returns `PACKET_TOO_LARGE` rather than a
@@ -65,10 +72,11 @@ used as a current traversal edge. Tests are deterministic over the same candidat
 digest except the deliberately injected stale-state scenario, which is a policy
 unit test rather than a new release build.
 
-Exact trace accepts a selected record ID and original task separately. It starts
-from the exact identity under a focused 16 KiB default cap while preserving the
-original question in the response. This is a local library operation; it does
-not authenticate a user or read the implementation file.
+Exact trace accepts a selected record ID and original task separately. It is
+anchored to that **record ID**, so a competing descriptor text match cannot
+displace the selected source. It starts under a focused 16 KiB default cap while
+preserving the original question in the response. This is a local library
+operation; it does not authenticate a user or read the implementation file.
 
 The focused evidence operation takes an evidence ID and the caller-supplied A2
 capture, rechecks full declared-byte closure and locator binding, then returns
@@ -105,7 +113,10 @@ reason to join on a similar name or imply complete data impact.
 
 The separate offline evaluation helper accepts expected record IDs **only after**
 both retrieval arms run. It reports source presence, lexical nomination, seed
-admission and typed-packet inclusion for each obligation. On the synthetic
+admission and typed-packet inclusion for each obligation. A same-seed/same-hop
+32 KiB counterfactual distinguishes a path omitted by the requested wire cap
+from one absent even at that cap; the latter is **not** proof that a graph path
+does not exist beyond the traversal limits. On the synthetic
 business-to-service scenario, the service is not a lexical seed but is retained
 by typed traversal. On service-to-data, the SQL table is source-present yet absent
 from the packet, classified as a traversal/budget gap. A wide lexical audit that

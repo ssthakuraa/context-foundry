@@ -71,6 +71,12 @@ or paid-model authority from a request to continue public synthetic implementati
 Resume **A3**, unless fresh receipts show it is complete: finish the
 [retrieval prototype](docs/technical-design/a3-retrieval-prototype-receipt.md)
 into a full same-information lexical/typed selection and stage-loss comparison;
+A 3 KB counterexample exposed approval-concern loss in greedy whole-path packing;
+the current anchor-first code preserves both concern seeds but still omits the
+service path at that cap, explicitly marked `PATH_TRUNCATED`. The offline receipt
+separates that wire-budget loss from the unsupported service-to-table path via a
+same-seed/hop 32 KiB counterfactual. Exact trace is now record-ID anchored.
+Continue broader A3 scenario and quality gates; do not treat this fix as A3 acceptance.
 A4 tests the reviewed investigation loop and prepares authorized agent comparisons;
 A5 establishes refresh correctness. Preserve explicit unresolved links instead of
 using expected fixture answers as runtime data. No broad scanner expansion, rich UI,

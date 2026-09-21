@@ -59,12 +59,12 @@ export function traceCandidateRecord(candidate: CrossLayerCandidate, args: {
 }): RetrievalResult | { ok: false; code: 'NOT_FOUND' } {
   const record = candidate.records.find(item => item.record_id === args.record_id);
   if (!record) return { ok: false, code: 'NOT_FOUND' };
-  return retrieveCandidate(candidate, {
+  return retrieveCandidateInternal(candidate, {
     question: args.original_question, intent: args.intent, mode: 'typed',
     concerns: [{ id: 'trace', text: record.identity.key }],
     max_seeds: 1, max_hops: args.max_hops ?? 4,
     max_bytes: args.max_bytes ?? 16 * 1024,
-  });
+  }, record);
 }
 
 function rankConcern(records: readonly ExtensionRecord[], query: string): ExtensionRecord[] {
@@ -103,6 +103,11 @@ function rankConcern(records: readonly ExtensionRecord[], query: string): Extens
 /** Offline same-information comparison. Caller provides an already validated candidate. */
 export function retrieveCandidate(candidate: CrossLayerCandidate,
   request: RetrievalRequest): RetrievalResult {
+  return retrieveCandidateInternal(candidate, request);
+}
+
+function retrieveCandidateInternal(candidate: CrossLayerCandidate,
+  request: RetrievalRequest, forcedSeed?: ExtensionRecord): RetrievalResult {
   const { question, mode, intent } = request;
   const maxSeeds = request.max_seeds ?? 3;
   const maxHops = request.max_hops ?? 3;
@@ -126,7 +131,8 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
     return { id: concern.id, ranked: rankConcern(candidate.records, concern.text) };
   });
   const rankedIds = new Set(lanes.flatMap(lane => lane.ranked.map(item => item.record_id)));
-  const seedEntries: { item: ExtensionRecord; concern_id: string }[] = [];
+  const seedEntries: { item: ExtensionRecord; concern_id: string }[] = forcedSeed ?
+    [{ item: forcedSeed, concern_id: 'trace' }] : [];
   const seen = new Set<string>();
   for (let depth = 0; seedEntries.length < maxSeeds && depth < 32; depth++) {
     let any = false;
@@ -233,19 +239,23 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
     facts: facts.filter(item => rootOf(item) === seed.item.record_id) }));
   const admitted: typeof groups = [];
   const skipped: string[] = [];
+  const truncated: string[] = [];
   const baseDiagnostics = [
     ...(candidate.coverage.some(item => item.status !== 'complete_for_declared_scope')
       ? ['PARTIAL_COVERAGE'] : []),
     ...[...limitDiagnostics].sort(),
   ];
+  const inspectIds = () => [...new Set([...skipped, ...truncated])];
   const makePacket = (): RetrievalPacket => ({ request, candidate_digest: candidate.digest,
     facts: admitted.flatMap(group => group.facts),
-    ...(skipped.length ? { inspect_record_ids: [...skipped] } : {}),
+    ...(inspectIds().length ? { inspect_record_ids: inspectIds() } : {}),
     stage: { candidates: rankedIds.size, seeds: seeds.length, examined_edges: examinedEdges,
       admitted_connectors: admitted.flatMap(group => group.facts).filter(
         item => item.reason === 'typed_connector').length,
-      omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) + skipped.length },
-    diagnostics: skipped.length ? [...baseDiagnostics, 'OVERSIZED_UNIT'] : baseDiagnostics,
+      omitted_for_limit: Math.max(0, rankedIds.size - seeds.length) + skipped.length +
+        truncated.length },
+    diagnostics: inspectIds().length ? [...baseDiagnostics, 'OVERSIZED_UNIT',
+      ...(truncated.length ? ['PATH_TRUNCATED'] : [])] : baseDiagnostics,
   });
   const packetBytes = () => Buffer.byteLength(canonicalJson(makePacket()), 'utf8');
   if (!groups.length) {
@@ -255,11 +265,23 @@ export function retrieveCandidate(candidate: CrossLayerCandidate,
     return bytes > maxBytes ? { ok: false, code: 'PACKET_TOO_LARGE' } :
       { ok: true, packet, json, bytes };
   }
+  // Admit one independent source anchor per concern before spending the shared
+  // wire budget on any multi-hop path. Never serialize a partial connector path.
   for (const group of groups) {
-    admitted.push(group);
+    admitted.push({ seed_id: group.seed_id,
+      facts: group.facts.filter(item => item.record_id === group.seed_id) });
     if (packetBytes() <= maxBytes) continue;
     admitted.pop();
     skipped.push(group.seed_id);
+  }
+  for (const group of groups) {
+    const index = admitted.findIndex(item => item.seed_id === group.seed_id);
+    if (index < 0 || group.facts.length <= 1) continue;
+    const anchor = admitted[index]!;
+    admitted[index] = group;
+    if (packetBytes() <= maxBytes) continue;
+    admitted[index] = anchor;
+    truncated.push(group.seed_id);
   }
   while (admitted.length && packetBytes() > maxBytes) {
     skipped.unshift(admitted.pop()!.seed_id);

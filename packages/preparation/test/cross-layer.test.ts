@@ -306,6 +306,35 @@ test('evaluation oracle reports connector gain and unresolved data-path loss by 
   assert.equal(missing.obligations[0]?.typed_packet, false);
   assert.equal(missing.obligations[0]?.lexical_candidate, false);
   assert.equal(missing.obligations[0]?.loss_stage, 'typed_traversal_or_budget');
+  assert.equal(missing.obligations[0]?.typed_with_full_wire_cap, false);
+});
+
+test('evaluation distinguishes a complete-path wire omission from an unsupported graph path', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const rule = built.candidate.records.find(item => item.kind === 'business.rule' &&
+    String(item.payload['statement']).includes('coordinator'))!;
+  const table = built.candidate.records.find(item => item.kind === 'source.artifact' &&
+    item.payload['name'] === 'REPAIR_REQUEST')!;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const request = {
+    question: 'Investigate approval and storage', intent: 'enhancement' as const,
+    concerns: [{ id: 'approval', text: 'coordinator' },
+      { id: 'storage', text: 'REPAIR_REQUEST' }],
+    max_seeds: 2, max_hops: 3, max_bytes: 3000,
+  };
+  const receipt = compareRetrieval(built.candidate, 'two-concern-tight-cap', request,
+    [rule.record_id, table.record_id, service.record_id]);
+  assert.equal(receipt.obligations[0]?.typed_with_full_wire_cap, true);
+  assert.equal(receipt.obligations[0]?.typed_packet, true);
+  assert.equal(receipt.obligations[0]?.loss_stage, 'none');
+  assert.equal(receipt.obligations[1]?.loss_stage, 'none');
+  assert.equal(receipt.obligations[2]?.typed_packet, false);
+  assert.equal(receipt.obligations[2]?.loss_stage, 'wire_budget');
+  assert.ok(receipt.typed_full_wire_bytes! > receipt.typed_bytes!);
+  if (process.env['CF_A3_RECEIPT'] === '1') process.stdout.write(`${JSON.stringify(receipt)}\n`);
 });
 
 test('reverse test-impact path nominates reviewed test relevance without claiming execution', async () => {
@@ -383,6 +412,25 @@ test('exact trace keeps the original task separate from a selected source record
   assert.equal(result.packet.request.question, story);
   assert.equal(result.packet.facts[0]?.record_id, service.record_id);
   assert.ok(result.packet.facts.some(item => item.identity.includes('rejectsSecondApproval')));
+});
+
+test('exact trace is anchored to the selected record ID despite a competing exact-name match', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const service = built.candidate.records.find(item => item.kind === 'engineering.symbol' &&
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)')!;
+  const rival = built.candidate.records.find(item => item.kind === 'source.artifact')!;
+  // Deliberately altered in-memory search projection; not a validated capture.
+  const candidate = { ...built.candidate, records: built.candidate.records.map(item =>
+    item.record_id === rival.record_id ? { ...item, record_id: '000-rival',
+      descriptor: { ...item.descriptor, name: service.identity.key } } : item) };
+  const result = traceCandidateRecord(candidate, { record_id: service.record_id,
+    original_question: 'Investigate approval', intent: 'test_impact' });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.packet.facts[0]?.record_id, service.record_id);
+  assert.ok(!result.packet.facts.some(item => item.record_id === '000-rival'));
 });
 
 test('selective evidence read checks the full capture and returns exact source lines', async () => {
@@ -585,7 +633,9 @@ test('tight wire cap skips an oversized complete path but retains another concer
   if (!result.ok) return;
   assert.ok(result.bytes <= 3000);
   assert.ok(result.packet.diagnostics.includes('OVERSIZED_UNIT'));
+  assert.ok(result.packet.diagnostics.includes('PATH_TRUNCATED'));
   assert.ok(result.packet.inspect_record_ids?.length);
+  assert.ok(result.packet.facts.some(item => item.concern_id === 'approval'));
   assert.ok(result.packet.facts.some(item => item.concern_id === 'storage'));
   assert.ok(!result.packet.facts.some(item => item.kind === 'engineering.relationship'));
   if (process.env['CF_A3_RECEIPT'] === '1') process.stdout.write(`${JSON.stringify({
