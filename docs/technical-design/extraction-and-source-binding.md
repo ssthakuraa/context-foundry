@@ -2,6 +2,12 @@
 
 **Status:** Implementation specification for the validation slice · CF-0.2
 
+**CF-0.3 amendment:** use the [SDK extension contract](sdk-extension-contract.md)
+for installed profiles, producer interoperability and the distinction between a
+process runner and an enforced sandbox. The [lifecycle specification](knowledge-lifecycle-and-retrieval.md)
+governs resolution dependencies and refresh. Existing implementation notes below
+remain provisional-code inventories, not proof of a complete preparation pipeline.
+
 **WP1 alignment note (2026-09-20):** The provisional `SourceCaptureSchema` now
 includes source/authority/snapshot identities, revision kind/value, file-manifest
 digest, publication-policy reference and capture producer. The locator schema

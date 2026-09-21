@@ -1,6 +1,11 @@
 # Technology stack and tradeoffs
 
-**Status:** Proposed validation-slice baseline · CF-0.2
+**Status:** CF-0.3 selected direction; deployment/library gates remain open
+
+The first offline proof needs the existing TypeScript workspace, immutable files,
+a reference in-memory index and a Python adapter conformance example. The table
+below is the shared-deployment target, not an instruction to install every layer
+before proving retrieval. See the [architecture review](architecture-review.md).
 
 ## Recommended baseline
 
@@ -12,7 +17,7 @@
 | Runtime | Supported Node.js LTS, strict TypeScript | Shared contracts and extension authoring |
 | HTTP | Fastify with first-party JSON Schema/Ajv | Explicit input/output schemas; services shared with MCP |
 | Database access | PostgreSQL driver and versioned SQL migrations | Inspectable permission, search, and adjacency queries |
-| Workers | Isolated Node processes/containers; Tree-sitter and format parsers | Bounded CPU/memory; framework semantics remain explicit |
+| Workers | Versioned process protocol; TypeScript/Python producers, parser libraries | Enforced sandbox required for untrusted adapters; a child process alone is not isolation |
 | Semantic index ingestion | First-party SCIP import from approved enterprise CI | Revision-bound symbol resolution; no required external code-intelligence server |
 | Operational storage | PostgreSQL 18 major as provisional baseline | Transactions for configuration, permissions, reviews, jobs, audit |
 | Retrieval storage | PostgreSQL projection tables | Exact indexes, weighted full text, batched typed adjacency |

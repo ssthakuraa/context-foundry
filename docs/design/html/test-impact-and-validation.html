@@ -40,6 +40,12 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="test-impact-and-validation">Test impact and validation</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#primary-question">Primary question</a></li><li><a href="#impact-inputs">Impact inputs</a></li><li><a href="#impact-outputs">Impact outputs</a></li><li><a href="#future-extensions">Future extensions</a></li><li><a href="#responsibility-boundaries">Responsibility boundaries</a></li><li><a href="#association-semantics">Association semantics</a></li><li><a href="#initial-output-and-safety">Initial output and safety</a></li><li><a href="#migration-and-parity-extensions">Migration and parity extensions</a></li></ul></details>
 <p><strong>Status:</strong> Proposed</p>
+<p>The CF-0.3 <a href="../../architecture/html/architecture-review.html">architecture walkthrough</a> and
+<a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">typed retrieval policies</a>
+specify the first schema-change/test-nomination journey. Static relations nominate
+tests; behavior validation requires relevant assertions and authenticated execution
+evidence. The initial offline proof must visibly reject the inference from an empty
+test declaration to passed behavior or migration parity.</p>
 <p>ContextFoundry should begin with Test Impact Analysis and grow into a broader
 change-verification capability. It should complement CI and test platforms,
 not replace them.</p>

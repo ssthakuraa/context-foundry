@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture review and implementation decision · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../architecture-review.md">Markdown source</a></nav>
+    <article>
+      <h1 id="architecture-review-and-implementation-decision">Architecture review and implementation decision</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#verdict-and-authority">Verdict and authority</a></li><li><a href="#what-the-review-found">What the review found</a></li><li><a href="#research-transferred-into-decisions">Research transferred into decisions</a></li><li><a href="#selected-architecture">Selected architecture</a></li><li><a href="#design-walkthroughs-not-executed-acceptance-tests">Design walkthroughs — not executed acceptance tests</a></li><li><a href="#alternatives-and-stop-rules">Alternatives and stop rules</a></li><li><a href="#handoff">Handoff</a></li></ul></details>
+<p><strong>Status:</strong> CF-0.3 design decision baseline · 2026-09-20. Ready for the bounded
+implementation below; usefulness, scalability and production security are unproven.</p>
+<h2 id="verdict-and-authority">Verdict and authority</h2>
+<p>Retain the extensible extraction SDK, evidence-bearing knowledge and human-reviewed
+agent journey. Do not restart the framework or replace it with document RAG, a
+universal LLM extractor, or wrappers around other products. Correct the integration
+contracts and test the complete investigation loop before expanding the platform.</p>
+<p>This review supersedes conflicting CF-0.2 <strong>design and sequencing</strong> statements.
+It does not change executable schema version <code>0.2.0</code>, claim a contract freeze, or
+retroactively validate existing spikes. Product requirements remain authoritative;
+the architect owns design choices and their evidence, the owner owns domain truth,
+data authority and product acceptance. No further general architecture questionnaire
+is needed to start the public synthetic slice.</p>
+<p>The <a href="../../technical-design/html/sdk-extension-contract.html">SDK extension contract</a>,
+<a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">knowledge lifecycle and retrieval specification</a>
+and <a href="../../execution/html/architecture-handoff.html">bounded implementation handoff</a> are the
+normative additions. Historical research remains evidence, not an alternative queue.</p>
+<h2 id="what-the-review-found">What the review found</h2>
+<table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Decision</th>
+<th>Verification still required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>An extensible SDK is promised, but kind negotiation accepts only nine built-ins and symbols only Java/TypeScript</td>
+<td>Versioned installed kind registry, open language identifiers, standard searchable projections, separate custom relation semantics</td>
+<td>Independently written Python adapter works without editing core or UI</td>
+</tr>
+<tr>
+<td>Scanners are progressing independently of task usefulness</td>
+<td>Integrate one business/API/Java/data/test journey; instrument every selection stage</td>
+<td>From captured bytes to useful source reads, not a manually fabricated graph presented as extraction</td>
+</tr>
+<tr>
+<td>Qualified names can be mistaken for shared identity</td>
+<td>Explicit identity schemes, source/module qualification and evidence-bearing resolution</td>
+<td>Overloads, duplicate services, unresolved and cross-pack references</td>
+</tr>
+<tr>
+<td>Support cycles and program cycles can be confused</td>
+<td>Evidence-dependency graph is acyclic; engineering relationship graph can be cyclic</td>
+<td>Mutual calls accepted, circular proof rejected</td>
+</tr>
+<tr>
+<td>Incremental parsing alone does not maintain cross-file truth</td>
+<td>Contributions, resolution watch keys and reviewed-mapping invalidation</td>
+<td>Added/removed provider, changed framework config, full/delta equivalence</td>
+</tr>
+<tr>
+<td>Retrieval architecture is described more precisely than its selection algorithm</td>
+<td>Bounded candidate lanes, typed path policies, per-concern evidence packets and explicit continuation</td>
+<td>Connector survival, actual wire size, unsupported/ambiguous results and same-information comparison</td>
+</tr>
+<tr>
+<td>Scope and implementation approvals can be overclaimed</td>
+<td>Local simulation now; authenticated exact-version decisions before shared use; external shell remains outside server control</td>
+<td>Resume/revocation tests and host capability conformance</td>
+</tr>
+<tr>
+<td>Documents overstate readiness or lag the code</td>
+<td>Separate design decisions, current prototypes, implementation acceptance and product utility</td>
+<td>Worklist receipts and restart checks, never test counts as utility evidence</td>
+</tr>
+</tbody>
+</table>
+<h2 id="research-transferred-into-decisions">Research transferred into decisions</h2>
+<p>This is a targeted follow-up to <a href="../../research/html/design-closeout.html">the research closeout</a>
+and <a href="../../research/html/scanner-and-enterprise-patterns.html">scanner audit</a>, not a new market
+survey. Primary sources below were inspected on 2026-09-20. External mechanisms
+inform our design; their performance and product outcomes have not been reproduced.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence inspected</th>
+<th>Mechanism adopted</th>
+<th>Deliberate limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/scip-code/scip/blob/main/scip.proto">SCIP protocol source</a></td>
+<td>Language string rather than closed language enum; qualified symbols, source occurrences and explicit position encoding</td>
+<td>A SCIP reference is not automatically a call or runtime dependency; validate each indexer's semantics and revision</td>
+</tr>
+<tr>
+<td><a href="https://glean.software/docs/schema/basic/">Meta Glean schema model</a></td>
+<td>Typed facts with explicit identity rather than an undifferentiated chunk store</td>
+<td>Our conflicting assertions remain separate; do not silently apply one-value uniqueness to disputed business truth</td>
+</tr>
+<tr>
+<td><a href="https://backstage.io/docs/features/software-catalog/life-of-an-entity/">Backstage entity lifecycle</a></td>
+<td>Separate contributions, relationship assembly and search projection; track origin dependencies for lifecycle</td>
+<td>Provenance dependencies are not domain relations; adopt the separation, not the Backstage runtime</td>
+</tr>
+<tr>
+<td><a href="https://docs.langchain.com/oss/javascript/langgraph/interrupts">LangGraph interrupts</a></td>
+<td>Durable pause/resume around reviewable state</td>
+<td>A resume payload is not authenticated human authorization; do not require LangGraph to orchestrate an external coding agent</td>
+</tr>
+<tr>
+<td>V2 <code>src/extractor-packages.js</code>, <code>extractor-authoring.js</code>, <code>interface-registry.js</code></td>
+<td>Adapter manifests/examples, attributed results, service-qualified joins, ambiguous/unresolved states and snapshot-bound lookup fingerprints</td>
+<td>Independent implementation; no copying private code, platform dependency or assertion that all reference code is correct</td>
+</tr>
+</tbody>
+</table>
+<p>The v2 failed-design retrospective and discovery RCA in the supplied reference repo
+report a large one-shot response followed by broad source rediscovery, plus expensive
+scoped lexical/proof work. They distinguish historical model comparisons from
+controlled runtime diagnostics. This review read those reports and selected source;
+it did <strong>not</strong> rerun their experiments. They support changing retrieval composition,
+observability and acceptance gates, not a conclusion that extensible extraction is
+inherently wrong or PostgreSQL alone fixes performance.</p>
+<h2 id="selected-architecture">Selected architecture</h2>
+<ol>
+<li><strong>Capture:</strong> source-control-neutral, immutable bytes and inventory; acquisition
+authority is separate from publication and query permission.</li>
+<li><strong>Analyze:</strong> language/format parsers produce anchored declarations, documents,
+contract facets and unresolved references. Framework rules add explicit meaning.</li>
+<li><strong>Resolve and compile:</strong> join qualified references against a pinned snapshot;
+preserve ambiguity; validate support, custom-kind profiles and coverage; assemble
+an immutable candidate. Reviewed business mappings are inputs, not inferred truth.</li>
+<li><strong>Retrieve:</strong> search and bounded typed expansion produce small, attributed
+evidence packets for particular concerns, not an answer or full repository dump.</li>
+<li><strong>Investigate:</strong> the host agent reasons about sufficiency, gets scope review,
+reads the indicated current source selectively, and proposes findings/design/plan.</li>
+<li><strong>Review and implement:</strong> a second exact-version human decision permits coding
+in a conforming integration. ContextFoundry does not generate or execute the code.</li>
+</ol>
+<p>The offline reference implementation uses immutable files and an in-memory projection.
+It tests semantics, not enterprise capacity. The first <strong>shared deployment</strong> remains
+a TypeScript modular application, Fastify, React Studio, PostgreSQL and isolated
+preparation workers. PostgreSQL is selected for shared transactional operations;
+its retrieval performance remains a gate. No mandatory vector store, graph database,
+query LLM, distributed workflow engine or rich UI precedes utility evidence.</p>
+<p>Use existing parser/compiler/index formats when they supply the required semantics.
+Tree-sitter is appropriate for syntax; SCIP/compiler output can improve binding;
+structured OpenAPI/XML readers handle declared metadata. Do not build a general
+compiler or widen the temporary SQL lexer into a dialect-complete parser. Choose and
+license-check a dialect parser when the selected task exceeds the bounded DDL subset.</p>
+<h2 id="design-walkthroughs-not-executed-acceptance-tests">Design walkthroughs — not executed acceptance tests</h2>
+<p>These traces identify necessary records and failure behavior. Fixtures and measured
+receipts must establish that implementation follows them. <code>cross-layer</code> below means
+the invented public fixture in <code>packages/extractor-spike/fixtures/cross-layer</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Knowledge and investigation path</th>
+<th>Required boundary / failure case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consume the repair approval API</td>
+<td>Exact operation -&gt; request/response and declared error/security facets -&gt; contract pointers; agent decides whether the known facets answer the question</td>
+<td>Missing authorization or side-effect semantics remain unknown. Do not infer them from an HTTP verb or read the service automatically for a simple declared-contract question</td>
+</tr>
+<tr>
+<td>Enhance approval to record the coordinator</td>
+<td>Business passage -&gt; reviewed mapping -&gt; declared API -&gt; qualified route/controller -&gt; service -&gt; explicitly mapped entity/table -&gt; test candidates; Gate 1, selective reads, findings and Gate 2</td>
+<td>Fixture code omits the documented coordinator expectation; surface this mismatch, not a fabricated implementation claim. Empty test methods do not validate behavior</td>
+</tr>
+<tr>
+<td>Diagnose a cross-product failure</td>
+<td>Product/flow applicability -&gt; relevant technical entry points -&gt; unresolved integration/configuration boundary -&gt; human adds missing subsystem -&gt; revise scope -&gt; read its evidence if authorized</td>
+<td>A human addition is task-local and does not grant source access or become a published business mapping. Dynamic dispatch remains a gap until investigated</td>
+</tr>
+<tr>
+<td>Assess a schema change and affected tests</td>
+<td>Changed column/table -&gt; reverse explicit ORM/query/dependency links -&gt; consumers and statically associated tests -&gt; agent reviews behavior and proposes tests</td>
+<td>Unsupported SQL or missing consumers prevent a completeness claim. Static association does not justify skipping all other tests or declaring behavior parity</td>
+</tr>
+<tr>
+<td>Add an enterprise workflow format</td>
+<td>Independent Python analyzer emits a registered namespaced kind and standard projection -&gt; generic search/inspect -&gt; installed resolver supplies declared workflow relationships</td>
+<td>No core language switch or custom UI needed. Unknown schema, false support, excessive output and unregistered relation semantics fail conformance</td>
+</tr>
+<tr>
+<td>Refresh after deletion or a second provider appears</td>
+<td>Replace source contribution -&gt; invalidate dependent assertions/watch keys -&gt; recompute joins -&gt; stale reviewed mapping -&gt; new validated snapshot</td>
+<td>A formerly unique route becomes unresolved/ambiguous, not silently rebound. Old snapshot stays immutable; current access revocation still applies</td>
+</tr>
+</tbody>
+</table>
+<p>The first integrated slice needs one stack, not every technology on every task.
+Java/Spring + OpenAPI + explicit JPA/SQL + Markdown + test declarations exercises
+the difficult boundaries. Existing TypeScript work remains reusable and supplies a
+second language check; React/Hono and wider enterprise formats follow diagnosed
+task needs. Both required repository profiles must pass before multi-profile claims.</p>
+<h2 id="alternatives-and-stop-rules">Alternatives and stop rules</h2>
+<table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Decision and revisit trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ordinary agent search with no prepared knowledge</td>
+<td>Mandatory baseline. Prefer it if preparation does not earn its maintenance cost</td>
+</tr>
+<tr>
+<td>Documents and precise pointers, without typed expansion</td>
+<td>Mandatory same-information baseline. Ship this simpler scope if typed expansion adds no repeatable benefit</td>
+</tr>
+<tr>
+<td>Embedding-first RAG</td>
+<td>Optional recall lane when terminology misses are demonstrated; not an identity, evidence or dependency model</td>
+</tr>
+<tr>
+<td>Fully automatic business knowledge extraction</td>
+<td>Reviewable proposals only; accuracy, source support and curation cost must be measured</td>
+</tr>
+<tr>
+<td>Build the enterprise platform before investigating utility</td>
+<td>Rejected. Local proof first; no shared private serving until access/security gates pass</td>
+</tr>
+</tbody>
+</table>
+<p>Zero tolerance for false <em>exact</em> links in conformance cases, hidden evidence leakage,
+forged approval acceptance or test-success claims from declarations. Quality must not
+be traded away for smaller packets. Use the controlled evaluation gates, and after
+two bounded diagnosed iterations without benefit choose simplify/change/stop rather
+than adding mechanisms indefinitely. Synthetic success cannot establish market
+leadership; that requires independent adopters, unseen tasks and maintenance evidence.</p>
+<h2 id="handoff">Handoff</h2>
+<p>The design is sufficiently concrete for the five <a href="../../execution/html/architecture-handoff.html">bounded implementation tasks</a>.
+The shared contract is still provisional, and each task must supply its stated
+receipts. Stronger review is reserved for new semantic/security decisions and the
+utility verdict, not every parser function or test. The user can switch to Sol Medium
+for this queue after this documentation checkpoint; no model setting is changed by
+this document and no equivalence or quota-saving percentage is promised.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/architecture/architecture-review.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

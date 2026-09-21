@@ -1,6 +1,15 @@
 # ADR 0005: Validation slice and two-gate implementation baseline
 
-**Status:** Proposed implementation baseline, ready for owner review · CF-0.2
+**Status:** CF-0.2 baseline amended by the CF-0.3 architecture review
+
+The [CF-0.3 decision](../architecture/architecture-review.md) retains the product
+boundaries below and supersedes sequencing: public synthetic A1–A5 first, one
+integrated stack before broader profiles, and the minimum extension/evidence
+contract revision before dependent work rather than a global contract freeze.
+Local utility precedes enterprise authentication/serving. The owner has authorized
+continuing this work; private/paid evaluation still requires WP0 decisions. This
+amendment is a design selection, not owner approval of a benchmark answer key or
+proof of empirical usefulness.
 
 ## Decision
 

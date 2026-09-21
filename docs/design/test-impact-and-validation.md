@@ -2,6 +2,13 @@
 
 **Status:** Proposed
 
+The CF-0.3 [architecture walkthrough](../architecture/architecture-review.md) and
+[typed retrieval policies](../technical-design/knowledge-lifecycle-and-retrieval.md)
+specify the first schema-change/test-nomination journey. Static relations nominate
+tests; behavior validation requires relevant assertions and authenticated execution
+evidence. The initial offline proof must visibly reject the inference from an empty
+test declaration to passed behavior or migration parity.
+
 ContextFoundry should begin with Test Impact Analysis and grow into a broader
 change-verification capability. It should complement CI and test platforms,
 not replace them.

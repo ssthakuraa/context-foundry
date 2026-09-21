@@ -39,7 +39,15 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../0005-validation-slice-baseline.md">Markdown source</a></nav>
     <article>
       <h1 id="adr-0005-validation-slice-and-two-gate-implementation-baseline">ADR 0005: Validation slice and two-gate implementation baseline</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#decision">Decision</a></li><li><a href="#firm-product-boundaries">Firm product boundaries</a></li><li><a href="#reversible-hypotheses">Reversible hypotheses</a></li><li><a href="#consequences">Consequences</a></li></ul></details>
-<p><strong>Status:</strong> Proposed implementation baseline, ready for owner review · CF-0.2</p>
+<p><strong>Status:</strong> CF-0.2 baseline amended by the CF-0.3 architecture review</p>
+<p>The <a href="../../architecture/html/architecture-review.html">CF-0.3 decision</a> retains the product
+boundaries below and supersedes sequencing: public synthetic A1–A5 first, one
+integrated stack before broader profiles, and the minimum extension/evidence
+contract revision before dependent work rather than a global contract freeze.
+Local utility precedes enterprise authentication/serving. The owner has authorized
+continuing this work; private/paid evaluation still requires WP0 decisions. This
+amendment is a design selection, not owner approval of a benchmark answer key or
+proof of empirical usefulness.</p>
 <h2 id="decision">Decision</h2>
 <p>Use a private, read-only three-repository fixture: rentalapp for business behavior,
 platform for shared libraries, and agentic-platform for cross-product contracts.

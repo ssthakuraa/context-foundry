@@ -65,12 +65,12 @@ does not replace their code-generation or agent capabilities.</p>
 <li><a href="../docs/design/html/identity-and-policy.html">Identity and policy</a></li>
 </ul>
 <h2 id="project-status">Project status</h2>
-<p>The project is in the design phase. CF-0.2 reconciles architecture, functional and
-technical designs with the two-gate human workflow and a Java/Spring plus TypeScript
-validation slice. Research synthesis and the design handoff are ready for review;
-prototype effectiveness, performance and market competitiveness remain unvalidated.
-Product runtime implementation has not started; WP0 evaluation setup and WP1
-executable contract work are underway.
+<p>The project has provisional contracts and isolated extraction prototypes, not a
+serving product. The <a href="../docs/architecture/html/architecture-review.html">CF-0.3 architecture review</a>
+defines the adopter-extensible SDK, evidence lifecycle and task-specific retrieval
+loop. The <a href="../docs/execution/html/architecture-handoff.html">next five implementation tasks</a>
+integrate one complete investigation before expanding the platform. Effectiveness,
+enterprise performance and market competitiveness remain unvalidated.
 The <a href="https://github.com/ssthakuraa/context-foundry">public GitHub repository</a> is live
 under the <a href="../LICENSE">Apache-2.0 license</a>. Private evaluation fixtures are not part
 of this repository or license grant.</p>
@@ -78,7 +78,7 @@ of this repository or license grant.</p>
 <p>The initial contract package is under <code>packages/contracts</code>. With Node.js 22+ and
 pnpm 11, run <code>pnpm install --frozen-lockfile</code>, then <code>pnpm test</code>, <code>pnpm typecheck</code>
 and <code>pnpm build</code>. Run <code>pnpm --filter @context-foundry/contracts schema:check</code>
-to verify the twenty-one exported Draft 7 JSON schemas match the TypeScript source.
+to verify the twenty-eight exported Draft 7 JSON schemas match the TypeScript source.
 These are a WP1 subset; they are not a complete or frozen product API.
 Canonical JSON/digest helpers and strict raw-JSON parsing are included, with their
 normalization and limits specified in <a href="../docs/technical-design/html/data-contracts.html">data contracts</a>.

@@ -40,15 +40,15 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="contextfoundry-product-requirements">ContextFoundry product requirements</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#authority-and-purpose">Authority and purpose</a></li><li><a href="#users-and-knowledge-scope">Users and knowledge scope</a></li><li><a href="#supported-task-intents">Supported task intents</a></li><li><a href="#primary-journey-and-review-checkpoints">Primary journey and review checkpoints</a></li><li><a href="#functional-requirements-and-acceptance">Functional requirements and acceptance</a></li><li><a href="#default-source-access-model">Default source-access model</a></li><li><a href="#responsibilities-and-assurance">Responsibilities and assurance</a></li><li><a href="#non-goals-and-sequencing">Non-goals and sequencing</a></li></ul></details>
 <p><strong>Status:</strong> User-confirmed product direction; detailed requirements proposed for review
-<strong>Baseline:</strong> CF-0.2 requirements alignment · 2026-09-20</p>
+<strong>Baseline:</strong> CF-0.3 requirements alignment · 2026-09-20</p>
 <h2 id="authority-and-purpose">Authority and purpose</h2>
 <p>This document is the authoritative statement of intended product behavior. It
 captures the owner's clarified requirements; it does not claim implementation or
 approval of every design choice. Design documents describe how these requirements
 are fulfilled. Historical research is evidence, not a competing product specification.
-CF-0.2 is the reconciled validation-slice design baseline. Historical CF-0.1 research
-remains evidence, not a competing execution plan; unchanged technical choices retain
-their proposed status.</p>
+The <a href="../../architecture/html/architecture-review.html">CF-0.3 architecture review</a> is the
+current design decision baseline. Historical research remains evidence, not a
+competing execution plan. Detailed design choices are not product outcome claims.</p>
 <p>ContextFoundry fills the company-specific knowledge gap between a general-purpose
 LLM and the enterprise's functional, technical, product-family and domain experts.
 It supports existing agents rather than replacing their reasoning or coding tools.</p>
@@ -237,6 +237,11 @@ inquiries may combine scope confirmation with clarification and need no coding g
 <td>Demonstrate benefit and maintainability</td>
 <td>Same-information baselines, unseen tasks, missed impacts, human effort, preparation/refresh cost and scoped latency are reported</td>
 </tr>
+<tr>
+<td>CF-R17</td>
+<td>Let adopters extend languages, formats and enterprise framework knowledge</td>
+<td>An independently written non-TypeScript adapter contributes a custom artifact through versioned contracts; generic search/inspect works without core/UI edits, and unsupported relation semantics remain explicit</td>
+</tr>
 </tbody>
 </table>
 <p>CF-R01/R07/R12 require multi-artifact evidence, not merely a populated index:
@@ -247,6 +252,11 @@ reviewed and missing links distinctly. A code-search match is not a resolved cal
 and a declared test is not a passing run. The
 <a href="../../research/html/scanner-and-enterprise-patterns.html">scanner gate</a> supplies the first
 executable acceptance shape without claiming full language coverage.</p>
+<p>CF-R17 makes the previously stated SDK requirement explicit; it is not a request
+for every language to be implemented now. Seeded analyzers and adopter extensions
+use the same contract. Parsing, framework interpretation and reference resolution
+are distinct capabilities. The initial proof integrates one cross-layer stack,
+then validates additional repository profiles before claiming broader coverage.</p>
 <h2 id="default-source-access-model">Default source-access model</h2>
 <p>The coding agent normally has authorized project-folder access already. ContextFoundry
 returns logical source identity, relative file path, symbol/section, revision/digest,

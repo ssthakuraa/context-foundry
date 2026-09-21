@@ -39,6 +39,11 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../record-kind-catalog.md">Markdown source</a></nav>
     <article>
       <h1 id="first-slice-record-kind-catalog">First-slice record-kind catalog</h1>
+<p><strong>CF-0.3 design amendment:</strong> this page inventories the implemented provisional
+CF-0.2 kinds. Their closed registry is not the final SDK architecture. The
+<a href="sdk-extension-contract.html">extension contract</a> adds installed namespaced profiles,
+generic projections and a minimal source-artifact kind in A1, with explicit schema
+versioning and conformance. Unknown kinds remain rejected by current code until then.</p>
 <p><strong>Status:</strong> Proposed catalog for CF-0.2, not a frozen schema or permission to emit unregistered kinds. A source parser may produce only kinds registered by the runtime validator; unsupported declarations become adapter coverage/diagnostics, not loosely shaped records.</p>
 <table>
 <thead>
@@ -106,7 +111,7 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 </tbody>
 </table>
-<p>The minimal first-slice producer/consumer handshake must declare which of these kinds it can produce, which it can use in retrieval, and which fields are optional or unknown. A strict required-kind registry rejects unknown payloads; an extension namespace, if later allowed, must be explicitly negotiated by both producer and consumer and cannot masquerade as a first-party kind. Adapter coverage records unsupported constructs instead of promoting them to approximate facts.</p>
+<p>The producer/consumer handshake declares which kinds it can produce or use and which fields are optional or unknown. The current closed registry rejects unknown payloads. CF-0.3 selects an installed extension registry, explicitly negotiated by producer and consumer, which cannot masquerade as a first-party kind. Adapter coverage records unsupported constructs instead of promoting them to approximate facts.</p>
 <p><code>ProducerCapabilitiesSchema</code> and <code>ConsumerCapabilitiesSchema</code> now restrict declarations to the nine registered kinds. <code>checkKindHandshake</code> rejects missing consumer-required kinds, producer kinds not accepted by the consumer, undeclared emitted kinds and invalid records. It is a declared compatibility check, not authentication of an adapter, proof that declared extraction coverage is true, or evidence that a consumer correctly interprets every payload. Extensions remain unsupported in CF-0.2; <code>declared_unsupported</code> is a diagnostic label list, not a grant to emit unknown records.</p>
 <p>Three distinctions are mandatory across future payloads: API consumption details versus service implementation location; test association versus observed execution; intended business outcome versus observed code behavior. Exact evidence pointers and transitive support remain required, but support alone does not establish truth, currency, visibility or permission.</p>
 <p><code>checkBusinessFlowLinks</code> rejects missing, duplicate, unlisted and mismatched flow/step identities. <code>checkObligationLinks</code> resolves step outcome references and test targets explicitly typed as behavior obligations against unique obligation entities. <code>checkEngineeringTargetLinks</code> resolves interface implementation pointers and test targets explicitly typed as engineering entities against unique, valid <code>engineering.symbol</code> records in the supplied record set; missing and ambiguous targets fail closed. <code>checkReleaseIntegrity</code> withholds its support closure if any of these checks fail. Step preconditions, business-mapping engineering pointers, test declaration identity, relationship endpoints and cross-pack targets are not yet resolved. Structural membership and typed references do not prove business sequence, test coverage, observed behavior or cross-product truth.</p>

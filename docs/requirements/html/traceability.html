@@ -39,11 +39,14 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../traceability.md">Markdown source</a></nav>
     <article>
       <h1 id="requirements-to-design-traceability">Requirements-to-design traceability</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#alignment-audit">Alignment audit</a></li><li><a href="#known-limits-after-alignment">Known limits after alignment</a></li></ul></details>
-<p><strong>Status:</strong> CF-0.2 design alignment audit · 2026-09-20</p>
+<p><strong>Status:</strong> CF-0.3 design alignment audit · 2026-09-20</p>
 <p>This maps intended behavior to implementation and observable acceptance. A row is
 not an implementation claim. Requirement authority remains the
 <a href="product-requirements.html">product requirements</a>; work is sequenced by the
 <a href="../../execution/html/validation-work-packages.html">validation packages</a>.</p>
+<p>The immediate A1–A5 queue in the <a href="../../execution/html/architecture-handoff.html">architecture handoff</a>
+refines WP1/WP2/POV. Local simulated review tests precede authenticated WP3–WP5
+acceptance; they do not discharge CF-R13 or establish human authority.</p>
 <table>
 <thead>
 <tr>
@@ -150,6 +153,12 @@ not an implementation claim. Requirement authority remains the
 <td>WP0, WP6, WP7</td>
 <td>Same-information comparisons, held-outs, critical-impact and maintenance ledger</td>
 </tr>
+<tr>
+<td>CF-R17 Adopter-extensible SDK</td>
+<td><a href="../../technical-design/html/sdk-extension-contract.html">Extension contract</a></td>
+<td>A1–A3 / WP1–2</td>
+<td>Independent Python custom-kind producer; generic search/inspect without core edits; version/unsupported-semantic rejection</td>
+</tr>
 </tbody>
 </table>
 <h2 id="alignment-audit">Alignment audit</h2>
@@ -191,13 +200,15 @@ not an implementation claim. Requirement authority remains the
 </tr>
 <tr>
 <td>Research and decisions</td>
-<td>Historical CF-0.1 reports retained as evidence; CF-0.2 verdict/ADR define current proposed scope</td>
+<td>Historical reports retained as evidence; <a href="../../architecture/html/architecture-review.html">CF-0.3 architecture decision</a> and bounded handoff define current design scope</td>
 </tr>
 </tbody>
 </table>
 <h2 id="known-limits-after-alignment">Known limits after alignment</h2>
-<p>Schemas and fixtures are specified, not yet executable. Exact dependency versions
-are pinned in WP1. Benchmark answer keys require owner review; capture and paid runs
+<p>Twenty-eight provisional schema exports and isolated parser/conformance fixtures
+exist; the new extension/lifecycle/retrieval contracts are not implemented or frozen.
+Some dependency versions are pinned; additional dependencies require checks.
+Benchmark answer keys require owner review; private evaluation and paid runs
 require authority. PostgreSQL performance, agent conformance, quality gains and market
 advantage remain unvalidated. These are tracked gates, not hidden missing design work.</p>
 

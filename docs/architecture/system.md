@@ -1,6 +1,11 @@
 # System architecture
 
-**Status:** Proposed validation-slice baseline · CF-0.2
+**Status:** Selected bounded design · CF-0.3; empirical validation pending
+
+The [architecture review](architecture-review.md) records the decisions and remaining
+proof. The [SDK extension contract](../technical-design/sdk-extension-contract.md)
+and [lifecycle/retrieval specification](../technical-design/knowledge-lifecycle-and-retrieval.md)
+govern extension compatibility, snapshot compilation and task evidence selection.
 
 ## Purpose and boundaries
 
@@ -49,7 +54,9 @@ Enterprise IdP -> authenticated application services / policy enforcement
 ```
 
 An API process, worker process, PostgreSQL, and managed evidence storage form the
-first deployment. Use a modular application rather than a microservice estate.
+first shared deployment. The preceding offline utility proof will use immutable files and
+an in-memory projection, without a network listener or enterprise identity claims.
+Use a modular application rather than a microservice estate.
 Workers isolate expensive parsing and extraction from interactive requests.
 Capture, language/format extraction, semantic-index import, framework resolution,
 reviewed business mapping and observed CI/test evidence are separate stages. A
@@ -105,11 +112,14 @@ facts while preserving source checks for behavior, contradictions, freshness, an
 The [workflow](../design/human-reviewed-engineering-workflow.md) is map -> human scope
 review -> selective investigation -> findings/design/validation proposal -> human
 implementation approval -> authorized coding/validation. Inquiry and diagnosis can
-end without coding. Minimal maps, proposals and verified review pages belong in the
-first slice; rich workbenches follow evidence of benefit.
+end without coding. Minimal maps and proposals belong in the offline proof, with
+visibly simulated review events. Verified review pages belong in the secured shared
+slice; rich workbenches follow evidence of benefit.
 
 The [three-repository fixture](../evaluation/three-repository-benchmark.md) requires
-narrow Java/Spring and TypeScript support from the start. Supported declarations,
+narrow Java/Spring and TypeScript support before multi-profile acceptance. The first
+integrated synthetic journey uses one cross-layer stack, not all languages at once.
+Supported declarations,
 framework rules and semantic bindings have separate precision tiers. No complete
 runtime graph or business-rule inference is promised.
 Before claiming useful preparation, a task fixture must trace a business passage

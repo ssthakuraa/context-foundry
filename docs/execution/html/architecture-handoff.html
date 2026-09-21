@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bounded implementation handoff after architecture review · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../architecture-handoff.md">Markdown source</a></nav>
+    <article>
+      <h1 id="bounded-implementation-handoff-after-architecture-review">Bounded implementation handoff after architecture review</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#scope-and-model-handoff">Scope and model handoff</a></li><li><a href="#a1-freeze-the-minimum-extension-and-evidence-slice">A1 — Freeze the minimum extension and evidence slice</a></li><li><a href="#a2-conforming-producer-runner-and-one-integrated-capture">A2 — Conforming producer runner and one integrated capture</a></li><li><a href="#a3-retrieval-loop-and-same-information-baseline">A3 — Retrieval loop and same-information baseline</a></li><li><a href="#a4-reviewed-investigation-walkthrough-and-utility-decision">A4 — Reviewed investigation walkthrough and utility decision</a></li><li><a href="#a5-refresh-correctness-and-implementation-handoff-receipt">A5 — Refresh correctness and implementation handoff receipt</a></li><li><a href="#existing-code-disposition">Existing code disposition</a></li></ul></details>
+<p><strong>Status:</strong> CF-0.3 queue selected · 2026-09-20. A1–A5 are pending, not completed.
+Implementation was paused during this documentation review. Resume at A1 using the
+root <code>WORKLIST.md</code>; do not repeat a broad research survey or build a platform shell.</p>
+<h2 id="scope-and-model-handoff">Scope and model handoff</h2>
+<p>Read <a href="../../architecture/html/architecture-review.html">the architecture decision</a>,
+<a href="../../technical-design/html/sdk-extension-contract.html">SDK contract</a> and
+<a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">lifecycle/retrieval specification</a>.
+They refine WP1/WP2/POV, not a second competing project. WP0 authority decisions
+apply to private/paid evaluation, not public synthetic implementation.</p>
+<p>Sol Medium is a reasonable implementation choice for these specified, testable
+tasks. This is an engineering recommendation, not a measured model comparison or
+quota estimate. <a href="https://developers.openai.com/api/docs/models/gpt-5.6-sol">Official Sol model documentation</a>
+lists medium reasoning support. Keep stronger review for a genuinely new contract,
+identity/resolution or security decision and the final utility verdict. Test failures
+within an existing design are normal implementation work, not automatic escalation.</p>
+<p>Each task ends with tests, doc/HTML updates, checked worklist evidence, refreshed
+restart context and a reviewed Git checkpoint. Continue to the next independent
+task without asking merely because a deliverable completed. Stop only for missing
+authority, material product ambiguity or a demonstrated design contradiction.</p>
+<h2 id="a1-freeze-the-minimum-extension-and-evidence-slice">A1 — Freeze the minimum extension and evidence slice</h2>
+<p><strong>Purpose:</strong> make the SDK extensible before additional built-in scanners entrench
+the nine-kind/Java-TypeScript limitation. This is a narrow schema revision, not
+completion of every enterprise WP1 contract.</p>
+<p><strong>Work:</strong> inventory existing exports and dependent checks in <code>packages/contracts</code>.
+Add versioned installed adapter/kind profiles, standard descriptor projection,
+language-independent identity/reference validation and minimal <code>source.artifact</code>.
+Specify finite size/depth/message limits as checked configuration. Add producer and
+consumer profile negotiation and an explicit provisional-version migration policy.
+Generalize only relevant endpoint validation; preserve strict business/test rules.</p>
+<p><strong>Tests:</strong> custom workflow kind accepted only with installed matching profile;
+unknown/changed profile rejected; Python-emitted canonical records accepted;
+malformed support, duplicate identity, unknown fields and protocol version rejected;
+Java/TypeScript legacy fixtures not silently reinterpreted; call cycles versus
+evidence cycles distinguished; Unicode byte/range conversion specified.</p>
+<p><strong>Receipt:</strong> exported schema inventory, compatibility matrix, exact migration cases,
+portable TypeScript/Python vectors, and a delta to the
+<a href="../../technical-design/html/contract-freeze-review.html">contract-freeze review</a>.
+<strong>Stop:</strong> if general search requires a core code edit for every adopter kind, A1
+has failed CF-R17. Do not freeze unrelated task/policy/CI schemas to unblock A2.</p>
+<h2 id="a2-conforming-producer-runner-and-one-integrated-capture">A2 — Conforming producer runner and one integrated capture</h2>
+<p><strong>Depends:</strong> A1's minimum subset. <strong>Packages:</strong> preparation/adapter modules and
+conformance tests; retain experimental code under <code>extractor-spike</code> until promoted.</p>
+<p>Build the bounded process protocol and atomic contribution assembly over reviewed
+synthetic input. Demonstrate one independent Python custom-format adapter outside
+the core package. Reuse the Java/SQL/TypeScript spikes only after matching their
+output to capture-bound locators, family coverage and installed kind profiles.
+Add bounded OpenAPI, Markdown, explicit JPA and test-declaration handling needed by
+the public cross-layer fixture. Reject remote references and repository execution.</p>
+<p>Separate framework route interpretation from Java declarations; resolution must
+prove the controller/service target in this small fixture using explicit scope/type
+evidence. If the current parser cannot do that, retain unresolved state and introduce
+the smallest qualified resolver or approved semantic-index fixture needed. Never
+patch in an exact edge because <code>expected.json</code> expects it. Expected files are test
+oracles and are not runtime inputs. Explicit reviewed business mappings are valid
+inputs, frozen separately and disclosed in both baseline arms.</p>
+<p><strong>Tests:</strong> exact source pointers; comments/string decoys; overload/duplicate-route
+ambiguity; partial declarations; quoted SQL names; stream truncation/extra output;
+timeout/cancel; unchanged deterministic capture. The empty test cannot emit a
+passed-run or behavior-coverage claim. Untrusted-adapter sandbox claims are excluded.</p>
+<p><strong>Receipt:</strong> one actual capture -&gt; validated contribution -&gt; resolved/unknown links
+-&gt; candidate release trace, plus an adopter example that needs no core changes.
+<strong>Stop:</strong> unresolved critical links are not a reason for more unrelated language
+scanners. Diagnose their needed evidence or scope the claim down explicitly.</p>
+<h2 id="a3-retrieval-loop-and-same-information-baseline">A3 — Retrieval loop and same-information baseline</h2>
+<p><strong>Depends:</strong> A2's integrated candidate. <strong>Packages:</strong> retrieval and local evaluation.
+Use an in-memory reference projection; do not introduce PostgreSQL, a vector service
+or a paid query model for this slice.</p>
+<p>Implement exact/lexical pointer baseline and typed candidate expansion over the
+<strong>same</strong> documents, mappings, declarations and searchable descriptors. Implement
+orientation, inspect, trace and evidence as library operations with bounded serializable
+results; no network listener. Use the specified ranking, concern diversity, path
+admission and actual wire caps. Retain the original task separately from instructions.
+Expose per-stage receipts and typed error/limit reasons.</p>
+<p><strong>Tests:</strong> API-use versus enhancement packet; critical low-lexical connector;
+irrelevant same-name distractor; conflicting/stale rule; unsupported data access;
+cycle/edge-budget termination; oversized evidence; ambiguity; stable tie ordering;
+no exact-edge manufacture; extension descriptor found without a custom code path.
+Test changing a question without changing the graph and changing evidence without
+changing the question. A manually curated evidence packet is only an oracle arm.</p>
+<p><strong>Receipt:</strong> stage-loss report and full actual response capture for each scenario;
+baseline/typed quality and byte comparisons, including failures. This is mechanical
+retrieval evidence, not measured agent productivity.
+<strong>Stop:</strong> required evidence lost by selection or serialization must be repaired
+before adding semantic search or more preparation. Add a semantic experiment only
+if source/extraction are correct and terminology recall is the diagnosed failure.</p>
+<h2 id="a4-reviewed-investigation-walkthrough-and-utility-decision">A4 — Reviewed investigation walkthrough and utility decision</h2>
+<p><strong>Depends:</strong> A3. <strong>Packages:</strong> local integration/evaluation and minimal task state.
+Exercise scope correction, per-question sufficiency, changed/missing source binding,
+selective reads, findings/design/validation plan and both review checkpoints. Use
+versioned local reviewer events marked simulated for deterministic conformance.
+Do not build authenticated Studio or claim these events are real human approval.</p>
+<p>First run scripted mechanics on public fixtures. Then prepare the bounded real-agent
+comparison: identical model/effort/tools, sources and task information; plain search,
+pointer baseline and typed packets; fixed criteria and held-outs; separate response
+content from guidance. Private sources, external model routing or paid runs wait for
+WP0 decisions. Normal implementation may continue on public fixtures while waiting.</p>
+<p><strong>Tests/receipt:</strong> wrong scope corrected and re-reviewed; old map/proposal cannot
+advance the task; diagnosis cannot authorize coding; source mismatch is visible;
+declared test is not parity evidence; tracked broadening reasons; per-stage trajectory,
+missed obligations, source/context cost and reviewer effort. Preserve negative trials.</p>
+<p><strong>Decision:</strong> scripted conformance permits A5, not a productivity claim. Broader
+platform investment requires actual comparative utility and the scoped-storage
+feasibility gate. Set task-specific quality/cost thresholds before model runs with
+the rubric owner; do not invent an accepted business answer or silently call a run
+successful because a report was generated. After two diagnosed no-benefit iterations,
+choose simplify/change/stop and seek owner direction for material scope change.</p>
+<h2 id="a5-refresh-correctness-and-implementation-handoff-receipt">A5 — Refresh correctness and implementation handoff receipt</h2>
+<p><strong>Depends:</strong> A2/A3; can proceed on public fixtures if A4's paid/private experiment
+is awaiting authority. <strong>Packages:</strong> preparation lifecycle and evaluation.</p>
+<p>Start from the full-build oracle. Add contribution replacement, watch-key invalidation,
+reviewed-mapping staleness and atomic candidate activation. Full rebuild is an
+acceptable initial strategy; claim incremental support only after equivalence tests.</p>
+<p><strong>Tests:</strong> provider added/removed/duplicated; unchanged consumer re-resolved; changed
+configuration; deleted files; same-name other service; schema/profile change; stale
+mapping; interrupted build and rollback; current-source mismatch; deterministic
+semantic parity excluding attempt metadata.</p>
+<p><strong>Receipt:</strong> full/delta or explicit full-rebuild report, refresh/curation costs,
+remaining precision/coverage matrix and a local-slice readiness review. This is the
+strong-review checkpoint before WP3/WP4: authentication, extraction/publication/query
+policy and actual scoped PostgreSQL workload. No serving of private knowledge or
+untrusted extensions until their respective security gates pass.</p>
+<h2 id="existing-code-disposition">Existing code disposition</h2>
+<p>Keep canonical serialization, source-binding tests, evidence support checks and the
+bounded parser spikes where they conform. Rework closed kind/language negotiation
+and reference validation. Integrate before enlarging scanner coverage. Do not port
+private v1/v2 files or infer their license from this repository's Apache-2.0 license.
+No existing component test result counts as an A1–A5 acceptance receipt.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/execution/architecture-handoff.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

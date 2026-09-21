@@ -2,6 +2,12 @@
 
 **Status:** Proposed strategy; model/index choices experimental · 2026-09-20
 
+The CF-0.3 [selection specification](../technical-design/knowledge-lifecycle-and-retrieval.md)
+defines first-slice lane fusion, exact-match priority, concern budgets, typed-path
+admission, actual wire caps and diagnostics. It takes precedence over underspecified
+algorithm choices below. Fuzzy/semantic lanes are diagnostic additions, not required
+before the exact/lexical plus typed comparison. Numeric defaults are experimental.
+
 Supports CF-R01, CF-R02, CF-R04, CF-R06 and CF-R14. Search finds candidates;
 evidence-backed relations explain connections. Neither similarity nor model fluency
 establishes company-specific truth.

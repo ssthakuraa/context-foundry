@@ -1,7 +1,7 @@
 # ContextFoundry product requirements
 
 **Status:** User-confirmed product direction; detailed requirements proposed for review
-**Baseline:** CF-0.2 requirements alignment · 2026-09-20
+**Baseline:** CF-0.3 requirements alignment · 2026-09-20
 
 ## Authority and purpose
 
@@ -9,9 +9,9 @@ This document is the authoritative statement of intended product behavior. It
 captures the owner's clarified requirements; it does not claim implementation or
 approval of every design choice. Design documents describe how these requirements
 are fulfilled. Historical research is evidence, not a competing product specification.
-CF-0.2 is the reconciled validation-slice design baseline. Historical CF-0.1 research
-remains evidence, not a competing execution plan; unchanged technical choices retain
-their proposed status.
+The [CF-0.3 architecture review](../architecture/architecture-review.md) is the
+current design decision baseline. Historical research remains evidence, not a
+competing execution plan. Detailed design choices are not product outcome claims.
 
 ContextFoundry fills the company-specific knowledge gap between a general-purpose
 LLM and the enterprise's functional, technical, product-family and domain experts.
@@ -85,6 +85,7 @@ inquiries may combine scope confirmation with clarification and need no coding g
 | CF-R14 | Retrieve terminology robustly without inventing facts | Exact names, typos and paraphrases are evaluated separately; similarity nominates candidates, never proves business equivalence or dependency |
 | CF-R15 | Expose review and investigation artifacts accessibly | Host conversation and Studio can display the same versioned map/proposal; tables/text do not require graph visualization |
 | CF-R16 | Demonstrate benefit and maintainability | Same-information baselines, unseen tasks, missed impacts, human effort, preparation/refresh cost and scoped latency are reported |
+| CF-R17 | Let adopters extend languages, formats and enterprise framework knowledge | An independently written non-TypeScript adapter contributes a custom artifact through versioned contracts; generic search/inspect works without core/UI edits, and unsupported relation semantics remain explicit |
 
 CF-R01/R07/R12 require multi-artifact evidence, not merely a populated index:
 supported Java/Spring, SQL/data, API contract, TypeScript/frontend, document and
@@ -94,6 +95,12 @@ reviewed and missing links distinctly. A code-search match is not a resolved cal
 and a declared test is not a passing run. The
 [scanner gate](../research/scanner-and-enterprise-patterns.md) supplies the first
 executable acceptance shape without claiming full language coverage.
+
+CF-R17 makes the previously stated SDK requirement explicit; it is not a request
+for every language to be implemented now. Seeded analyzers and adopter extensions
+use the same contract. Parsing, framework interpretation and reference resolution
+are distinct capabilities. The initial proof integrates one cross-layer stack,
+then validates additional repository profiles before claiming broader coverage.
 
 ## Default source-access model
 

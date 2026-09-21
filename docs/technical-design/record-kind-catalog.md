@@ -1,5 +1,11 @@
 # First-slice record-kind catalog
 
+**CF-0.3 design amendment:** this page inventories the implemented provisional
+CF-0.2 kinds. Their closed registry is not the final SDK architecture. The
+[extension contract](sdk-extension-contract.md) adds installed namespaced profiles,
+generic projections and a minimal source-artifact kind in A1, with explicit schema
+versioning and conformance. Unknown kinds remain rejected by current code until then.
+
 **Status:** Proposed catalog for CF-0.2, not a frozen schema or permission to emit unregistered kinds. A source parser may produce only kinds registered by the runtime validator; unsupported declarations become adapter coverage/diagnostics, not loosely shaped records.
 
 | Kind | Meaning and minimum payload | Permitted origin and support boundary | Status |
@@ -14,7 +20,7 @@
 | `business.flow_step` | Step identity, containing flow, involved product/capability and precondition/outcome pointers | Bounded applicability and explicit source/expert support; cross-product joins require reviewed mappings | Strict payload and flow/step membership check; curation route pending |
 | `behavior.obligation` | Expected outcome, conditions, product scope and validation intent | Separates intended behavior from source observation; a test result can discharge it only through an authenticated run importer | Strict payload; importer and obligation-reference closure pending |
 
-The minimal first-slice producer/consumer handshake must declare which of these kinds it can produce, which it can use in retrieval, and which fields are optional or unknown. A strict required-kind registry rejects unknown payloads; an extension namespace, if later allowed, must be explicitly negotiated by both producer and consumer and cannot masquerade as a first-party kind. Adapter coverage records unsupported constructs instead of promoting them to approximate facts.
+The producer/consumer handshake declares which kinds it can produce or use and which fields are optional or unknown. The current closed registry rejects unknown payloads. CF-0.3 selects an installed extension registry, explicitly negotiated by producer and consumer, which cannot masquerade as a first-party kind. Adapter coverage records unsupported constructs instead of promoting them to approximate facts.
 
 `ProducerCapabilitiesSchema` and `ConsumerCapabilitiesSchema` now restrict declarations to the nine registered kinds. `checkKindHandshake` rejects missing consumer-required kinds, producer kinds not accepted by the consumer, undeclared emitted kinds and invalid records. It is a declared compatibility check, not authentication of an adapter, proof that declared extraction coverage is true, or evidence that a consumer correctly interprets every payload. Extensions remain unsupported in CF-0.2; `declared_unsupported` is a diagnostic label list, not a grant to emit unknown records.
 

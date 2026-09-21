@@ -1,6 +1,10 @@
 # Architecture overview
 
-**Status:** Proposed for review · **Design baseline:** CF-0.2 · **Date:** 2026-09-20
+**Status:** Bounded implementation baseline · **Design baseline:** CF-0.3 · **Date:** 2026-09-20
+
+Start with the [architecture review and decisions](architecture-review.md) for the
+current verdict, design walkthroughs and scope. The arrangement below describes
+the shared product; an offline reference slice proves utility before deployment.
 
 The detailed component boundaries, release lifecycle, and agent interaction are
 specified in [system architecture](system.md). Read this overview first, followed

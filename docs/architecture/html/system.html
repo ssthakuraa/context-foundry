@@ -39,7 +39,11 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../system.md">Markdown source</a></nav>
     <article>
       <h1 id="system-architecture">System architecture</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#purpose-and-boundaries">Purpose and boundaries</a></li><li><a href="#system-arrangement">System arrangement</a></li><li><a href="#components">Components</a></li><li><a href="#knowledge-authority">Knowledge authority</a></li><li><a href="#retrieval-and-source-use">Retrieval and source use</a></li><li><a href="#reuse-and-acceptance">Reuse and acceptance</a></li></ul></details>
-<p><strong>Status:</strong> Proposed validation-slice baseline · CF-0.2</p>
+<p><strong>Status:</strong> Selected bounded design · CF-0.3; empirical validation pending</p>
+<p>The <a href="architecture-review.html">architecture review</a> records the decisions and remaining
+proof. The <a href="../../technical-design/html/sdk-extension-contract.html">SDK extension contract</a>
+and <a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">lifecycle/retrieval specification</a>
+govern extension compatibility, snapshot compilation and task evidence selection.</p>
 <h2 id="purpose-and-boundaries">Purpose and boundaries</h2>
 <p>ContextFoundry maintains business meaning, engineering structure, ownership,
 standards, decisions, and validation evidence, then retrieves the portion relevant
@@ -80,7 +84,9 @@ Enterprise IdP -&gt; authenticated application services / policy enforcement
                 architecture and validation reviews
 </code></pre>
 <p>An API process, worker process, PostgreSQL, and managed evidence storage form the
-first deployment. Use a modular application rather than a microservice estate.
+first shared deployment. The preceding offline utility proof will use immutable files and
+an in-memory projection, without a network listener or enterprise identity claims.
+Use a modular application rather than a microservice estate.
 Workers isolate expensive parsing and extraction from interactive requests.
 Capture, language/format extraction, semantic-index import, framework resolution,
 reviewed business mapping and observed CI/test evidence are separate stages. A
@@ -174,10 +180,13 @@ facts while preserving source checks for behavior, contradictions, freshness, an
 <p>The <a href="../../design/html/human-reviewed-engineering-workflow.html">workflow</a> is map -&gt; human scope
 review -&gt; selective investigation -&gt; findings/design/validation proposal -&gt; human
 implementation approval -&gt; authorized coding/validation. Inquiry and diagnosis can
-end without coding. Minimal maps, proposals and verified review pages belong in the
-first slice; rich workbenches follow evidence of benefit.</p>
+end without coding. Minimal maps and proposals belong in the offline proof, with
+visibly simulated review events. Verified review pages belong in the secured shared
+slice; rich workbenches follow evidence of benefit.</p>
 <p>The <a href="../../evaluation/html/three-repository-benchmark.html">three-repository fixture</a> requires
-narrow Java/Spring and TypeScript support from the start. Supported declarations,
+narrow Java/Spring and TypeScript support before multi-profile acceptance. The first
+integrated synthetic journey uses one cross-layer stack, not all languages at once.
+Supported declarations,
 framework rules and semantic bindings have separate precision tiers. No complete
 runtime graph or business-rule inference is promised.
 Before claiming useful preparation, a task fixture must trace a business passage

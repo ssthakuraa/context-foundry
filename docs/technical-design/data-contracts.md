@@ -2,6 +2,12 @@
 
 **Status:** Proposed technical specification · CF-0.2
 
+**CF-0.3 design amendment:** the executable schema is still provisional `0.2.0`.
+[SDK extension profiles](sdk-extension-contract.md) specify its next revision;
+[lifecycle/retrieval](knowledge-lifecycle-and-retrieval.md) defines contribution
+and selection semantics. The implementation inventory below describes existing
+code, not completed extension support. A1 explicitly versions incompatible changes.
+
 **Implementation note (2026-09-20):** `packages/contracts` now contains twenty-eight
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
@@ -73,7 +79,7 @@ Source locators now carry a unique `evidence_id` within the supplied release set
 that relationship payload support is declared on its envelope, and that IDs are
 unique. It computes a bounded transitive evidence-ID set per record for acyclic
 dependencies. A record with no evidence anywhere in that chain is rejected.
-Missing/invalid references, duplicate IDs, cycles or excessive closure
+Missing/invalid references, duplicate IDs, evidence-dependency cycles or excessive closure
 return issues and **no** closure; records blocked by a cycle are diagnosed along with
 cycle members. This initial slice rejects cycles rather than publishing a partial
 strongly connected group. Call `checkReleaseIntegrity` to combine this check with
@@ -97,6 +103,10 @@ time. This is a **shape only**: it is not accepted by `checkSupportClosure` or
 verify the producer, actual report bytes, capture/revision bindings, test identities
 and publication policy before a run can support a released assertion or discharge a
 validation obligation. In particular, a caller-supplied `passed` value proves nothing.
+
+This support-cycle rule does not forbid cycles in the engineering relationship
+graph. Two methods can call each other when each relationship has independent
+source support; two assertions cannot be each other's only justification.
 
 ## Identity and versioning
 

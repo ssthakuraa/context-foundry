@@ -40,6 +40,11 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="retrieval-content-and-agent-guidance">Retrieval content and agent guidance</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#problem-and-hypothesis">Problem and hypothesis</a></li><li><a href="#input-separation">Input separation</a></li><li><a href="#proposed-operations">Proposed operations</a></li><li><a href="#selection-pipeline">Selection pipeline</a></li><li><a href="#response-presentation">Response presentation</a></li><li><a href="#agent-guidance-contract">Agent guidance contract</a></li><li><a href="#experiment-and-acceptance">Experiment and acceptance</a></li></ul></details>
 <p><strong>Status:</strong> Proposed, subject to controlled experiments · CF-0.2</p>
+<p><strong>CF-0.3 refinement:</strong> the <a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">lifecycle and selection specification</a>
+turns the concepts below into a deterministic first algorithm, explicit evidence
+packet and diagnostic chain. The <a href="../../execution/html/architecture-handoff.html">A3/A4 handoff</a>
+tests actual emitted packets and agent investigation separately; scripted mechanics
+cannot be reported as a productivity experiment.</p>
 <h2 id="problem-and-hypothesis">Problem and hypothesis</h2>
 <p>V2 demonstrates that relevant facts can exist while selection loses a useful path,
 or a large response imposes more interpretation work on the agent. ContextFoundry

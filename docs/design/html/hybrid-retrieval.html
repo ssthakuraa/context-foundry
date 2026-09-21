@@ -40,6 +40,11 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="hybrid-retrieval-exact-fuzzy-semantic-and-structural">Hybrid retrieval: exact, fuzzy, semantic and structural</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#technique-selection">Technique selection</a></li><li><a href="#proposed-query-path">Proposed query path</a></li><li><a href="#enterprise-semantic-model">Enterprise semantic model</a></li><li><a href="#implementation-and-data-protection">Implementation and data protection</a></li><li><a href="#experiments-and-boundaries">Experiments and boundaries</a></li></ul></details>
 <p><strong>Status:</strong> Proposed strategy; model/index choices experimental · 2026-09-20</p>
+<p>The CF-0.3 <a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">selection specification</a>
+defines first-slice lane fusion, exact-match priority, concern budgets, typed-path
+admission, actual wire caps and diagnostics. It takes precedence over underspecified
+algorithm choices below. Fuzzy/semantic lanes are diagnostic additions, not required
+before the exact/lexical plus typed comparison. Numeric defaults are experimental.</p>
 <p>Supports CF-R01, CF-R02, CF-R04, CF-R06 and CF-R14. Search finds candidates;
 evidence-backed relations explain connections. Neither similarity nor model fluency
 establishes company-specific truth.</p>

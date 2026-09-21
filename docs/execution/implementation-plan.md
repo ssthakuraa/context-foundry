@@ -1,6 +1,6 @@
 # Detailed implementation plan
 
-**Status:** Revised local utility gate before enterprise hardening · CF-0.2
+**Status:** CF-0.3 local utility gate before enterprise hardening
 
 ## Execution rule
 
@@ -11,7 +11,8 @@ estimate is implied by the sequence. Record actual effort during the first slice
 
 ## Dependency order
 
-The immediate coding queue is the narrower [validation work packages](validation-work-packages.md).
+The immediate coding queue is [A1–A5](architecture-handoff.md), refining the narrower
+[validation work packages](validation-work-packages.md).
 Its POV work package now proves a local single-operator knowledge/retrieval/workflow
 path before enterprise identity and secured serving. M1 below remains the enterprise
 application milestone; only its contract portion precedes that POV. Do not build
@@ -55,7 +56,7 @@ Tasks:
    minimal-guidance control. Reserve independent must-find facts and unseen tasks.
 8. Design the PostgreSQL authorization/query-plan spike, including hidden distractors,
    expired source entitlements, support density, and concurrent preparation.
-9. Map CF-R01–16 to executable acceptance; freeze both review-gate semantics and host
+9. Map CF-R01–17 to executable acceptance; freeze both review-gate semantics and host
    assurance level. Decide exact schema/runtime versions in WP1.
 10. Audit v1/v2 extractor entry points and tests against Java/Spring, SQL/PLSQL,
     OpenAPI, TypeScript/Hono, document and test needs; record reuse/disposition and

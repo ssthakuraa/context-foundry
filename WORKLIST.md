@@ -5,6 +5,23 @@
 
 Legend: `[ ]` pending, `[-]` in progress, `[x]` complete, `[!]` needs a product decision or external input. A checked item means its stated evidence exists; it does not imply the entire package has passed.
 
+## Current queue — CF-0.3 architecture handoff
+
+This queue refines WP1/WP2/POV below and takes precedence over older next-action
+wording. Historical receipts remain evidence, not acceptance of this new slice.
+Implementation was paused during the review; no A1–A5 task has passed yet.
+
+- [x] Complete the architecture review and targeted primary-source/reference-code follow-up. Evidence: [architecture decisions and six walkthroughs](docs/architecture/architecture-review.md); no external performance experiments rerun.
+- [x] Specify adopter extension interoperability, installed kind profiles, standard projections and versioned migration. Evidence: [SDK extension contract](docs/technical-design/sdk-extension-contract.md); CF-R17 and traceability added. Existing closed schemas remain provisional.
+- [x] Specify contribution/refresh invalidation, proof-versus-program graphs, deterministic task evidence selection and progressive investigation. Evidence: [lifecycle and retrieval](docs/technical-design/knowledge-lifecycle-and-retrieval.md).
+- [x] Write the five-task implementation/model handoff; reconcile architecture, requirements, technical design, retrieval/preparation, readiness and execution entry points. Evidence: [A1–A5](docs/execution/architecture-handoff.md). Sol Medium may implement this queue; stronger review remains for new semantic/security choices and utility verdicts.
+- [ ] A1: freeze the minimum extension/evidence schema revision with TypeScript/Python compatibility and negative cases; do not freeze all enterprise contracts first.
+- [ ] A2: conforming producer runner, independent custom-format adapter and one integrated business/API/Java/data/test capture; no hard-coded oracle edges.
+- [ ] A3: same-information lexical baseline versus bounded typed retrieval, actual evidence packets and stage-loss receipts.
+- [ ] A4: reviewed selective-investigation mechanics, then authorized real-agent comparison; distinguish simulated gates from real approvals and mechanics from productivity.
+- [ ] A5: full-build/refresh correctness, resolver watch keys, stale mappings and a local-slice verdict before shared-platform work. Public fixture work can proceed while private/paid evaluation awaits WP0.
+- [x] Verify this docs-only checkpoint: `python3 scripts/build-docs.py` and `--check` built/verified 55 HTML pages with valid local links/anchors; `git diff --check` passed. All 17 requirement IDs have traceability rows. No package, script or dependency files changed; runtime tests and external/private benchmarks were not rerun. Public diff reviewed; Git commit/push receipt is in repository history and the task handoff.
+
 ## Design and handoff
 
 - [x] CF-0.2 product requirements, architecture, research verdict, technical designs, traceability and execution plan written. Evidence: [review guide](docs/review-guide.md), [requirements traceability](docs/requirements/traceability.md).
@@ -67,6 +84,6 @@ Legend: `[ ]` pending, `[-]` in progress, `[x]` complete, `[!]` needs a product 
 - The owner authorized work on this plan on 2026-09-20, asked for documentation updates as designs change, and wants continuity files for a quota interruption.
 - The owner agreed on 2026-09-20 to defer full enterprise identity and serving authorization until a local knowledge/retrieval/workflow utility gate. Extraction input safety, provenance and visibility labels remain mandatory from the first prototype; shared/private serving and authoritative human approvals still require WP3/WP4.
 - Product implementation and experiments must be recorded separately. The three fixture repositories are evaluation inputs; their existing contents must not be edited as part of ContextFoundry development.
-- The current proposed design is CF-0.2. It is an implementation baseline for a validation slice, not proof of market competitiveness.
+- The current design decision baseline is CF-0.3; executable contracts remain provisional `0.2.0` until A1's explicit revision. This is a bounded implementation baseline, not proof of market competitiveness.
 - Commit and push the public repo after each verified work-package checkpoint; review the staged file list and keep `.local/` out of every push.
 - After every meaningful work session, update this ledger and [restart context](restartcontext.md), then regenerate and check HTML for any changed documentation Markdown.

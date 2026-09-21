@@ -39,15 +39,17 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="index.html">Documentation</a><a href="review-guide.html">Review guide</a><a href="../review-guide.md">Markdown source</a></nav>
     <article>
       <h1 id="design-closeout-review-guide">Design-closeout review guide</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#what-is-complete">What is complete</a></li><li><a href="#suggested-reading-order">Suggested reading order</a></li><li><a href="#proposed-decisions-to-review">Proposed decisions to review</a></li><li><a href="#important-corrections-to-the-initial-documents">Important corrections to the initial documents</a></li><li><a href="#remaining-uncertainty">Remaining uncertainty</a></li><li><a href="#review-outcome-to-record">Review outcome to record</a></li></ul></details>
-<p><strong>Status:</strong> Design handoff ready for validation-slice review · CF-0.2 · 2026-09-20</p>
+<p><strong>Status:</strong> CF-0.3 bounded implementation handoff · 2026-09-20</p>
 <h2 id="what-is-complete">What is complete</h2>
-<p>The bounded research synthesis and design reconciliation are complete for a
-validation slice. Start with the <a href="../research/html/design-closeout.html">research verdict</a>,
+<p>The architecture review and targeted research follow-up are complete for a bounded
+implementation slice. Start with the <a href="../architecture/html/architecture-review.html">architecture decision</a>,
 <a href="../requirements/html/product-requirements.html">product requirements</a>, and
 <a href="../execution/html/readiness-and-risks.html">readiness/risk register</a>. This means a concrete
 implementation handoff exists, not that the architecture is empirically proven.
-No comparative agent experiments, PostgreSQL spike or serving product runtime has run;
-WP1 executable-contract work and an isolated TypeScript candidate spike are underway.
+No comparative agent experiments, PostgreSQL spike or serving product runtime has run.
+Twenty-eight provisional schema exports and TypeScript, SQL, Java and Spring spikes
+exist. No integrated source-to-agent utility gate has passed. Their closed kind and
+language assumptions need the specified A1 revision, not another broad rewrite.
 The <a href="../execution/html/validation-work-packages.html">work packages</a> now put a local,
 single-operator utility proof before enterprise identity and secured serving.</p>
 <p>The package specifies product boundaries, system architecture, a concrete technology
@@ -59,14 +61,15 @@ or a production-certified specification.</p>
 <h2 id="suggested-reading-order">Suggested reading order</h2>
 <p>For the short owner review:</p>
 <ol>
-<li><a href="../research/html/design-closeout.html">Research verdict and confidence</a>: why this design,
-what competitors overlap, and what remains uncertain.</li>
+<li><a href="../architecture/html/architecture-review.html">Architecture review and decisions</a>: findings,
+adopted mechanisms, representative task walkthroughs and what remains unproven.</li>
 <li><a href="../requirements/html/product-requirements.html">Product requirements</a> and
 <a href="../design/html/human-reviewed-engineering-workflow.html">human-reviewed workflow</a>: confirm
 scope review, selective source reading, proposal and coding authorization.</li>
 <li><a href="../evaluation/html/three-repository-benchmark.html">Benchmark dossier</a>: approve maintenance
 scope, rubric ownership, held-out policy and execution budget.</li>
-<li><a href="../execution/html/validation-work-packages.html">Work packages</a>: bounded coding handoff.</li>
+<li><a href="../execution/html/architecture-handoff.html">A1–A5 handoff</a>: next five tasks, tests, stop
+conditions and model handoff; broader work packages remain the product roadmap.</li>
 <li><a href="../requirements/html/traceability.html">Traceability</a>: requirements-to-design/test coverage.</li>
 </ol>
 <p>Detailed architecture review follows:</p>
@@ -129,6 +132,11 @@ scope, rubric ownership, held-out policy and execution budget.</li>
 <p>Implementers also read <a href="../technical-design/html/extraction-and-source-binding.html">extraction/source binding</a>,
 <a href="../technical-design/html/task-and-review-contracts.html">task/decision contracts</a> and the
 <a href="../technical-design/html/contract-freeze-review.html">open WP1 freeze review</a> before dependent coding.</p>
+<p>The new <a href="../technical-design/html/sdk-extension-contract.html">SDK extension contract</a> and
+<a href="../technical-design/html/knowledge-lifecycle-and-retrieval.html">lifecycle/retrieval specification</a>
+take precedence for their CF-0.3 refinements. Markdown is canonical; sibling <code>html/</code>
+pages provide the same review content. Readiness means implementable decisions,
+not evidence of market competitiveness or a freeze of every shared contract.</p>
 <p>Then review <a href="../design/html/studio-experience.html">Studio</a>, <a href="../design/html/target-architecture-workbench.html">architecture proposals</a>,
 <a href="../design/html/test-impact-and-validation.html">test impact</a>, <a href="../technical-design/html/data-contracts.html">data contracts</a>,
 and <a href="../technical-design/html/interfaces.html">interfaces</a> in detail.</p>

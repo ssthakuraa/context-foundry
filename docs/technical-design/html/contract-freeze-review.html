@@ -38,8 +38,22 @@ p, li, td, a { overflow-wrap: anywhere; }
   <main>
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../contract-freeze-review.md">Markdown source</a></nav>
     <article>
-      <h1 id="wp1-contract-freeze-review">WP1 contract-freeze review</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#verified-now">Verified now</a></li><li><a href="#blocking-gaps-before-a-shared-contract-freeze">Blocking gaps before a shared contract freeze</a></li><li><a href="#decision">Decision</a></li></ul></details>
+      <h1 id="wp1-contract-freeze-review">WP1 contract-freeze review</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#cf-03-architecture-review-amendment">CF-0.3 architecture review amendment</a></li><li><a href="#verified-now">Verified now</a></li><li><a href="#blocking-gaps-before-a-shared-contract-freeze">Blocking gaps before a shared contract freeze</a></li><li><a href="#decision">Decision</a></li></ul></details>
 <p><strong>Status:</strong> Open review · CF-0.2 · 2026-09-20. This is a gap audit, not a freeze or permission to start private evaluation.</p>
+<h2 id="cf-03-architecture-review-amendment">CF-0.3 architecture review amendment</h2>
+<p>The current executable version remains <code>0.2.0</code>. The architecture review found that
+closed kind negotiation and the Java/TypeScript-only symbol schema do not fulfill
+the adopter-extensible SDK requirement. <a href="../../execution/html/architecture-handoff.html">A1</a>
+must freeze only the minimum extension/evidence subset against the
+<a href="sdk-extension-contract.html">new extension specification</a>, with a versioned migration
+and portable producer conformance. Do not freeze the existing closed registry or
+block the local proof on unrelated enterprise task/CI/policy contracts.</p>
+<p>Additional closure obligations: registered endpoint types including data/doc artifacts;
+identity scheme changes; custom descriptor interoperability without core edits;
+relation semantics distinct from generic search; proof cycles distinct from program
+cycles; failed producer attempts cannot activate partial output. These are design
+decisions, not implemented checks. Historical test counts below belong to their
+checkpoint; the latest pre-review suite was 64 contract and 25 extractor tests.</p>
 <h2 id="verified-now">Verified now</h2>
 <ul>
 <li>Twenty-eight Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes. Producer/consumer capability manifests can check declared kind compatibility.</li>

@@ -1,16 +1,18 @@
 # Design-closeout review guide
 
-**Status:** Design handoff ready for validation-slice review · CF-0.2 · 2026-09-20
+**Status:** CF-0.3 bounded implementation handoff · 2026-09-20
 
 ## What is complete
 
-The bounded research synthesis and design reconciliation are complete for a
-validation slice. Start with the [research verdict](research/design-closeout.md),
+The architecture review and targeted research follow-up are complete for a bounded
+implementation slice. Start with the [architecture decision](architecture/architecture-review.md),
 [product requirements](requirements/product-requirements.md), and
 [readiness/risk register](execution/readiness-and-risks.md). This means a concrete
 implementation handoff exists, not that the architecture is empirically proven.
-No comparative agent experiments, PostgreSQL spike or serving product runtime has run;
-WP1 executable-contract work and an isolated TypeScript candidate spike are underway.
+No comparative agent experiments, PostgreSQL spike or serving product runtime has run.
+Twenty-eight provisional schema exports and TypeScript, SQL, Java and Spring spikes
+exist. No integrated source-to-agent utility gate has passed. Their closed kind and
+language assumptions need the specified A1 revision, not another broad rewrite.
 The [work packages](execution/validation-work-packages.md) now put a local,
 single-operator utility proof before enterprise identity and secured serving.
 
@@ -25,14 +27,15 @@ or a production-certified specification.
 
 For the short owner review:
 
-1. [Research verdict and confidence](research/design-closeout.md): why this design,
-   what competitors overlap, and what remains uncertain.
+1. [Architecture review and decisions](architecture/architecture-review.md): findings,
+   adopted mechanisms, representative task walkthroughs and what remains unproven.
 2. [Product requirements](requirements/product-requirements.md) and
    [human-reviewed workflow](design/human-reviewed-engineering-workflow.md): confirm
    scope review, selective source reading, proposal and coding authorization.
 3. [Benchmark dossier](evaluation/three-repository-benchmark.md): approve maintenance
    scope, rubric ownership, held-out policy and execution budget.
-4. [Work packages](execution/validation-work-packages.md): bounded coding handoff.
+4. [A1–A5 handoff](execution/architecture-handoff.md): next five tasks, tests, stop
+   conditions and model handoff; broader work packages remain the product roadmap.
 5. [Traceability](requirements/traceability.md): requirements-to-design/test coverage.
 
 Detailed architecture review follows:
@@ -52,6 +55,12 @@ Detailed architecture review follows:
 Implementers also read [extraction/source binding](technical-design/extraction-and-source-binding.md),
 [task/decision contracts](technical-design/task-and-review-contracts.md) and the
 [open WP1 freeze review](technical-design/contract-freeze-review.md) before dependent coding.
+
+The new [SDK extension contract](technical-design/sdk-extension-contract.md) and
+[lifecycle/retrieval specification](technical-design/knowledge-lifecycle-and-retrieval.md)
+take precedence for their CF-0.3 refinements. Markdown is canonical; sibling `html/`
+pages provide the same review content. Readiness means implementable decisions,
+not evidence of market competitiveness or a freeze of every shared contract.
 
 Then review [Studio](design/studio-experience.md), [architecture proposals](design/target-architecture-workbench.md),
 [test impact](design/test-impact-and-validation.md), [data contracts](technical-design/data-contracts.md),

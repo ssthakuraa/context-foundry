@@ -6,12 +6,12 @@ inside the enterprise boundary.
 
 ## Start here
 
-**CF-0.2 design closeout:** begin with the [review guide](review-guide.md),
-[research verdict](research/design-closeout.md) and
-[implementation readiness](execution/readiness-and-risks.md).
-All architecture/technical choices remain proposed unless an ADR states otherwise.
-WP1 executable contracts are underway; no product runtime or benchmark validation
-is claimed.
+**CF-0.3 architecture review:** begin with the [review guide](review-guide.md),
+[architecture decisions and walkthroughs](architecture/architecture-review.md) and
+[next five implementation tasks](execution/architecture-handoff.md).
+The bounded design is ready for implementation; executable schemas and parser
+spikes are still provisional. No integrated utility or enterprise-serving acceptance
+is claimed. See [readiness and risks](execution/readiness-and-risks.md).
 
 1. [Vision](vision.md)
 2. [Engineering context](concepts/engineering-context.md)
@@ -37,6 +37,7 @@ is claimed.
 
 ## Architecture and security
 
+- [Architecture review and decisions](architecture/architecture-review.md)
 - [System architecture](architecture/system.md)
 - [Technology stack and alternatives](architecture/technology-stack.md)
 - [Deployment and operations](architecture/deployment-and-operations.md)
@@ -53,6 +54,9 @@ is claimed.
 
 ## Technical design and execution
 
+- [SDK extension and interoperability contract](technical-design/sdk-extension-contract.md)
+- [Knowledge lifecycle and task evidence selection](technical-design/knowledge-lifecycle-and-retrieval.md)
+- [Bounded A1–A5 implementation handoff](execution/architecture-handoff.md)
 - [Technical design](technical-design/system.md)
 - [Data contracts and storage](technical-design/data-contracts.md)
 - [API, MCP, and CLI contracts](technical-design/interfaces.md)

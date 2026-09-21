@@ -1,6 +1,12 @@
 # Validation-slice implementation work packages
 
-**Status:** Revised local proof sequence; enterprise security gate remains mandatory · CF-0.2
+**Status:** CF-0.3 local proof sequence; enterprise security gate remains mandatory
+
+**Immediate queue:** [A1–A5 architecture handoff](architecture-handoff.md) refines
+WP1/WP2/POV below. Start A1, not a broad shared-contract freeze or another independent
+scanner. One complete cross-layer stack comes before additional repository profiles;
+public synthetic work does not wait for WP0 private/paid experiment approval.
+These packages retain their broader acceptance scope and security gates.
 
 These packages implement the first slice of the [milestone plan](implementation-plan.md).
 They replace broad M1–M3 bootstrap work as the immediate coding queue. No package is

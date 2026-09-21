@@ -1,6 +1,10 @@
 # Technical design
 
-**Status:** Proposed technical specification · CF-0.2
+**Status:** CF-0.3 bounded technical baseline; implementation incomplete
+
+Normative refinements: [SDK extensions](sdk-extension-contract.md) and
+[knowledge lifecycle/retrieval](knowledge-lifecycle-and-retrieval.md). The next
+coding queue is [A1–A5](../execution/architecture-handoff.md), not all modules below.
 
 ## Module layout
 
@@ -21,7 +25,8 @@ packages/adapters       first-party source/metadata extractors
 packages/evaluation     replay, experiments, scoring, accounting
 ```
 
-This is a proposed implementation layout; no packages have been created. The domain
+This is the target layout; `packages/contracts` and `packages/extractor-spike`
+already exist, while most production modules do not. The domain
 and contract packages do not import transport, UI, or database drivers. Application
 services authorize operations before calling repositories. Offline validators may
 read explicitly supplied files; they do not bypass enterprise serving policy.
@@ -29,7 +34,8 @@ read explicitly supplied files; they do not bypass enterprise serving policy.
 The first implementation follows [validation work packages](../execution/validation-work-packages.md),
 not creation of every module/UI feature at once. The initial extraction scope includes
 Java/Spring and TypeScript. [Extraction/source binding](extraction-and-source-binding.md)
-and [task/review contracts](task-and-review-contracts.md) specify the CF-0.2 boundaries.
+and [task/review contracts](task-and-review-contracts.md) specify retained boundaries;
+the CF-0.3 refinements above govern extension and retrieval changes.
 The local client is not a second agent runtime; its root mappings remain on the host.
 
 ## Preparation worker protocol

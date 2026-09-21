@@ -39,7 +39,10 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../system.md">Markdown source</a></nav>
     <article>
       <h1 id="technical-design">Technical design</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#module-layout">Module layout</a></li><li><a href="#preparation-worker-protocol">Preparation worker protocol</a></li><li><a href="#job-durability">Job durability</a></li><li><a href="#query-execution">Query execution</a></li><li><a href="#authorization-cost-without-weakening-authorization">Authorization cost without weakening authorization</a></li><li><a href="#caches-and-continuations">Caches and continuations</a></li><li><a href="#concurrency-and-consistency">Concurrency and consistency</a></li><li><a href="#error-and-observability-contracts">Error and observability contracts</a></li><li><a href="#compatibility-and-testing">Compatibility and testing</a></li></ul></details>
-<p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
+<p><strong>Status:</strong> CF-0.3 bounded technical baseline; implementation incomplete</p>
+<p>Normative refinements: <a href="sdk-extension-contract.html">SDK extensions</a> and
+<a href="knowledge-lifecycle-and-retrieval.html">knowledge lifecycle/retrieval</a>. The next
+coding queue is <a href="../../execution/html/architecture-handoff.html">A1–A5</a>, not all modules below.</p>
 <h2 id="module-layout">Module layout</h2>
 <pre><code class="language-text">apps/studio             React review and administration UI
 apps/server             HTTP, MCP, authentication/session boundary
@@ -56,14 +59,16 @@ packages/storage        PostgreSQL repositories, blobs, release manifests
 packages/adapters       first-party source/metadata extractors
 packages/evaluation     replay, experiments, scoring, accounting
 </code></pre>
-<p>This is a proposed implementation layout; no packages have been created. The domain
+<p>This is the target layout; <code>packages/contracts</code> and <code>packages/extractor-spike</code>
+already exist, while most production modules do not. The domain
 and contract packages do not import transport, UI, or database drivers. Application
 services authorize operations before calling repositories. Offline validators may
 read explicitly supplied files; they do not bypass enterprise serving policy.</p>
 <p>The first implementation follows <a href="../../execution/html/validation-work-packages.html">validation work packages</a>,
 not creation of every module/UI feature at once. The initial extraction scope includes
 Java/Spring and TypeScript. <a href="extraction-and-source-binding.html">Extraction/source binding</a>
-and <a href="task-and-review-contracts.html">task/review contracts</a> specify the CF-0.2 boundaries.
+and <a href="task-and-review-contracts.html">task/review contracts</a> specify retained boundaries;
+the CF-0.3 refinements above govern extension and retrieval changes.
 The local client is not a second agent runtime; its root mappings remain on the host.</p>
 <h2 id="preparation-worker-protocol">Preparation worker protocol</h2>
 <p>Each run receives a trusted job descriptor: principal/delegation, pack, source

@@ -2,6 +2,23 @@
 
 **Status:** Open review · CF-0.2 · 2026-09-20. This is a gap audit, not a freeze or permission to start private evaluation.
 
+## CF-0.3 architecture review amendment
+
+The current executable version remains `0.2.0`. The architecture review found that
+closed kind negotiation and the Java/TypeScript-only symbol schema do not fulfill
+the adopter-extensible SDK requirement. [A1](../execution/architecture-handoff.md)
+must freeze only the minimum extension/evidence subset against the
+[new extension specification](sdk-extension-contract.md), with a versioned migration
+and portable producer conformance. Do not freeze the existing closed registry or
+block the local proof on unrelated enterprise task/CI/policy contracts.
+
+Additional closure obligations: registered endpoint types including data/doc artifacts;
+identity scheme changes; custom descriptor interoperability without core edits;
+relation semantics distinct from generic search; proof cycles distinct from program
+cycles; failed producer attempts cannot activate partial output. These are design
+decisions, not implemented checks. Historical test counts below belong to their
+checkpoint; the latest pre-review suite was 64 contract and 25 extractor tests.
+
 ## Verified now
 
 - Twenty-eight Draft 7 JSON Schema exports, static TypeScript types and runtime validators exist. Nine registered record kinds cover engineering symbols/relationships, business rules/mappings, interface operations, test associations, business flows/steps and behavior obligations; all five task artifact body kinds have strict shapes. Producer/consumer capability manifests can check declared kind compatibility.

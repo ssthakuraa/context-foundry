@@ -39,7 +39,11 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../technology-stack.md">Markdown source</a></nav>
     <article>
       <h1 id="technology-stack-and-tradeoffs">Technology stack and tradeoffs</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#recommended-baseline">Recommended baseline</a></li><li><a href="#postgresql-decision">PostgreSQL decision</a></li><li><a href="#semantic-retrieval">Semantic retrieval</a></li><li><a href="#library-evidence-and-constraints">Library evidence and constraints</a></li><li><a href="#alternatives">Alternatives</a></li></ul></details>
-<p><strong>Status:</strong> Proposed validation-slice baseline · CF-0.2</p>
+<p><strong>Status:</strong> CF-0.3 selected direction; deployment/library gates remain open</p>
+<p>The first offline proof needs the existing TypeScript workspace, immutable files,
+a reference in-memory index and a Python adapter conformance example. The table
+below is the shared-deployment target, not an instruction to install every layer
+before proving retrieval. See the <a href="architecture-review.html">architecture review</a>.</p>
 <h2 id="recommended-baseline">Recommended baseline</h2>
 <table>
 <thead>
@@ -82,8 +86,8 @@ p, li, td, a { overflow-wrap: anywhere; }
 </tr>
 <tr>
 <td>Workers</td>
-<td>Isolated Node processes/containers; Tree-sitter and format parsers</td>
-<td>Bounded CPU/memory; framework semantics remain explicit</td>
+<td>Versioned process protocol; TypeScript/Python producers, parser libraries</td>
+<td>Enforced sandbox required for untrusted adapters; a child process alone is not isolation</td>
 </tr>
 <tr>
 <td>Semantic index ingestion</td>

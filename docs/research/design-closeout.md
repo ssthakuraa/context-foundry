@@ -1,5 +1,11 @@
 # Research verdict and design closeout
 
+**Later design review:** the [CF-0.3 architecture decision](../architecture/architecture-review.md)
+supersedes conflicting readiness/sequence statements in this historical synthesis.
+It retains the research evidence and adds extension interoperability, lifecycle,
+task evidence selection and a bounded implementation handoff. This report is not
+evidence that the prototype has demonstrated utility.
+
 **Status:** Research synthesis complete for the validation slice; empirical validation pending
 **Baseline:** CF-0.2 · 2026-09-20
 

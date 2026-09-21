@@ -40,6 +40,12 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="preparation-and-business-knowledge">Preparation and business knowledge</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#user-journeys">User journeys</a></li><li><a href="#preparation-stages">Preparation stages</a></li><li><a href="#first-adapter-slice">First adapter slice</a></li><li><a href="#precision-tiers-and-semantic-index-import">Precision tiers and semantic-index import</a></li><li><a href="#incremental-maintenance">Incremental maintenance</a></li><li><a href="#business-knowledge-model">Business knowledge model</a></li><li><a href="#acceptance">Acceptance</a></li></ul></details>
 <p><strong>Status:</strong> Proposed validation-slice design · CF-0.2</p>
+<p><strong>CF-0.3 refinement:</strong> <a href="../../technical-design/html/sdk-extension-contract.html">extension profiles</a>
+and <a href="../../technical-design/html/knowledge-lifecycle-and-retrieval.html">contribution/refresh rules</a>
+make the SDK/lifecycle boundaries executable design obligations. Start with one
+integrated cross-layer task; do not require a broad analyzer catalog before testing
+retrieval. Reviewed mappings require unchanged support and applicability to remain
+current; task-local human corrections do not silently publish shared knowledge.</p>
 <h2 id="user-journeys">User journeys</h2>
 <p>A pack maintainer declares a product scope, owners, source roots, allowed adapters,
 and publication reviewers. An extractor operator starts a scoped job. The system

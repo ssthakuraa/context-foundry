@@ -40,6 +40,11 @@ p, li, td, a { overflow-wrap: anywhere; }
     <article>
       <h1 id="data-contracts-and-storage">Data contracts and storage</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#identity-and-versioning">Identity and versioning</a></li><li><a href="#record-envelope">Record envelope</a></li><li><a href="#evidence-dimensions">Evidence dimensions</a></li><li><a href="#record-families">Record families</a></li><li><a href="#storage-separation">Storage separation</a></li><li><a href="#proposed-relational-layout">Proposed relational layout</a></li><li><a href="#release-manifest-and-activation">Release manifest and activation</a></li><li><a href="#schema-changes-and-portability">Schema changes and portability</a></li></ul></details>
 <p><strong>Status:</strong> Proposed technical specification · CF-0.2</p>
+<p><strong>CF-0.3 design amendment:</strong> the executable schema is still provisional <code>0.2.0</code>.
+<a href="sdk-extension-contract.html">SDK extension profiles</a> specify its next revision;
+<a href="knowledge-lifecycle-and-retrieval.html">lifecycle/retrieval</a> defines contribution
+and selection semantics. The implementation inventory below describes existing
+code, not completed extension support. A1 explicitly versions incompatible changes.</p>
 <p><strong>Implementation note (2026-09-20):</strong> <code>packages/contracts</code> now contains twenty-eight
 Draft 7-compatible TypeBox schemas (source capture, locator, record envelope,
 captured file, execution evidence, coverage, release manifest/set, relationship payload, task artifact,
@@ -108,7 +113,7 @@ included every file in the underlying source.</p>
 that relationship payload support is declared on its envelope, and that IDs are
 unique. It computes a bounded transitive evidence-ID set per record for acyclic
 dependencies. A record with no evidence anywhere in that chain is rejected.
-Missing/invalid references, duplicate IDs, cycles or excessive closure
+Missing/invalid references, duplicate IDs, evidence-dependency cycles or excessive closure
 return issues and <strong>no</strong> closure; records blocked by a cycle are diagnosed along with
 cycle members. This initial slice rejects cycles rather than publishing a partial
 strongly connected group. Call <code>checkReleaseIntegrity</code> to combine this check with
@@ -131,6 +136,9 @@ time. This is a <strong>shape only</strong>: it is not accepted by <code>checkSu
 verify the producer, actual report bytes, capture/revision bindings, test identities
 and publication policy before a run can support a released assertion or discharge a
 validation obligation. In particular, a caller-supplied <code>passed</code> value proves nothing.</p>
+<p>This support-cycle rule does not forbid cycles in the engineering relationship
+graph. Two methods can call each other when each relationship has independent
+source support; two assertions cannot be each other's only justification.</p>
 <h2 id="identity-and-versioning">Identity and versioning</h2>
 <p>An entity ID combines logical repository or document namespace with adapter-owned
 artifact identity. A record ID identifies an assertion about an entity; a content

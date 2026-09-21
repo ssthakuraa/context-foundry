@@ -1,11 +1,15 @@
 # Requirements-to-design traceability
 
-**Status:** CF-0.2 design alignment audit · 2026-09-20
+**Status:** CF-0.3 design alignment audit · 2026-09-20
 
 This maps intended behavior to implementation and observable acceptance. A row is
 not an implementation claim. Requirement authority remains the
 [product requirements](product-requirements.md); work is sequenced by the
 [validation packages](../execution/validation-work-packages.md).
+
+The immediate A1–A5 queue in the [architecture handoff](../execution/architecture-handoff.md)
+refines WP1/WP2/POV. Local simulated review tests precede authenticated WP3–WP5
+acceptance; they do not discharge CF-R13 or establish human authority.
 
 | Requirement | Design / technical owner | First package | Acceptance evidence |
 |---|---|---|---|
@@ -25,6 +29,7 @@ not an implementation claim. Requirement authority remains the
 | CF-R14 Robust terminology | Hybrid retrieval | WP4, WP6 | Exact/typo/paraphrase/ambiguous cases scored independently |
 | CF-R15 Reviewable artifacts | [Studio](../design/studio-experience.md), task contracts | WP3, WP5 | Same version in host and UI; keyboard/narrow layout; no mandatory graph |
 | CF-R16 Measured value | [Methodology](../evaluation/methodology.md), [benchmark](../evaluation/three-repository-benchmark.md) | WP0, WP6, WP7 | Same-information comparisons, held-outs, critical-impact and maintenance ledger |
+| CF-R17 Adopter-extensible SDK | [Extension contract](../technical-design/sdk-extension-contract.md) | A1–A3 / WP1–2 | Independent Python custom-kind producer; generic search/inspect without core edits; version/unsupported-semantic rejection |
 
 ## Alignment audit
 
@@ -37,11 +42,13 @@ not an implementation claim. Requirement authority remains the
 | Workflow, UI, identity, interfaces | Version-bound authenticated human decisions; agent credentials cannot approve; minimal review UI precedes broad workbenches |
 | Architecture/test workbenches | Minimal design and validation obligations in first slice; rich diagrams, migration and parity later; skipped tests are not proof |
 | Execution | Private three-repository fixture plus public-safe synthetic cases; WP0–7 before broader feature investment |
-| Research and decisions | Historical CF-0.1 reports retained as evidence; CF-0.2 verdict/ADR define current proposed scope |
+| Research and decisions | Historical reports retained as evidence; [CF-0.3 architecture decision](../architecture/architecture-review.md) and bounded handoff define current design scope |
 
 ## Known limits after alignment
 
-Schemas and fixtures are specified, not yet executable. Exact dependency versions
-are pinned in WP1. Benchmark answer keys require owner review; capture and paid runs
+Twenty-eight provisional schema exports and isolated parser/conformance fixtures
+exist; the new extension/lifecycle/retrieval contracts are not implemented or frozen.
+Some dependency versions are pinned; additional dependencies require checks.
+Benchmark answer keys require owner review; private evaluation and paid runs
 require authority. PostgreSQL performance, agent conformance, quality gains and market
 advantage remain unvalidated. These are tracked gates, not hidden missing design work.

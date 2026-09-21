@@ -2,6 +2,13 @@
 
 **Status:** Proposed validation-slice design · CF-0.2
 
+**CF-0.3 refinement:** [extension profiles](../technical-design/sdk-extension-contract.md)
+and [contribution/refresh rules](../technical-design/knowledge-lifecycle-and-retrieval.md)
+make the SDK/lifecycle boundaries executable design obligations. Start with one
+integrated cross-layer task; do not require a broad analyzer catalog before testing
+retrieval. Reviewed mappings require unchanged support and applicability to remain
+current; task-local human corrections do not silently publish shared knowledge.
+
 ## User journeys
 
 A pack maintainer declares a product scope, owners, source roots, allowed adapters,

@@ -2,6 +2,12 @@
 
 **Status:** Design input and implementation gate, not a claim of reproduced third-party performance · CF-0.2
 
+**CF-0.3 follow-up:** [architecture decisions](../architecture/architecture-review.md)
+record targeted protocol/lifecycle source inspection and the integrated design.
+[A1–A5](../execution/architecture-handoff.md) is the immediate queue: extension
+conformance and one complete cross-layer task before additional scanner breadth.
+Both repository profiles remain required for eventual multi-profile acceptance.
+
 ## Finding
 
 No reviewed system provides the whole ContextFoundry journey: company-specific
@@ -79,7 +85,7 @@ include comment/string decoys, quoted identifiers, nested type parentheses,
 malformed input and byte limits. It is not wired to source capture, locators,
 coverage records or release assembly, and proves nothing about runtime behavior.
 
-The next bounded spike uses Tree-sitter Java to extract top-level type and method
+The implemented bounded spike uses Tree-sitter Java to extract top-level type and method
 signatures from caller-supplied bytes. A separate Spring MVC rule recognizes only
 literal class/method paths backed by explicit Spring imports; same-named custom
 annotations and computed paths do not produce exact routes. These are syntax/rule

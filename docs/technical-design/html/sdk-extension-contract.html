@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SDK extension and interoperability contract · ContextFoundry</title>
+  <style>
+:root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+body { margin: 0; color: #172033; background: #f5f7fb; line-height: 1.65; }
+main { max-width: 1060px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+article { background: white; border: 1px solid #dfe5ef; border-radius: 14px; padding: 2.5rem 3rem; box-shadow: 0 8px 30px rgba(31, 45, 70, .06); }
+h1, h2, h3 { color: #13284a; line-height: 1.25; scroll-margin-top: 1rem; }
+h1 { font-size: 2.25rem; margin-top: 0; }
+h2 { margin-top: 2.2rem; border-bottom: 1px solid #e7ebf2; padding-bottom: .35rem; }
+a { color: #1559a6; }
+code { background: #eef2f7; border-radius: 4px; padding: .12rem .3rem; }
+pre { overflow-x: auto; padding: 1rem; border-radius: 8px; background: #172033; color: #f5f7fb; }
+pre code { background: transparent; padding: 0; }
+table { border-collapse: collapse; display: block; overflow-x: auto; width: 100%; }
+th, td { border: 1px solid #dfe5ef; padding: .6rem .75rem; text-align: left; vertical-align: top; }
+th { background: #eef3fa; }
+blockquote { border-left: 4px solid #6a8fc2; margin-left: 0; padding-left: 1rem; color: #4d5b70; }
+nav { color: #526278; font-size: .92rem; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; }
+.brand { font-weight: 750; color: #13284a; margin-right: auto; }
+.toc { background: #f5f7fb; border: 1px solid #dfe5ef; padding: .75rem 1rem; margin: 1rem 0 2rem; border-radius: 8px; }
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.toc li { break-inside: avoid; }
+.toc summary { cursor: pointer; font-weight: 600; }
+footer { font-size: .85rem; color: #526278; margin-top: 1rem; }
+a:focus-visible, summary:focus-visible { outline: 3px solid #b45b00; outline-offset: 3px; }
+p, li, td, a { overflow-wrap: anywhere; }
+@media print { body { background: white; } main { margin: 0; max-width: none; } article { box-shadow: none; border: 0; padding: 0; } nav, .toc, footer { display: none; } pre { white-space: pre-wrap; } }
+.meta { color: #66758a; font-size: .9rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { main { margin: 1rem auto; padding: 0 .75rem 2rem; } article { padding: 1.25rem; } h1 { font-size: 1.8rem; } .toc ul { columns: 1; } }
+</style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../sdk-extension-contract.md">Markdown source</a></nav>
+    <article>
+      <h1 id="sdk-extension-and-interoperability-contract">SDK extension and interoperability contract</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#extension-units-and-boundaries">Extension units and boundaries</a></li><li><a href="#installed-manifest">Installed manifest</a></li><li><a href="#common-projections-not-untyped-escape-hatches">Common projections, not untyped escape hatches</a></li><li><a href="#identity-and-resolution">Identity and resolution</a></li><li><a href="#process-exchange-and-local-safety">Process exchange and local safety</a></li><li><a href="#compatibility-and-migration">Compatibility and migration</a></li><li><a href="#extension-author-acceptance">Extension author acceptance</a></li></ul></details>
+<p><strong>Status:</strong> CF-0.3 implementation specification; not implemented or schema-frozen.
+Implements CF-R11, CF-R12, CF-R13 and CF-R17. Read with the
+<a href="../../architecture/html/architecture-review.html">architecture decision</a>.</p>
+<h2 id="extension-units-and-boundaries">Extension units and boundaries</h2>
+<table>
+<thead>
+<tr>
+<th>Unit</th>
+<th>Receives</th>
+<th>Emits / responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source connector</td>
+<td>Host-approved source selector and acquisition credentials</td>
+<td>Immutable capture, inventory, revision attestation where supported; never agent-provided arbitrary paths</td>
+</tr>
+<tr>
+<td>Analyzer</td>
+<td>Approved capture handles, configuration, parser/rule versions</td>
+<td>Source-anchored declarations, text/contract facets, reference requests, coverage and diagnostics</td>
+</tr>
+<tr>
+<td>Resolver</td>
+<td>Validated analyzer contributions and a pinned symbol/interface registry</td>
+<td>Supported relationships or explicit unresolved/ambiguous/conflict outcomes; lookup dependencies</td>
+</tr>
+<tr>
+<td>Knowledge importer</td>
+<td>Approved documents or attributed expert mappings</td>
+<td>Source/expert assertions with applicability and review status, never implicit runtime truth</td>
+</tr>
+<tr>
+<td>CI evidence importer</td>
+<td>Authenticated producer and revision-bound report bytes</td>
+<td>Observations only after report integrity and producer authority checks</td>
+</tr>
+</tbody>
+</table>
+<p>A parser is a library within an analyzer, not a compulsory additional deployment.
+Language syntax, framework conventions and project-wide binding have separate
+versions and conformance cases even if shipped in one technology pack. First-party
+and adopter-written analyzers use the same protocol. TypeScript convenience helpers
+are optional; a Python process must be a first-class conforming producer.</p>
+<h2 id="installed-manifest">Installed manifest</h2>
+<p>Freeze an <code>AdapterManifest</code> in task A1 with required fields: protocol major, adapter
+ID/version, package digest, role, accepted media/language identifiers, configuration
+schema digest, emitted kind profiles, consumed kind profiles for resolvers, parser
+and rule versions, requested input capabilities, resource-limit profile and license
+metadata. Language identifiers are bounded strings, not a closed Java/TypeScript
+enum. The host's approved job selects executable/runtime and actual grants; a
+manifest cannot authorize itself, enlarge capture scope, or request credentials
+from the user at query time.</p>
+<p>An installed <code>KindProfile</code> contains a namespaced kind identifier and semantic major,
+payload JSON Schema digest, standard projection schema version, allowed origins,
+identity scheme, reference field definitions and optional relation profile. The
+registry belongs to trusted installation configuration, not arbitrary pack uploads.
+No downloaded <code>$ref</code>, executable schema keyword, dynamic query SQL, UI JavaScript or
+unbounded regular expression is accepted from a knowledge pack. Validate schema size,
+depth and supported keywords; compilation occurs outside request handling.</p>
+<h2 id="common-projections-not-untyped-escape-hatches">Common projections, not untyped escape hatches</h2>
+<p>Every contributed assertion retains the core envelope: qualified entity identity,
+kind/profile identity, immutable record/content identity, source/evidence support,
+producer attribution, applicability and separate origin/review/freshness/coverage.
+Custom payloads must validate against their installed profile. Unknown arbitrary
+fields are not a substitute for an extension registry.</p>
+<table>
+<thead>
+<tr>
+<th>Projection</th>
+<th>Minimum interoperability</th>
+<th>What it does not authorize</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Descriptor</td>
+<td>Bounded display name, aliases, description and source locators, each attributable to support</td>
+<td>Generated descriptions/aliases cannot silently become source-declared facts</td>
+</tr>
+<tr>
+<td>Entity identity</td>
+<td>Source namespace, identity scheme/version, qualified key; optional language and artifact subtype</td>
+<td>No merge merely because names, paths or embeddings resemble each other</td>
+</tr>
+<tr>
+<td>Reference</td>
+<td>Target kind/scheme, namespace and selector, source anchor, required resolution context</td>
+<td>A selector is not a resolved relationship</td>
+</tr>
+<tr>
+<td>Relationship</td>
+<td>Typed subject/object, direction, assertion basis, support and resolution outcome</td>
+<td>Custom relations cannot claim core <code>calls</code>, <code>implements</code> or data access semantics without the corresponding conformance profile</td>
+</tr>
+</tbody>
+</table>
+<p>Generic search and inspect consume the descriptor/envelope, so a new language or
+custom workflow kind does not require a core switch statement or UI change. Typed
+trace/impact is enabled only for installed relation profiles. Custom relations can
+be displayed with their declared meaning without being used in the core impact
+policy. Adopters may register namespaced traversal profiles as trusted configuration;
+they cannot inject executable retrieval code through records.</p>
+<p>Start with the nine provisional kinds plus a minimal <code>source.artifact</code> kind for
+source-backed document sections/data objects and their subtype. Preserve dedicated
+business, interface and test semantics. Broaden <code>engineering.symbol.language</code> to
+bounded identifiers; make its subtype extensible through a profile. Do not pretend
+a table or business flow is a Java symbol to satisfy existing reference checks.
+Generalize endpoint validation through registered entity/reference profiles, while
+retaining stricter target requirements where the payload explicitly requires a method.</p>
+<h2 id="identity-and-resolution">Identity and resolution</h2>
+<p>Separate an entity key from an assertion ID and its content digest. Entity identity
+uses source/module namespace plus an explicit identity scheme; parser software
+version belongs in provenance, not automatically in every entity key. A syntax
+identity and a compiler/SCIP identity may coexist. Equivalence needs a validated
+mapping; changing schemes requires migration, never silent renaming/merging.</p>
+<p>Qualified display strings alone are not semantic keys. HTTP joins require declared
+service identity, method, normalized route and applicable version. Preserve literal
+case, explicit base paths and protocol rules. Missing service identity or duplicate
+providers produces unresolved/ambiguous results. Column/ORM joins include catalog,
+schema and dialect conventions; never universally lowercase quoted SQL names.</p>
+<p>Resolution outcomes are <code>resolved</code>, <code>unresolved</code>, <code>ambiguous</code>, <code>conflict</code> or
+<code>unsupported</code>, with a reason and bounded candidates. Only a supported <code>resolved</code>
+outcome can yield the corresponding exact typed relationship. A reviewed business
+association remains a reviewed association even when its endpoint resolves exactly.
+Relationships and their supporting assertions retain independent authority labels.</p>
+<h2 id="process-exchange-and-local-safety">Process exchange and local safety</h2>
+<p>The first runner uses bounded JSONL over stdin/stdout. Host input is one job header
+followed by declared capture units and a terminator; output starts with a matching
+protocol/job/adapter header, then typed record/reference/diagnostic/coverage messages,
+and exactly one completion message with counts and content digest. Binary input
+uses approved read-only handles rather than embedding arbitrary filesystem paths.
+Stderr is bounded diagnostics, not a second record channel. Reject extra output,
+missing completion, unknown message tags, noncanonical/duplicate keys, malformed
+UTF-8, mismatched counts, unsupported versions and output beyond limits.</p>
+<p>The runner assigns verified producer/job/capture attribution after validation; it
+does not trust producer-claimed identity, permission or completion. Stage all output
+until a successful exit, complete stream, byte bindings and reference checks; failed
+attempts cannot leave half a contribution active. Keep logs free of source bytes by
+default. Existing canonical JSON/JSONL rules and configured size limits apply.</p>
+<p>For the offline proof, run only reviewed first-party and synthetic demonstration
+adapters, with bounded process time/output and explicit capture input. <strong>A child
+process is not a security sandbox.</strong> It cannot substantiate denial of filesystem or
+network access. Loading untrusted third-party adapters is prohibited until a runner
+profile actually enforces read-only mounts, no credentials/egress, CPU/RSS/time limits
+and termination, and passes escape/denial tests. Enterprise preparation authorization
+is separately required before shared use.</p>
+<h2 id="compatibility-and-migration">Compatibility and migration</h2>
+<p>Protocol major, envelope schema, kind profile, adapter package and release generation
+are independently versioned. Negotiate actual installed profile digests, not merely
+strings that claim support. A consumer must reject a missing required kind/profile
+or unknown semantic major. The first slice also rejects unsupported optional kinds
+at activation rather than silently discarding their support or search content; a
+future opaque-archive mode needs a separate contract. Diagnostic lists never grant
+permission to emit unregistered records.</p>
+<p>The CF-0.2 implementation remains explicit legacy behavior. A1 introduces the next
+schema version with an inventory of changed exports and before/after fixtures;
+existing <code>0.2.0</code> records are never reinterpreted in place. Recompile the synthetic
+capture or use an explicit tested migration. Do not update package/schema versions
+merely because this document is called CF-0.3.</p>
+<h2 id="extension-author-acceptance">Extension author acceptance</h2>
+<p>The conformance kit must validate manifest/profile compatibility, independent
+Python serialization, declared kind enforcement, exact byte anchors, deterministic
+output, explicit partial/unsupported coverage, reference closure and bounded failure.
+Provide positive, decoy, malformed, ambiguous, Unicode-range and version-mismatch
+fixtures. A second producer emitting the same identity must produce a deliberate
+duplicate/conflict outcome, not last-writer-wins.</p>
+<p>Acceptance is an adopter-style adapter outside core packages that contributes a
+synthetic workflow artifact, appears in generic search/inspect, and declares its
+unsupported impact semantics without editing the core registry source or UI. Adding
+new code to a hard-coded built-in switch does not pass CF-R17. No plugin marketplace,
+visual adapter authoring or universal language coverage is needed for this proof.</p>
+
+    </article>
+    <footer>CF-0.2 design review · Generated from docs/technical-design/sdk-extension-contract.md · Proposed behavior unless explicitly stated.</footer>
+  </main>
+</body>
+</html>

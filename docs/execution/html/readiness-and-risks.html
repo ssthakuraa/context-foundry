@@ -39,18 +39,20 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../readiness-and-risks.md">Markdown source</a></nav>
     <article>
       <h1 id="implementation-readiness-and-risk-register">Implementation readiness and risk register</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#ready-means-bounded">Ready means bounded</a></li><li><a href="#readiness-matrix">Readiness matrix</a></li><li><a href="#risks-and-triggers">Risks and triggers</a></li><li><a href="#quota-conscious-execution-handoff">Quota-conscious execution handoff</a></li><li><a href="#decision-log-template">Decision log template</a></li></ul></details>
-<p><strong>Status:</strong> Design closeout for validation implementation · CF-0.2 · 2026-09-20</p>
+<p><strong>Status:</strong> CF-0.3 bounded implementation handoff · 2026-09-20</p>
 <h2 id="ready-means-bounded">Ready means bounded</h2>
-<p>The requirements, architecture, workflows, extraction scope, task contracts and
-ordered work packages are now a reconciled design baseline for the validation slice.
-This is not an implemented product, completed M0 acceptance, or a proven market claim.
-Owner review, benchmark truth and execution permission remain distinct checkpoints.</p>
+<p>The <a href="../../architecture/html/architecture-review.html">architecture review</a> found and resolved
+design gaps in extension interoperability, source lifecycle and evidence selection.
+The <a href="architecture-handoff.html">A1–A5 handoff</a> specifies the immediate implementation
+and negative tests. It is ready for bounded coding, not production or a market claim.
+Existing schemas/spikes are provisional; the new design is not yet implemented.</p>
 <p>Read <a href="../../research/html/design-closeout.html">research verdict</a>,
 <a href="../../requirements/html/traceability.html">traceability</a>,
 <a href="../../evaluation/html/three-repository-benchmark.html">benchmark dossier</a>, then
-<a href="validation-work-packages.html">work packages</a>. Start WP0 before coding. Approval of
-this documentation does not authorize paid inference, external publication, or edits
-to the three evaluation repositories.</p>
+<a href="validation-work-packages.html">work packages</a>. Start A1 on public synthetic inputs;
+WP0 remains required before private/paid evaluation. Public documentation checkpoints
+are already authorized, but this does not authorize publishing private evidence,
+new paid experiments or edits to the three evaluation repositories.</p>
 <h2 id="readiness-matrix">Readiness matrix</h2>
 <table>
 <thead>
@@ -63,18 +65,18 @@ to the three evaluation repositories.</p>
 <tbody>
 <tr>
 <td>Product intent and functional journey</td>
-<td>CF-R01–16; task depth and both human gates reconciled</td>
-<td>Owner accepts detailed behavior</td>
+<td>CF-R01–17; adopter extensibility made explicit; both review gates retained</td>
+<td>Owner reviews task/domain truth for comparative evaluation</td>
 </tr>
 <tr>
 <td>Architecture</td>
-<td>Responsibility boundaries and reversible storage/retrieval choices specified</td>
-<td>Scoped query spike and end-to-end value</td>
+<td>Extension profiles, snapshot compilation, typed selection and six design walkthroughs specified</td>
+<td>Integrated conformance, scoped query spike and end-to-end value</td>
 </tr>
 <tr>
 <td>Technical contracts</td>
-<td>Extraction precision, source locators, task state/decisions, errors and access specified</td>
-<td>Executable schemas/conformance fixtures in WP1</td>
+<td>28 provisional exports and isolated spikes exist; closed-kind/language gap identified</td>
+<td>A1 minimum contract revision; A2/A3 integration; no global freeze claimed</td>
 </tr>
 <tr>
 <td>Evaluation corpus</td>
@@ -83,8 +85,8 @@ to the three evaluation repositories.</p>
 </tr>
 <tr>
 <td>Implementation scope</td>
-<td>Dependency-ordered work packages with failure tests and receipts</td>
-<td>Explicit start approval and WP0 exit</td>
+<td>A1–A5 specifies outputs, dependencies, failure tests and stop criteria</td>
+<td>Public synthetic implementation may proceed; WP0 before private/paid runs</td>
 </tr>
 <tr>
 <td>Competitive confidence</td>
@@ -171,9 +173,9 @@ to the three evaluation repositories.</p>
 </tr>
 <tr>
 <td>R11</td>
-<td>Documentation drifts during parallel coding</td>
-<td>Shared contracts first; small work packages; contract-change reviews</td>
-<td>Worker changes interfaces or accepted semantics without review</td>
+<td>Documentation drifts during coding</td>
+<td>Minimum relevant contracts first; small work packages; contract-change reviews</td>
+<td>Implementation changes interfaces or accepted semantics without review</td>
 </tr>
 <tr>
 <td>R12</td>
@@ -181,11 +183,23 @@ to the three evaluation repositories.</p>
 <td>Separate captures/trajectories; no corpus in product repo; publication review</td>
 <td>Unapproved source, business rule, credential or identifying output in distributable artifacts</td>
 </tr>
+<tr>
+<td>R13</td>
+<td>Extension API exists but every new format needs core changes</td>
+<td>Independent Python custom kind, standard projection and generic search/inspect acceptance</td>
+<td>An adopter must patch core/UI or masquerade as a built-in kind</td>
+</tr>
+<tr>
+<td>R14</td>
+<td>Incremental updates preserve stale or newly ambiguous links</td>
+<td>Resolver watch keys and full-build oracle; stale-review invalidation</td>
+<td>Provider change leaves a formerly resolved relation falsely exact</td>
+</tr>
 </tbody>
 </table>
 <h2 id="quota-conscious-execution-handoff">Quota-conscious execution handoff</h2>
-<p>The design-closeout boundary is the appropriate point to lower reasoning effort or
-switch to the user's preferred implementation model. Routine implementation should
+<p>The completed CF-0.3 documentation checkpoint is the appropriate point to switch
+to the user's requested Sol Medium for A1–A5. Routine implementation should
 receive only its work package, linked contracts, relevant code and acceptance cases,
 not an instruction to redesign the entire product. A model choice is not a quality
 gate; check actual results.</p>
@@ -195,10 +209,10 @@ Escalate unresolved architectural or security choices; do not repeatedly regener
 the whole design. This is an execution recommendation, not an estimate of account
 quota multipliers or a promise of equivalent model performance.</p>
 <h2 id="decision-log-template">Decision log template</h2>
-<p>Documentation verification on 2026-09-20: generated-page parity and local link/anchor
-checks passed for 45 pages; desktop review-guide and narrow work-package views were
-visually spot-checked. All 16 requirement IDs have traceability rows. These checks
-validate documentation artifacts, not application behavior or the proposed architecture.</p>
+<p>Earlier documentation verification covered 45 pages; that historical count is not
+the current inventory. Use the root <code>WORKLIST.md</code> for the latest HTML/link check.
+All 17 requirement IDs have traceability rows. Documentation checks validate the
+artifacts, not application behavior or the proposed architecture.</p>
 <p>Record date, work package, question, evidence, options, decision owner, affected
 contracts/tests and keep/change/stop result. Store failed trials as well as successes.
 Do not convert a proposed target into an achieved result by editing its status alone.</p>

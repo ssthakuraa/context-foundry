@@ -39,14 +39,15 @@ p, li, td, a { overflow-wrap: anywhere; }
     <nav aria-label="Documentation"><span class="brand">ContextFoundry</span><a href="../../html/index.html">Documentation</a><a href="../../html/review-guide.html">Review guide</a><a href="../implementation-plan.md">Markdown source</a></nav>
     <article>
       <h1 id="detailed-implementation-plan">Detailed implementation plan</h1><details class="toc" open><summary>On this page</summary><ul><li><a href="#execution-rule">Execution rule</a></li><li><a href="#dependency-order">Dependency order</a></li><li><a href="#m0-review-research-ledger-and-experiment-specification">M0 — Review, research ledger, and experiment specification</a></li><li><a href="#m1-contracts-application-skeleton-and-access-boundaries">M1 — Contracts, application skeleton, and access boundaries</a></li><li><a href="#m2-complete-preparation-slice">M2 — Complete preparation slice</a></li><li><a href="#m3-retrieval-content-and-agent-usefulness-gate">M3 — Retrieval content and agent-usefulness gate</a></li><li><a href="#m4-business-knowledge-and-studio-review">M4 — Business knowledge and Studio review</a></li><li><a href="#m5a-architecture-workbench">M5A — Architecture workbench</a></li><li><a href="#m5b-test-impact-and-validation">M5B — Test impact and validation</a></li><li><a href="#m6-enterprise-beta-and-operational-readiness">M6 — Enterprise beta and operational readiness</a></li><li><a href="#work-item-discipline">Work-item discipline</a></li><li><a href="#deferred-work">Deferred work</a></li></ul></details>
-<p><strong>Status:</strong> Revised local utility gate before enterprise hardening · CF-0.2</p>
+<p><strong>Status:</strong> CF-0.3 local utility gate before enterprise hardening</p>
 <h2 id="execution-rule">Execution rule</h2>
 <p>Review this package before product implementation. Work proceeds by evidence-bearing
 milestones. A milestone completes only when its acceptance evidence exists; documents,
 schema counts, or test counts alone do not establish product usefulness. No deadline
 estimate is implied by the sequence. Record actual effort during the first slice.</p>
 <h2 id="dependency-order">Dependency order</h2>
-<p>The immediate coding queue is the narrower <a href="validation-work-packages.html">validation work packages</a>.
+<p>The immediate coding queue is <a href="architecture-handoff.html">A1–A5</a>, refining the narrower
+<a href="validation-work-packages.html">validation work packages</a>.
 Its POV work package now proves a local single-operator knowledge/retrieval/workflow
 path before enterprise identity and secured serving. M1 below remains the enterprise
 application milestone; only its contract portion precedes that POV. Do not build
@@ -84,7 +85,7 @@ their platforms. Confirm parser/protocol/library compatibility.</li>
 minimal-guidance control. Reserve independent must-find facts and unseen tasks.</li>
 <li>Design the PostgreSQL authorization/query-plan spike, including hidden distractors,
 expired source entitlements, support density, and concurrent preparation.</li>
-<li>Map CF-R01–16 to executable acceptance; freeze both review-gate semantics and host
+<li>Map CF-R01–17 to executable acceptance; freeze both review-gate semantics and host
 assurance level. Decide exact schema/runtime versions in WP1.</li>
 <li>Audit v1/v2 extractor entry points and tests against Java/Spring, SQL/PLSQL,
 OpenAPI, TypeScript/Hono, document and test needs; record reuse/disposition and

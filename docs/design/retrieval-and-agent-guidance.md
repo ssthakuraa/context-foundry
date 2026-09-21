@@ -2,6 +2,12 @@
 
 **Status:** Proposed, subject to controlled experiments · CF-0.2
 
+**CF-0.3 refinement:** the [lifecycle and selection specification](../technical-design/knowledge-lifecycle-and-retrieval.md)
+turns the concepts below into a deterministic first algorithm, explicit evidence
+packet and diagnostic chain. The [A3/A4 handoff](../execution/architecture-handoff.md)
+tests actual emitted packets and agent investigation separately; scripted mechanics
+cannot be reported as a productivity experiment.
+
 ## Problem and hypothesis
 
 V2 demonstrates that relevant facts can exist while selection loses a useful path,
