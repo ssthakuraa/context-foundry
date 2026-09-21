@@ -271,6 +271,21 @@ test('stale reviewed mapping is not traversed as current business-to-technical s
   assert.ok(!result.packet.facts.some(item => item.identity.includes('RepairService.approve')));
 });
 
+test('stale reviewed test relevance cannot nominate a test-impact path', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const stale = { ...built.candidate, records: built.candidate.records.map(item =>
+    item.kind === 'test.association' ? { ...item, review: { state: 'stale' as const } } : item) };
+  const result = retrieveCandidate(stale, {
+    question: 'fixture.repairs.RepairService.approve(String)',
+    intent: 'test_impact', mode: 'typed', max_seeds: 1 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(!result.packet.facts.some(item => item.kind === 'test.association'));
+  assert.ok(!result.packet.facts.some(item => item.identity.includes('rejectsSecondApproval')));
+});
+
 test('repository-to-table gap stays visible instead of inventing a service data edge', async () => {
   const built = await assembleCrossLayerCandidate(input());
   assert.equal(built.ok, true);
@@ -335,6 +350,58 @@ test('evaluation distinguishes a complete-path wire omission from an unsupported
   assert.equal(receipt.obligations[2]?.loss_stage, 'wire_budget');
   assert.ok(receipt.typed_full_wire_bytes! > receipt.typed_bytes!);
   if (process.env['CF_A3_RECEIPT'] === '1') process.stdout.write(`${JSON.stringify(receipt)}\n`);
+});
+
+test('same-information scenario matrix records quality and wire cost without oracle-fed ranking', async () => {
+  const built = await assembleCrossLayerCandidate(input());
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const candidate = built.candidate;
+  const find = (kind: string, match: (item: (typeof candidate.records)[number]) => boolean) =>
+    candidate.records.find(item => item.kind === kind && match(item))!.record_id;
+  const operation = find('interface.operation', item =>
+    item.payload['operation_key'] === 'POST /v1/repairs/{id}/approve');
+  const service = find('engineering.symbol', item =>
+    item.identity.key === 'fixture.repairs.RepairService.approve(String)');
+  const testAssociation = find('test.association', () => true);
+  const table = find('source.artifact', item => item.payload['name'] === 'REPAIR_REQUEST');
+  const scenarios = [
+    { id: 'api-use', question: 'POST /v1/repairs/{id}/approve',
+      intent: 'api_use' as const, required: [operation], forbidden: [service] },
+    { id: 'business-to-service', question: 'coordinator',
+      intent: 'enhancement' as const, required: [service], forbidden: [] },
+    { id: 'reverse-test-impact', question: 'fixture.repairs.RepairService.approve(String)',
+      intent: 'test_impact' as const, required: [testAssociation], forbidden: [] },
+    { id: 'unsupported-service-data', question: 'fixture.repairs.RepairService.approve(String)',
+      intent: 'enhancement' as const, required: [], forbidden: [table] },
+  ];
+  let lexicalRequired = 0;
+  let typedRequired = 0;
+  let requiredCount = 0;
+  for (const scenario of scenarios) {
+    const request = { question: scenario.question, intent: scenario.intent, max_seeds: 1,
+      max_hops: 4 };
+    const lexical = retrieveCandidate(candidate, { ...request, mode: 'lexical' });
+    const typed = retrieveCandidate(candidate, { ...request, mode: 'typed' });
+    assert.equal(lexical.ok, true, scenario.id);
+    assert.equal(typed.ok, true, scenario.id);
+    if (!lexical.ok || !typed.ok) continue;
+    const lexicalIds = new Set(lexical.packet.facts.map(item => item.record_id));
+    const typedIds = new Set(typed.packet.facts.map(item => item.record_id));
+    lexicalRequired += scenario.required.filter(id => lexicalIds.has(id)).length;
+    typedRequired += scenario.required.filter(id => typedIds.has(id)).length;
+    requiredCount += scenario.required.length;
+    for (const id of scenario.forbidden) assert.ok(!typedIds.has(id), scenario.id);
+    const receipt = compareRetrieval(candidate, scenario.id, request, scenario.required);
+    assert.equal(receipt.lexical_bytes, lexical.bytes);
+    assert.equal(receipt.typed_bytes, typed.bytes);
+    if (process.env['CF_A3_RECEIPT'] === '1') process.stdout.write(`${JSON.stringify({
+      scenario: scenario.id, receipt, lexical: lexical.packet, typed: typed.packet,
+    })}\n`);
+  }
+  assert.equal(requiredCount, 3);
+  assert.equal(typedRequired, 3);
+  assert.ok(lexicalRequired < typedRequired);
 });
 
 test('reverse test-impact path nominates reviewed test relevance without claiming execution', async () => {
@@ -515,6 +582,9 @@ test('selective implementation read does not promote a business expectation into
 
 test('conflicting source passages stay separate and neither becomes reviewed truth by rank', async () => {
   const original = input();
+  const originalBuilt = await assembleCrossLayerCandidate(original);
+  assert.equal(originalBuilt.ok, true);
+  if (!originalBuilt.ok) return;
   const business = new TextDecoder().decode(original.capture.supplied.find(
     item => item.path === 'business.md')!.bytes);
   const altered = replaceFile(original, 'business.md', new TextEncoder().encode(
@@ -522,6 +592,7 @@ test('conflicting source passages stay separate and neither becomes reviewed tru
   const built = await assembleCrossLayerCandidate(altered);
   assert.equal(built.ok, true);
   if (!built.ok) return;
+  assert.notEqual(built.candidate.digest, originalBuilt.candidate.digest);
   const rules = built.candidate.records.filter(item => item.kind === 'business.rule');
   assert.equal(rules.length, 2);
   assert.ok(rules.every(item => item.review.state === 'pending'));
@@ -530,6 +601,12 @@ test('conflicting source passages stay separate and neither becomes reviewed tru
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.ok(rules.every(rule => result.packet.facts.some(item => item.record_id === rule.record_id)));
+  const before = retrieveCandidate(originalBuilt.candidate, {
+    question: 'coordinator', intent: 'enhancement', mode: 'lexical', max_seeds: 16 });
+  assert.equal(before.ok, true);
+  if (!before.ok) return;
+  assert.equal(before.packet.facts.filter(item => item.kind === 'business.rule').length, 1);
+  assert.equal(result.packet.facts.filter(item => item.kind === 'business.rule').length, 2);
   assert.equal(built.candidate.records.filter(item => item.kind === 'business.mapping').length, 1);
 });
 

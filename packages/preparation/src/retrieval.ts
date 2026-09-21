@@ -158,7 +158,9 @@ function retrieveCandidateInternal(candidate: CrossLayerCandidate,
     for (const edge of candidate.records) {
       if (!['engineering.relationship', 'business.mapping', 'test.association'].includes(edge.kind) ||
         edge.references.length !== 2 || edge.references.some(ref => ref.resolution !== 'resolved') ||
-        (edge.kind === 'business.mapping' && edge.review.state !== 'approved')) continue;
+        edge.review.state === 'stale' ||
+        (['business.mapping', 'test.association'].includes(edge.kind) &&
+          edge.review.state !== 'approved')) continue;
       const [first, second] = edge.references.map(ref => byIdentity.get(
         `${ref.target_kind}\u0000${canonicalJson(ref.target)}`));
       if (!first || !second) continue;

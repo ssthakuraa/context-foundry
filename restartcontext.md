@@ -77,6 +77,12 @@ service path at that cap, explicitly marked `PATH_TRUNCATED`. The offline receip
 separates that wire-budget loss from the unsupported service-to-table path via a
 same-seed/hop 32 KiB counterfactual. Exact trace is now record-ID anchored.
 Continue broader A3 scenario and quality gates; do not treat this fix as A3 acceptance.
+A four-scenario same-candidate matrix now compares API use, business-to-service,
+reverse test impact and unsupported service-to-data with actual packet bytes and
+post-retrieval obligations; see A3 receipt. It does not cover the full negative and
+perturbation matrix or establish agent benefit.
+Stale reviewed test relevance is now excluded as well as stale business mapping;
+changing source bytes under the same question leaves competing passages separate.
 A4 tests the reviewed investigation loop and prepares authorized agent comparisons;
 A5 establishes refresh correctness. Preserve explicit unresolved links instead of
 using expected fixture answers as runtime data. No broad scanner expansion, rich UI,

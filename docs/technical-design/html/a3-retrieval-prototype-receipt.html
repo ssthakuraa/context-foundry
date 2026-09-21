@@ -58,8 +58,57 @@ source-resolved controller-to-service call. It examines three edges and admits
 six connector facts. Both warn of partial coverage. The test can emit each full
 actual packet by running the preparation tests with <code>CF_A3_RECEIPT=1</code>. These
 numbers describe this fixture and serialization only; typed retrieval costs
-more bytes here and no agent outcome has been measured.
-Both packets now carry complete capture-bound locators, including revision,
+more bytes here and no agent outcome has been measured.</p>
+<p>A four-scenario same-candidate matrix now runs both arms at one seed, four hops,
+the same source facts and default wire caps. Expected IDs are applied <strong>after</strong>
+retrieval, never as ranking input. Optional <code>CF_A3_RECEIPT=1</code> test output includes
+the full actual lexical/typed packets and obligation-stage receipt for each case.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th style="text-align:right">Lexical bytes</th>
+<th style="text-align:right">Typed bytes</th>
+<th>Required fact in lexical / typed</th>
+<th>Boundary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Declared API use</td>
+<td style="text-align:right">1,058</td>
+<td style="text-align:right">1,056</td>
+<td>1 / 1</td>
+<td>No service implementation in typed packet</td>
+</tr>
+<tr>
+<td>Business rule to service</td>
+<td style="text-align:right">987</td>
+<td style="text-align:right">7,904</td>
+<td>0 / 1</td>
+<td>Reviewed map plus source-resolved calls</td>
+</tr>
+<tr>
+<td>Reverse test impact</td>
+<td style="text-align:right">1,048</td>
+<td style="text-align:right">6,497</td>
+<td>0 / 1</td>
+<td>Reviewed relevance, not test execution</td>
+</tr>
+<tr>
+<td>Unsupported service-to-data</td>
+<td style="text-align:right">1,048</td>
+<td style="text-align:right">2,582</td>
+<td>n/a</td>
+<td>Table remains absent; no invented edge</td>
+</tr>
+</tbody>
+</table>
+<p>This is a <strong>3/3 versus 1/3 source-observed obligation</strong> result for these selected
+queries, not a general retrieval metric or agent benefit. The typed arm's connector
+cost is substantial; the unsupported data path remains a failure of cross-layer
+coverage. Negative and perturbation cases still need matrix coverage.</p>
+<p>Both packets now carry complete capture-bound locators, including revision,
 file digest and line/section range; shortening these to path-only pointers would
 make a coding agent repeat the discovery work.</p>
 <p>Seed ranking now reserves exact identity/name/operation-key matches, then fuses
@@ -103,7 +152,11 @@ partial edge. Exact record inspection returns a bounded file-range pointer and
 support without reading implementation bytes. A stale reviewed mapping is not
 used as a current traversal edge. Tests are deterministic over the same candidate
 digest except the deliberately injected stale-state scenario, which is a policy
-unit test rather than a new release build.</p>
+unit test rather than a new release build.
+The same rule excludes stale reviewed test relevance; a stale association cannot
+nominate a test-impact path. A source-byte perturbation with the same <code>coordinator</code>
+question yields a different candidate digest and two separately pending business
+passages, not an automatically adjudicated answer.</p>
 <p>Exact trace accepts a selected record ID and original task separately. It is
 anchored to that <strong>record ID</strong>, so a competing descriptor text match cannot
 displace the selected source. It starts under a focused 16 KiB default cap while

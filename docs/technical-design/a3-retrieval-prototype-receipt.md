@@ -22,6 +22,24 @@ six connector facts. Both warn of partial coverage. The test can emit each full
 actual packet by running the preparation tests with `CF_A3_RECEIPT=1`. These
 numbers describe this fixture and serialization only; typed retrieval costs
 more bytes here and no agent outcome has been measured.
+
+A four-scenario same-candidate matrix now runs both arms at one seed, four hops,
+the same source facts and default wire caps. Expected IDs are applied **after**
+retrieval, never as ranking input. Optional `CF_A3_RECEIPT=1` test output includes
+the full actual lexical/typed packets and obligation-stage receipt for each case.
+
+| Scenario | Lexical bytes | Typed bytes | Required fact in lexical / typed | Boundary |
+| --- | ---: | ---: | --- | --- |
+| Declared API use | 1,058 | 1,056 | 1 / 1 | No service implementation in typed packet |
+| Business rule to service | 987 | 7,904 | 0 / 1 | Reviewed map plus source-resolved calls |
+| Reverse test impact | 1,048 | 6,497 | 0 / 1 | Reviewed relevance, not test execution |
+| Unsupported service-to-data | 1,048 | 2,582 | n/a | Table remains absent; no invented edge |
+
+This is a **3/3 versus 1/3 source-observed obligation** result for these selected
+queries, not a general retrieval metric or agent benefit. The typed arm's connector
+cost is substantial; the unsupported data path remains a failure of cross-layer
+coverage. Negative and perturbation cases still need matrix coverage.
+
 Both packets now carry complete capture-bound locators, including revision,
 file digest and line/section range; shortening these to path-only pointers would
 make a coding agent repeat the discovery work.
@@ -71,6 +89,10 @@ support without reading implementation bytes. A stale reviewed mapping is not
 used as a current traversal edge. Tests are deterministic over the same candidate
 digest except the deliberately injected stale-state scenario, which is a policy
 unit test rather than a new release build.
+The same rule excludes stale reviewed test relevance; a stale association cannot
+nominate a test-impact path. A source-byte perturbation with the same `coordinator`
+question yields a different candidate digest and two separately pending business
+passages, not an automatically adjudicated answer.
 
 Exact trace accepts a selected record ID and original task separately. It is
 anchored to that **record ID**, so a competing descriptor text match cannot
