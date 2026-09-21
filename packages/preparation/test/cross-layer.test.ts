@@ -86,6 +86,8 @@ test('actual synthetic bytes yield a bounded business/API/service/data/test path
     item.payload['artifact_type'] === 'sql_table' && item.payload['name'] === 'REPAIR_REQUEST'));
   assert.ok(records.some(item => item.kind === 'business.rule' &&
     String(item.payload['statement']).includes('coordinator')));
+  assert.equal(records.find(item => item.kind === 'business.rule')?.payload['edition'],
+    'synthetic-1');
   assert.deepEqual(records.filter(item => item.kind === 'engineering.relationship')
     .map(item => item.payload['relation_type']).sort(), [
     'api.implemented_by', 'engineering.calls', 'engineering.calls', 'engineering.persisted_in',
@@ -456,4 +458,24 @@ test('selective implementation read does not promote a business expectation into
   assert.ok(!read.text.includes('coordinator'));
   assert.ok(!built.candidate.records.some(item => item.kind === 'test.association' &&
     item.payload['association_basis'] === 'observed_pass'));
+});
+
+test('conflicting source passages stay separate and neither becomes reviewed truth by rank', async () => {
+  const original = input();
+  const business = new TextDecoder().decode(original.capture.supplied.find(
+    item => item.path === 'business.md')!.bytes);
+  const altered = replaceFile(original, 'business.md', new TextEncoder().encode(
+    `${business}\n## Alternative approval guidance\n\nAn authorized coordinator must never approve a pending request.\n`));
+  const built = await assembleCrossLayerCandidate(altered);
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  const rules = built.candidate.records.filter(item => item.kind === 'business.rule');
+  assert.equal(rules.length, 2);
+  assert.ok(rules.every(item => item.review.state === 'pending'));
+  const result = retrieveCandidate(built.candidate, {
+    question: 'coordinator', intent: 'enhancement', mode: 'lexical', max_seeds: 16 });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.ok(rules.every(rule => result.packet.facts.some(item => item.record_id === rule.record_id)));
+  assert.equal(built.candidate.records.filter(item => item.kind === 'business.mapping').length, 1);
 });

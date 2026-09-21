@@ -233,7 +233,7 @@ export async function assembleCrossLayerCandidate(input: CrossLayerInput): Promi
       try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes); }
       catch { diagnostics.push(`MARKDOWN_INVALID:${file.path}`); cover(file, 'markdown', [], [], true); continue; }
       const lines = text.split(/\r?\n/);
-      const edition = /^Edition:\s*(.+)$/m.exec(text)?.[1]?.trim() ?? 'unknown';
+      const edition = /^Edition:\s*([A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*)/m.exec(text)?.[1] ?? 'unknown';
       for (let i = 0; i < lines.length; i++) {
         const heading = /^##\s+(.+)$/.exec(lines[i]!);
         if (!heading) continue;

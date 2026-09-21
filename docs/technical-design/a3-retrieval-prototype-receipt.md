@@ -66,6 +66,12 @@ preserves those as separate observations, not an automated defect verdict or
 proof of absence elsewhere in the application. The rule still has pending
 review and no test execution evidence has been imported.
 
+An injected contradictory approval passage remains a second pending rule in a
+separate source range. With sufficient lexical seed budget both are visible;
+only the explicitly reviewed original rule has a technical mapping. The test
+does **not** claim automatic contradiction detection or decide which passage
+is applicable. That requires functional review and scope/edition evidence.
+
 The negative service-to-data query does **not** return `REPAIR_REQUEST`: A2 knows
 the entity/table mapping, but lacks a supported repository-to-entity edge from
 the service's call path. The missing edge is an investigation target, not a
